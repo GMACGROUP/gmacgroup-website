@@ -85,7 +85,7 @@ OPPORTUNITIES = [
         "deadline": "2026-11-15T00:00:00Z",
     },
     {
-        "id": "opportunity-analytics-internship",
+        "id": "opportunity-research-internship",
         "title": "Graduate Analytics & Econometrics Internship",
         "type": "internship",
         "organization": "GMAC Applied Labs",
