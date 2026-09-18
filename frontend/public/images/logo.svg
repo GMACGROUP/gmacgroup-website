@@ -1,0 +1,35 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 380 120" width="380" height="120" fill="none">
+  <defs>
+    <linearGradient id="globeGradSvg" x1="10%" y1="10%" x2="90%" y2="90%">
+      <stop offset="0%" stopColor="#00C4FF" />
+      <stop offset="50%" stopColor="#0284C7" />
+      <stop offset="100%" stopColor="#0E4D82" />
+    </linearGradient>
+    <radialGradient id="globeGlowSvg" cx="40%" cy="40%" r="60%">
+      <stop offset="0%" stopColor="#E0F2FE" stopOpacity="0.4" />
+      <stop offset="100%" stopColor="#0E4D82" stopOpacity="0" />
+    </radialGradient>
+  </defs>
+
+  <!-- Globe Graphic -->
+  <g transform="translate(10, 10)">
+    <path d="M 18,72 A 42,42 0 1,1 86,52" stroke="#0284C7" stroke-width="3.5" stroke-linecap="round" stroke-dasharray="2 1" />
+    <circle cx="48" cy="52" r="38" fill="url(#globeGradSvg)" />
+    <circle cx="48" cy="52" r="38" fill="url(#globeGlowSvg)" />
+    <!-- Continents -->
+    <path d="M 32,24 C 36,22 42,26 48,27 C 54,28 62,32 64,36 C 60,40 55,42 50,45 C 46,47 42,44 38,40 C 34,36 30,30 32,24 Z" fill="#FFFFFF" opacity="0.95" />
+    <path d="M 43,45 C 45,48 46,53 43,56 C 41,54 41,50 43,45 Z" fill="#FFFFFF" opacity="0.95" />
+    <path d="M 43,56 C 48,58 54,64 52,70 C 50,76 45,82 41,84 C 39,81 37,74 38,68 C 39,62 41,58 43,56 Z" fill="#FFFFFF" opacity="0.95" />
+    <!-- Grid -->
+    <circle cx="48" cy="52" r="38" stroke="#FFFFFF" stroke-width="1" opacity="0.25" />
+    <ellipse cx="48" cy="52" rx="38" ry="16" stroke="#FFFFFF" stroke-width="1" opacity="0.25" />
+    <ellipse cx="48" cy="52" rx="18" ry="38" stroke="#FFFFFF" stroke-width="1" opacity="0.25" />
+  </g>
+
+  <!-- Text: GMAC GROUP -->
+  <text x="120" y="68" font-family="'Playfair Display', Georgia, 'Times New Roman', serif" font-weight="900" font-size="44" fill="#E51924" letter-spacing="-0.5">GMAC</text>
+  <text x="255" y="68" font-family="'Playfair Display', Georgia, 'Times New Roman', serif" font-weight="700" font-size="44" fill="#0E4D82" letter-spacing="-0.5">GROUP</text>
+
+  <!-- Tagline -->
+  <text x="124" y="96" font-family="'Playfair Display', Georgia, 'Times New Roman', serif" font-style="italic" font-weight="400" font-size="16" fill="#0E4D82" letter-spacing="0.2">Connecting talent to opportunity</text>
+</svg>
