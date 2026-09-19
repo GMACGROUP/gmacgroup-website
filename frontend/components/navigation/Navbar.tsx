@@ -159,14 +159,14 @@ export function Navbar() {
 
         {/* Mobile Navigation Drawer */}
         {mobileMenuOpen && (
-          <div className="lg:hidden mt-3 pt-3 border-t border-slate-100 space-y-1 pb-3">
+          <div className="lg:hidden mt-3 max-h-[calc(100dvh-5rem)] overflow-y-auto pt-3 border-t border-slate-100 space-y-1 pb-3">
             <ul className="space-y-0.5">
               {navLinks.map((link) => (
                 <li key={link.href}>
                   <Link
                     href={link.href}
                     onClick={() => setMobileMenuOpen(false)}
-                    className={`flex items-center gap-2 px-3 py-2 rounded-xl text-sm font-medium transition-colors ${
+                    className={`flex min-h-11 items-center gap-2 px-3 py-2 rounded-xl text-sm font-medium transition-colors ${
                       isActive(link.href)
                         ? "bg-brand-ice text-brand-navy font-bold"
                         : "text-slate-700 hover:bg-slate-50 hover:text-brand-navy"

@@ -197,7 +197,7 @@ function OpportunitiesPageContent() {
                       </p>
                     )}
 
-                    <div className="mt-6 pt-5 border-t border-slate-100 flex items-center justify-between gap-3">
+                    <div className="mt-6 pt-5 border-t border-slate-100 flex flex-wrap items-center justify-between gap-3">
                       <button
                         onClick={() => setSelectedOpportunity(opp)}
                         disabled={isClosed}
