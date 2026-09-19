@@ -67,7 +67,7 @@ export function PaperRequestModal({
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-fadeIn">
       <div
-        className="relative w-full max-w-lg bg-white rounded-3xl shadow-2xl border border-slate-200 overflow-hidden"
+        className="relative w-full max-w-lg max-h-[calc(100dvh-2rem)] overflow-y-auto bg-white rounded-3xl shadow-2xl border border-slate-200"
         role="dialog"
         aria-modal="true"
       >

@@ -57,7 +57,7 @@ export function EcosystemSection() {
         </div>
 
         {/* Dynamic Asymmetric Grid: 7 cols Opportunities / 5 cols Research Spotlight */}
-        <div className="grid lg:grid-cols-12 gap-8 items-stretch">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-8 items-stretch">
           
           {/* Left Column: Live Openings List */}
           <div className="lg:col-span-7 flex flex-col gap-4">

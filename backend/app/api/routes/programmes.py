@@ -3,6 +3,7 @@ Programme routes: student programmes, professional development,
 training programmes, institutional programmes, and enrolment.
 """
 
+from datetime import datetime, timezone
 from typing import List, Optional
 from fastapi import APIRouter, Depends, HTTPException, Query, status
 from app.api.dependencies import get_current_user, get_optional_user
@@ -48,6 +49,8 @@ async def enrol_in_programme(
     programme = next((item for item in PROGRAMMES if item["id"] == programme_id), None)
     if programme is None:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Programme not found")
+    if programme.get("end_date") and datetime.fromisoformat(programme["end_date"].replace("Z", "+00:00")) < datetime.now(timezone.utc):
+        raise HTTPException(status_code=status.HTTP_410_GONE, detail="This programme is closed")
     offer = next((item for item in programme.get("offers", []) if item["type"] == payload.offer_type.value), None)
     if offer is None or offer["amount"] > 0:
         raise HTTPException(status_code=status.HTTP_402_PAYMENT_REQUIRED, detail="Complete payment before selecting this offer")

@@ -100,7 +100,7 @@ export default function DashboardPage() {
 
   const handleLogout = () => {
     logout();
-    router.push("/login");
+    router.push("/");
   };
 
   const userDisplayName = user.full_name || user.email.split("@")[0];
@@ -114,7 +114,7 @@ export default function DashboardPage() {
           <div className="absolute top-0 right-0 w-96 h-96 bg-brand-cyan/10 rounded-full blur-3xl pointer-events-none" />
           <div className="absolute bottom-0 right-48 w-80 h-80 bg-brand-red/10 rounded-full blur-3xl pointer-events-none" />
 
-          <div className="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-6">
+            <div className="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-6">
             <div className="space-y-2">
               <div className="flex items-center gap-2">
                 <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-white/10 text-brand-cyan text-xs font-bold uppercase tracking-wider border border-white/15">
@@ -134,7 +134,7 @@ export default function DashboardPage() {
               </p>
             </div>
 
-            <div className="flex flex-wrap items-center gap-3 shrink-0">
+              <div className="flex flex-wrap items-center gap-2 sm:gap-3 shrink-0">
               <button
                 onClick={() => setIsEditingProfile(!isEditingProfile)}
                 className="px-4 py-2.5 rounded-xl font-bold text-xs bg-white/10 hover:bg-white/20 border border-white/20 text-white transition-all"
@@ -291,8 +291,8 @@ export default function DashboardPage() {
         <div className="grid md:grid-cols-2 gap-8">
 
           {/* Section 1: Enrolled Programmes */}
-          <div className="p-7 sm:p-8 rounded-3xl bg-white border border-slate-200 shadow-card space-y-5 flex flex-col">
-            <div className="flex items-center justify-between">
+          <div className="p-5 sm:p-8 rounded-3xl bg-white border border-slate-200 shadow-card space-y-5 flex flex-col">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
               <div>
                 <h2 className="text-xl font-bold text-slate-900 font-serif">My Cohorts & Enrolments</h2>
                 <p className="text-xs text-slate-500 mt-0.5">Development pathways and workshops registered to your profile</p>
@@ -339,8 +339,8 @@ export default function DashboardPage() {
           </div>
 
           {/* Section 2: Opportunity Applications */}
-          <div className="p-7 sm:p-8 rounded-3xl bg-white border border-slate-200 shadow-card space-y-5 flex flex-col">
-            <div className="flex items-center justify-between">
+          <div className="p-5 sm:p-8 rounded-3xl bg-white border border-slate-200 shadow-card space-y-5 flex flex-col">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
               <div>
                 <h2 className="text-xl font-bold text-slate-900 font-serif">Application History</h2>
                 <p className="text-xs text-slate-500 mt-0.5">Internship and fellowship submissions</p>

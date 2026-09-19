@@ -9,12 +9,13 @@ import { CheckCircleIcon } from "@/components/common/Icons";
 
 export function Footer() {
   const pathname = usePathname();
+  const safePathname = pathname ?? "/";
   const [email, setEmail] = useState("");
   const [submitting, setSubmitting] = useState(false);
   const [subscribed, setSubscribed] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  if (pathname.startsWith("/dashboard")) return null;
+  if (safePathname.startsWith("/dashboard")) return null;
 
   const handleSubscribe = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();

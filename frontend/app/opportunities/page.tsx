@@ -1,7 +1,7 @@
 "use client";
 
 import { Suspense, useEffect, useState } from "react";
-import { useSearchParams } from "next/navigation";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import Image from "next/image";
 import { apiClient } from "@/lib/api/client";
@@ -39,28 +39,42 @@ const typeImages: Record<string, string> = {
 };
 
 function OpportunitiesPageContent() {
+  const router = useRouter();
+  const pathname = usePathname();
   const searchParams = useSearchParams();
-  const requestedOpportunityId = searchParams.get("opportunity");
-  const [opportunities, setOpportunities] = useState<Opportunity[]>([]);
+  const safePathname = pathname ?? "/";
+  const requestedOpportunityId = searchParams?.get("opportunity") ?? null;
+  const [allOpportunities, setAllOpportunities] = useState<Opportunity[]>([]);
   const [loading, setLoading] = useState(true);
   const [typeFilter, setTypeFilter] = useState<string>("all");
   const [selectedOpportunity, setSelectedOpportunity] = useState<Opportunity | null>(null);
 
   useEffect(() => {
     setLoading(true);
-    const endpoint = typeFilter === "all" ? "/opportunities/" : `/opportunities/?type=${typeFilter}`;
+    const endpoint = "/opportunities/";
     apiClient
       .get<Opportunity[]>(endpoint)
-      .then((data) => setOpportunities(data))
-      .catch(() => setOpportunities([]))
+      .then((data) => setAllOpportunities(data))
+      .catch(() => setAllOpportunities([]))
       .finally(() => setLoading(false));
-  }, [typeFilter]);
+  }, []);
+
+  const opportunities = typeFilter === "all"
+    ? allOpportunities
+    : allOpportunities.filter((opportunity) => opportunity.type === typeFilter);
 
   useEffect(() => {
     if (!requestedOpportunityId || loading) return;
     const requestedOpportunity = opportunities.find((item) => item.id === requestedOpportunityId);
-    if (requestedOpportunity) setSelectedOpportunity(requestedOpportunity);
-  }, [loading, opportunities, requestedOpportunityId]);
+    if (!requestedOpportunity) return;
+    setSelectedOpportunity(requestedOpportunity);
+    router.replace(safePathname, { scroll: false });
+  }, [loading, opportunities, safePathname, requestedOpportunityId, router]);
+
+  const handleTypeFilter = (filter: string) => {
+    setSelectedOpportunity(null);
+    setTypeFilter(filter);
+  };
 
   return (
     <div className="bg-slate-50 min-h-screen">
@@ -80,7 +94,7 @@ function OpportunitiesPageContent() {
             return (
               <button
                 key={tab.key}
-                onClick={() => setTypeFilter(tab.key)}
+                onClick={() => handleTypeFilter(tab.key)}
                 className={`flex items-center gap-2 px-5 py-2.5 rounded-full text-sm font-semibold border transition-all duration-200 ${
                   typeFilter === tab.key
                     ? "bg-brand-navy text-white border-brand-navy shadow-elevate"
@@ -125,11 +139,12 @@ function OpportunitiesPageContent() {
               const accent = typeAccents[opp.type] || typeAccents.other;
               const badgeCls = typeBadges[opp.type] || typeBadges.other;
               const imageSrc = typeImages[opp.type] || typeImages.other;
+              const isClosed = Boolean(opp.deadline && new Date(opp.deadline).getTime() < Date.now());
 
               return (
                 <article
                   key={opp.id}
-                  className="group relative flex flex-col bg-white rounded-2xl border border-slate-200 shadow-card hover:shadow-card-hover hover:border-brand-navy/25 hover:-translate-y-1 transition-all duration-300 overflow-hidden"
+                  className={`group relative flex flex-col rounded-2xl border shadow-card transition-all duration-300 overflow-hidden ${isClosed ? "bg-slate-100 border-slate-300 opacity-75" : "bg-white border-slate-200 hover:shadow-card-hover hover:border-brand-navy/25 hover:-translate-y-1"}`}
                 >
                   {/* Photo Banner */}
                   <div className="relative h-36 w-full bg-slate-100 overflow-hidden">
@@ -141,8 +156,8 @@ function OpportunitiesPageContent() {
                     />
                     <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/25 to-transparent" />
                     <div className="absolute top-3 left-3">
-                      <span className={`badge ${badgeCls} capitalize shadow-sm`}>
-                        {opp.type}
+                      <span className={`badge ${isClosed ? "bg-slate-700 text-white border-slate-500" : badgeCls} capitalize shadow-sm`}>
+                        {isClosed ? "Closed" : opp.type}
                       </span>
                     </div>
                     {opp.deadline && (
@@ -183,12 +198,13 @@ function OpportunitiesPageContent() {
                       </p>
                     )}
 
-                    <div className="mt-6 pt-5 border-t border-slate-100 flex items-center justify-between gap-3">
+                    <div className="mt-6 pt-5 border-t border-slate-100 flex flex-wrap items-center justify-between gap-3">
                       <button
                         onClick={() => setSelectedOpportunity(opp)}
-                        className="btn-primary text-xs px-5 py-2.5 shadow-sm hover:shadow-md"
+                        disabled={isClosed}
+                        className="btn-primary text-xs px-5 py-2.5 shadow-sm hover:shadow-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-cyan disabled:cursor-not-allowed disabled:bg-slate-300 disabled:text-slate-500 disabled:shadow-none"
                       >
-                        Apply for Opening →
+                        {isClosed ? "Closed" : "Apply for Opening →"}
                       </button>
                       <Link
                         href={`/contact?subject=Opportunity Inquiry: ${encodeURIComponent(opp.title)}`}

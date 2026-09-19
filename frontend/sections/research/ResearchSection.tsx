@@ -43,7 +43,7 @@ export function ResearchSection() {
           </p>
         </div>
 
-        <div className="mt-14 grid md:grid-cols-2 gap-8 max-w-5xl mx-auto">
+        <div className="mt-14 grid grid-cols-1 md:grid-cols-2 gap-6 sm:gap-8 max-w-5xl mx-auto">
           {highlights.map((item, idx) => {
             const Icon = item.icon;
             return (
@@ -111,7 +111,7 @@ export function ResearchSection() {
         <div className="mt-12 text-center">
           <Link
             href="/research"
-            className="inline-flex items-center gap-2 px-8 py-3.5 rounded-xl font-bold text-sm text-brand-navy hover:text-white bg-white hover:bg-brand-navy border border-slate-300 hover:border-brand-navy shadow-card transition-all"
+            className="inline-flex w-full sm:w-auto items-center justify-center gap-2 px-5 sm:px-8 py-3.5 rounded-xl font-bold text-sm text-brand-navy hover:text-white bg-white hover:bg-brand-navy border border-slate-300 hover:border-brand-navy shadow-card transition-all"
           >
             Explore Research Projects, Publications & Experts →
           </Link>

@@ -10,6 +10,7 @@ export function Navbar() {
   const { user, loading, logout } = useAuth();
   const router = useRouter();
   const pathname = usePathname();
+  const safePathname = pathname ?? "/";
   const [isScrolled, setIsScrolled] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
@@ -22,7 +23,7 @@ export function Navbar() {
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
-  if (pathname.startsWith("/dashboard")) return null;
+  if (safePathname.startsWith("/dashboard")) return null;
 
   const navLinks = [
     { href: "/", label: "Home" },
@@ -34,11 +35,11 @@ export function Navbar() {
     { href: "/contact", label: "Contact" },
   ];
 
-  const isActive = (href: string) => pathname === href;
+  const isActive = (href: string) => safePathname === href;
 
   const handleLogout = () => {
     logout();
-    router.push("/login");
+    router.push("/");
   };
 
   const displayName =
@@ -50,18 +51,18 @@ export function Navbar() {
 
   return (
     <header
-      className={`fixed top-0 left-0 right-0 z-50 w-full bg-white transition-all duration-300 ease-in-out ${
+      className={`fixed top-0 left-0 right-0 z-50 w-full bg-white/95 backdrop-blur-md transition-all duration-300 ease-in-out ${
         isScrolled
           ? "border-b border-slate-200 shadow-[0_1px_12px_rgba(0,0,0,0.08)] py-2"
-          : "border-b border-slate-100 shadow-none py-4"
+          : "border-b border-slate-100 shadow-none py-3 sm:py-4"
       }`}
     >
-      <div className="w-full max-w-screen-xl mx-auto px-4 sm:px-6 lg:px-10">
-        <nav className="flex items-center justify-between gap-4">
+      <div className="w-full max-w-screen-xl mx-auto px-3 sm:px-6 lg:px-10">
+        <nav className="flex items-center justify-between gap-2 sm:gap-4">
 
           {/* Far Left: Brand Logo */}
-          <div className="flex-shrink-0 flex items-center">
-            <Logo size="sm" showTagline={!isScrolled} />
+          <div className="flex-shrink-0 flex items-center min-w-0">
+            <Logo size="sm" showTagline={!isScrolled && false} />
           </div>
 
           {/* Center: All Navigation Tabs */}
@@ -141,15 +142,15 @@ export function Navbar() {
             <button
               type="button"
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-              className="p-2 rounded-xl text-slate-700 hover:text-brand-navy hover:bg-slate-100 transition-colors focus:outline-none"
+              className="flex h-10 w-10 items-center justify-center rounded-xl border border-slate-200 bg-slate-50 text-slate-700 shadow-sm transition-colors hover:border-brand-navy/40 hover:text-brand-navy focus:outline-none"
               aria-label="Toggle Navigation Menu"
             >
               {mobileMenuOpen ? (
-                <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
                 </svg>
               ) : (
-                <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
                 </svg>
               )}
@@ -159,14 +160,14 @@ export function Navbar() {
 
         {/* Mobile Navigation Drawer */}
         {mobileMenuOpen && (
-          <div className="lg:hidden mt-3 pt-3 border-t border-slate-100 space-y-1 pb-3">
-            <ul className="space-y-0.5">
+          <div className="lg:hidden mt-2 rounded-2xl border border-slate-200 bg-white/95 p-3 shadow-lg shadow-slate-200/60 backdrop-blur-sm">
+            <ul className="space-y-1.5">
               {navLinks.map((link) => (
                 <li key={link.href}>
                   <Link
                     href={link.href}
                     onClick={() => setMobileMenuOpen(false)}
-                    className={`flex items-center gap-2 px-3 py-2 rounded-xl text-sm font-medium transition-colors ${
+                    className={`flex min-h-11 items-center gap-2 px-3 py-2.5 rounded-xl text-sm font-medium transition-colors ${
                       isActive(link.href)
                         ? "bg-brand-ice text-brand-navy font-bold"
                         : "text-slate-700 hover:bg-slate-50 hover:text-brand-navy"
@@ -180,7 +181,7 @@ export function Navbar() {
                 </li>
               ))}
             </ul>
-            <div className="pt-3 border-t border-slate-100 flex flex-col gap-2">
+            <div className="mt-3 pt-3 border-t border-slate-100 flex flex-col gap-2">
               {!loading && user ? (
                 <div className="space-y-2">
                   <div className="px-3 py-2 bg-slate-50 rounded-xl text-xs font-medium text-slate-600">

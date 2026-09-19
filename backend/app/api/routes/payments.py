@@ -19,6 +19,9 @@ def _find_target(payload: PaymentInitialize) -> tuple[dict, dict]:
     target = next((item for item in collection if item["id"] == payload.target_id), None)
     if target is None:
         raise HTTPException(status_code=404, detail="Programme or opportunity not found")
+    closing_date = target.get("deadline") if payload.target_type == "opportunity" else target.get("end_date")
+    if closing_date and datetime.fromisoformat(closing_date.replace("Z", "+00:00")) < datetime.now(timezone.utc):
+        raise HTTPException(status_code=410, detail="This event or opportunity is closed")
     offer = next((item for item in target.get("offers", []) if item["type"] == payload.offer_type), None)
     if offer is None:
         raise HTTPException(status_code=400, detail="That offer is not available for this item")

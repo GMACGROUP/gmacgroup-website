@@ -18,20 +18,24 @@ const filterTabs = [
 ];
 
 export default function ProgrammesPage() {
-  const [programmes, setProgrammes] = useState<Programme[]>([]);
+  const [allProgrammes, setAllProgrammes] = useState<Programme[]>([]);
   const [loading, setLoading] = useState(true);
   const [category, setCategory] = useState<string>("all");
   const [selectedProgramme, setSelectedProgramme] = useState<Programme | null>(null);
 
   useEffect(() => {
     setLoading(true);
-    const endpoint = category === "all" ? "/programmes/" : `/programmes/?category=${category}`;
+    const endpoint = "/programmes/";
     apiClient
       .get<Programme[]>(endpoint)
-      .then((data) => setProgrammes(data))
-      .catch(() => setProgrammes([]))
+      .then((data) => setAllProgrammes(data))
+      .catch(() => setAllProgrammes([]))
       .finally(() => setLoading(false));
-  }, [category]);
+  }, []);
+
+  const programmes = category === "all"
+    ? allProgrammes
+    : allProgrammes.filter((programme) => programme.category === category);
 
   return (
     <div className="bg-slate-50 min-h-screen">

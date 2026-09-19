@@ -50,6 +50,26 @@ export function EnrolmentModal({
 
   if (!isOpen || !programme) return null;
 
+  const isClosed = Boolean(programme.end_date && new Date(programme.end_date).getTime() < Date.now());
+
+  if (isClosed) {
+    return (
+      <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm modal-backdrop-in">
+        <div className="relative w-full max-w-lg bg-white rounded-3xl shadow-2xl border border-slate-200 p-8 text-center modal-panel-in" role="dialog" aria-modal="true">
+          <button onClick={onClose} className="absolute top-5 right-5 p-2 rounded-full text-slate-400 hover:text-slate-700 hover:bg-slate-100" aria-label="Close modal">
+            <XMarkIcon className="w-5 h-5" />
+          </button>
+          <div className="mx-auto mb-4 w-14 h-14 rounded-full bg-slate-100 text-slate-500 flex items-center justify-center">
+            <AcademicCapIcon className="w-7 h-7" />
+          </div>
+          <h2 className="text-xl sm:text-2xl font-bold text-slate-900 font-serif">Enrolment is closed</h2>
+          <p className="mt-2 text-sm text-slate-600">The dates for {programme.title} have passed. This form is no longer available.</p>
+          <button onClick={onClose} className="mt-6 px-6 py-2.5 rounded-xl text-sm font-bold text-white bg-brand-navy hover:bg-brand-navyDark">Close</button>
+        </div>
+      </div>
+    );
+  }
+
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
     if (!programme) return;
@@ -81,9 +101,9 @@ export function EnrolmentModal({
   }
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-fadeIn">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm modal-backdrop-in">
       <div
-        className="relative w-full max-w-lg bg-white rounded-3xl shadow-2xl border border-slate-200 overflow-hidden"
+        className="relative w-full max-w-lg max-h-[calc(100dvh-2rem)] overflow-y-auto bg-white rounded-3xl shadow-2xl border border-slate-200 modal-panel-in"
         role="dialog"
         aria-modal="true"
       >
@@ -228,7 +248,7 @@ export function EnrolmentModal({
                   <button
                     type="submit"
                     disabled={submitting}
-                    className="px-6 py-2.5 rounded-xl text-xs sm:text-sm font-bold text-white bg-brand-red hover:bg-brand-redDark shadow-md hover:shadow-lg transition-all disabled:opacity-50"
+                    className="px-6 py-2.5 rounded-xl text-xs sm:text-sm font-bold text-white bg-brand-red hover:bg-brand-redDark shadow-md hover:shadow-lg active:scale-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-cyan transition-all disabled:opacity-50"
                   >
                     {submitting ? "Processing Enrolment..." : "Confirm Cohort Enrolment →"}
                   </button>
