@@ -51,6 +51,10 @@ async def apply_to_opportunity(
     opportunity = next((item for item in OPPORTUNITIES if item["id"] == opportunity_id), None)
     if opportunity is None:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Opportunity not found")
+    offers = opportunity.get("offers", [])
+    offer = next((item for item in offers if item["type"] == payload.offer_type.value), None)
+    if offers and (offer is None or offer["amount"] > 0):
+        raise HTTPException(status_code=status.HTTP_402_PAYMENT_REQUIRED, detail="Complete payment before selecting this offer")
 
     user_id = current_user.get("id") if current_user else None
     email = current_user.get("email") if current_user else (payload.applicant_email or "applicant@example.com")
@@ -65,6 +69,7 @@ async def apply_to_opportunity(
         "phone": payload.phone,
         "linkedin_url": payload.linkedin_url,
         "cover_note": payload.cover_note,
+        "offer_type": payload.offer_type.value,
         "status": "submitted",
     })
     APPLICATIONS.append(application)

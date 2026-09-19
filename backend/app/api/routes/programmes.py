@@ -48,6 +48,9 @@ async def enrol_in_programme(
     programme = next((item for item in PROGRAMMES if item["id"] == programme_id), None)
     if programme is None:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Programme not found")
+    offer = next((item for item in programme.get("offers", []) if item["type"] == payload.offer_type.value), None)
+    if offer is None or offer["amount"] > 0:
+        raise HTTPException(status_code=status.HTTP_402_PAYMENT_REQUIRED, detail="Complete payment before selecting this offer")
 
     user_id = current_user.get("id") if current_user else None
     email = current_user.get("email") if current_user else (payload.email or "guest@example.com")
@@ -62,6 +65,7 @@ async def enrol_in_programme(
         "phone": payload.phone,
         "organization": payload.organization,
         "notes": payload.notes,
+        "offer_type": payload.offer_type.value,
         "status": "confirmed",
     })
     ENROLMENTS.append(enrolment)

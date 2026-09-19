@@ -1,6 +1,7 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { Suspense, useEffect, useState } from "react";
+import { useSearchParams } from "next/navigation";
 import Link from "next/link";
 import Image from "next/image";
 import { apiClient } from "@/lib/api/client";
@@ -37,7 +38,9 @@ const typeImages: Record<string, string> = {
   other: "/images/about-team.jpg",
 };
 
-export default function OpportunitiesPage() {
+function OpportunitiesPageContent() {
+  const searchParams = useSearchParams();
+  const requestedOpportunityId = searchParams.get("opportunity");
   const [opportunities, setOpportunities] = useState<Opportunity[]>([]);
   const [loading, setLoading] = useState(true);
   const [typeFilter, setTypeFilter] = useState<string>("all");
@@ -52,6 +55,12 @@ export default function OpportunitiesPage() {
       .catch(() => setOpportunities([]))
       .finally(() => setLoading(false));
   }, [typeFilter]);
+
+  useEffect(() => {
+    if (!requestedOpportunityId || loading) return;
+    const requestedOpportunity = opportunities.find((item) => item.id === requestedOpportunityId);
+    if (requestedOpportunity) setSelectedOpportunity(requestedOpportunity);
+  }, [loading, opportunities, requestedOpportunityId]);
 
   return (
     <div className="bg-slate-50 min-h-screen">
@@ -219,5 +228,13 @@ export default function OpportunitiesPage() {
         onClose={() => setSelectedOpportunity(null)}
       />
     </div>
+  );
+}
+
+export default function OpportunitiesPage() {
+  return (
+    <Suspense fallback={<div className="min-h-screen bg-slate-50" />}>
+      <OpportunitiesPageContent />
+    </Suspense>
   );
 }

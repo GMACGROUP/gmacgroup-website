@@ -22,6 +22,8 @@ export function Navbar() {
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
+  if (pathname.startsWith("/dashboard")) return null;
+
   const navLinks = [
     { href: "/", label: "Home" },
     { href: "/about", label: "About" },

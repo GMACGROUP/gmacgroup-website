@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import { apiClient } from "@/lib/api/client";
 import { useAuth } from "@/hooks/useAuth";
-import { Opportunity } from "@/types";
+import { OfferType, Opportunity } from "@/types";
 import { BriefcaseIcon, CheckCircleIcon, XMarkIcon } from "@/components/common/Icons";
 
 interface ApplicationModalProps {
@@ -23,6 +23,7 @@ export function ApplicationModal({
   const [submitting, setSubmitting] = useState(false);
   const [submitted, setSubmitted] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [offerType, setOfferType] = useState<OfferType>("free");
 
   const [formData, setFormData] = useState({
     applicant_name: "",
@@ -44,6 +45,7 @@ export function ApplicationModal({
     }
     setSubmitted(false);
     setError(null);
+    setOfferType(opportunity?.offers?.[0]?.type || "free");
   }, [user, isOpen, opportunity]);
 
   if (!isOpen || !opportunity) return null;
@@ -55,7 +57,20 @@ export function ApplicationModal({
     setError(null);
 
     try {
-      await apiClient.post(`/opportunities/${opportunity.id}/apply`, formData);
+      const offer = opportunity.offers?.find((item) => item.type === offerType);
+      if (offer && offer.amount > 0) {
+        const payment = await apiClient.post<{ checkout_url?: string }>("/payments/initialize", {
+          target_type: "opportunity",
+          target_id: opportunity.id,
+          offer_type: offer.type,
+          email: formData.applicant_email,
+          full_name: formData.applicant_name,
+          details: formData,
+        });
+        if (payment.checkout_url) window.location.assign(payment.checkout_url);
+        return;
+      }
+      await apiClient.post(`/opportunities/${opportunity.id}/apply`, { ...formData, offer_type: offerType });
       setSubmitted(true);
       if (onSuccess) onSuccess();
     } catch (err) {
@@ -97,6 +112,23 @@ export function ApplicationModal({
               <p className="text-xs sm:text-sm text-slate-500 mt-1 mb-6">
                 {opportunity.organization || "GMAC GROUP"} • {opportunity.location || "Hybrid"}
               </p>
+
+              {opportunity.offers && opportunity.offers.length > 0 && (
+                <label className="block mb-5">
+                  <span className="block text-xs font-bold text-slate-800 uppercase tracking-wider mb-1.5">Choose an offer</span>
+                  <select
+                    value={offerType}
+                    onChange={(event) => setOfferType(event.target.value as OfferType)}
+                    className="w-full px-3.5 py-2.5 text-sm rounded-xl border border-slate-300 bg-slate-50 text-slate-900"
+                  >
+                    {opportunity.offers.map((offer) => (
+                      <option key={offer.type} value={offer.type}>
+                        {offer.amount === 0 ? offer.label : `${offer.label} - ${offer.currency} ${offer.amount}`}
+                      </option>
+                    ))}
+                  </select>
+                </label>
+              )}
 
               <form onSubmit={handleSubmit} className="space-y-4">
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">

@@ -38,6 +38,11 @@ PROGRAMMES = [
         "description": "A practical cohort-based programme for building career direction, critical thinking, professional confidence, and employability skills.",
         "start_date": "2026-10-15T00:00:00Z",
         "end_date": "2026-12-15T00:00:00Z",
+        "offers": [
+            {"type": "free", "label": "Free", "amount": 0, "currency": "GHS"},
+            {"type": "vip", "label": "VIP", "amount": 250, "currency": "GHS"},
+            {"type": "premium", "label": "Premium", "amount": 500, "currency": "GHS"},
+        ],
     },
     {
         "id": "programme-research-skills",
@@ -46,6 +51,11 @@ PROGRAMMES = [
         "description": "Intensive training in study design, quantitative & econometric analysis, qualitative synthesis, and evidence-to-policy communication.",
         "start_date": "2026-11-01T00:00:00Z",
         "end_date": "2027-01-30T00:00:00Z",
+        "offers": [
+            {"type": "free", "label": "Free", "amount": 0, "currency": "GHS"},
+            {"type": "vip", "label": "VIP", "amount": 350, "currency": "GHS"},
+            {"type": "premium", "label": "Premium", "amount": 650, "currency": "GHS"},
+        ],
     },
     {
         "id": "programme-exec-leadership",
@@ -54,6 +64,11 @@ PROGRAMMES = [
         "description": "Advanced human-capital architecture for leaders scaling teams, optimizing workforce productivity, and driving institutional excellence.",
         "start_date": "2026-10-20T00:00:00Z",
         "end_date": "2026-11-20T00:00:00Z",
+        "offers": [
+            {"type": "free", "label": "Free", "amount": 0, "currency": "GHS"},
+            {"type": "vip", "label": "VIP", "amount": 750, "currency": "GHS"},
+            {"type": "premium", "label": "Premium", "amount": 1200, "currency": "GHS"},
+        ],
     },
     {
         "id": "programme-institutional-capacity",
@@ -62,6 +77,11 @@ PROGRAMMES = [
         "description": "Diagnostic and reform advisory for university faculties and academic leadership seeking to align curriculum with labor market realities.",
         "start_date": "2026-12-01T00:00:00Z",
         "end_date": "2027-03-01T00:00:00Z",
+        "offers": [
+            {"type": "free", "label": "Free", "amount": 0, "currency": "GHS"},
+            {"type": "vip", "label": "VIP", "amount": 1500, "currency": "GHS"},
+            {"type": "premium", "label": "Premium", "amount": 2500, "currency": "GHS"},
+        ],
     },
 ]
 
@@ -74,6 +94,11 @@ OPPORTUNITIES = [
         "location": "Accra / Hybrid",
         "description": "Join an elite cohort conducting baseline workforce transition studies and institutional capacity diagnostics across West Africa.",
         "deadline": "2026-10-31T00:00:00Z",
+        "offers": [
+            {"type": "free", "label": "Free", "amount": 0, "currency": "GHS"},
+            {"type": "vip", "label": "VIP", "amount": 300, "currency": "GHS"},
+            {"type": "premium", "label": "Premium", "amount": 600, "currency": "GHS"},
+        ],
     },
     {
         "id": "opportunity-strategy-associate",
@@ -83,6 +108,7 @@ OPPORTUNITIES = [
         "location": "Accra / Global Remote",
         "description": "Partner with cross-functional advisory teams supporting enterprise talent acquisition, workforce planning, and executive development.",
         "deadline": "2026-11-15T00:00:00Z",
+        "offers": [],
     },
     {
         "id": "opportunity-research-internship",
@@ -92,6 +118,11 @@ OPPORTUNITIES = [
         "location": "Accra / Hybrid",
         "description": "High-velocity internship for emerging quantitative analysts and social science graduates assisting on flagship policy evaluation projects.",
         "deadline": "2026-10-25T00:00:00Z",
+        "offers": [
+            {"type": "free", "label": "Free", "amount": 0, "currency": "GHS"},
+            {"type": "vip", "label": "VIP Mentorship", "amount": 400, "currency": "GHS"},
+            {"type": "premium", "label": "Premium Mentorship + Certificate", "amount": 750, "currency": "GHS"},
+        ],
     },
 ]
 
@@ -166,6 +197,7 @@ APPLICATIONS = []
 NEWSLETTER_SUBSCRIBERS = []
 PUBLICATION_REQUESTS = []
 EXPERT_APPLICATIONS = []
+PAYMENTS = []
 
 # In-memory user store seeded with demo users
 USERS = [

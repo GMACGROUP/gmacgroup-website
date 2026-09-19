@@ -15,6 +15,7 @@ from app.api.routes import (
     research,
     contact,
     ai,
+    payments,
 )
 
 settings = get_settings()
@@ -28,6 +29,7 @@ app = FastAPI(
 app.add_middleware(
     CORSMiddleware,
     allow_origins=settings.ALLOWED_ORIGINS + ["http://127.0.0.1:3000", "http://localhost:3000"],
+    allow_origin_regex=r"^https?://(localhost|127\.0\.0\.1)(:\d+)?$",
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -43,6 +45,7 @@ app.include_router(opportunities.router, prefix=f"{API_PREFIX}/opportunities", t
 app.include_router(research.router, prefix=f"{API_PREFIX}/research", tags=["Research"])
 app.include_router(contact.router, prefix=f"{API_PREFIX}/contact", tags=["Contact"])
 app.include_router(ai.router, prefix=f"{API_PREFIX}/ai", tags=["AI"])
+app.include_router(payments.router, prefix=f"{API_PREFIX}/payments", tags=["Payments"])
 
 
 @app.get("/")

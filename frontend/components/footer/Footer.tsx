@@ -2,15 +2,19 @@
 
 import { useState } from "react";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { apiClient } from "@/lib/api/client";
 import { Logo } from "@/components/common/Logo";
 import { CheckCircleIcon } from "@/components/common/Icons";
 
 export function Footer() {
+  const pathname = usePathname();
   const [email, setEmail] = useState("");
   const [submitting, setSubmitting] = useState(false);
   const [subscribed, setSubscribed] = useState(false);
   const [error, setError] = useState<string | null>(null);
+
+  if (pathname.startsWith("/dashboard")) return null;
 
   const handleSubscribe = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
