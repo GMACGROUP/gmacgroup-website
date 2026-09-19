@@ -2,6 +2,7 @@
 Opportunity routes: internships, jobs, fellowships, and applications.
 """
 
+from datetime import datetime, timezone
 from typing import List, Optional
 from fastapi import APIRouter, Depends, HTTPException, Query, status
 from app.api.dependencies import get_current_user, get_optional_user
@@ -51,6 +52,8 @@ async def apply_to_opportunity(
     opportunity = next((item for item in OPPORTUNITIES if item["id"] == opportunity_id), None)
     if opportunity is None:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Opportunity not found")
+    if opportunity.get("deadline") and datetime.fromisoformat(opportunity["deadline"].replace("Z", "+00:00")) < datetime.now(timezone.utc):
+        raise HTTPException(status_code=status.HTTP_410_GONE, detail="This opportunity is closed")
     offers = opportunity.get("offers", [])
     offer = next((item for item in offers if item["type"] == payload.offer_type.value), None)
     if offers and (offer is None or offer["amount"] > 0):

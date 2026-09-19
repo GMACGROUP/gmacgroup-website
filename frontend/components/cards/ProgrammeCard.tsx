@@ -26,6 +26,7 @@ export function ProgrammeCard({
   const displayCategory = programme?.category || category || "training";
   const displayDescription = programme?.description || description || "";
   const displayDate = programme?.start_date || startDate;
+  const isClosed = Boolean(programme?.end_date && new Date(programme.end_date).getTime() < Date.now());
 
   const categoryConfig: Record<string, { label: string; badge: string; accent: string; icon: typeof AcademicCapIcon; image: string }> = {
     student: {
@@ -110,6 +111,11 @@ export function ProgrammeCard({
               {new Date(displayDate).toLocaleDateString("en-US", { month: "short", day: "numeric" })}
             </span>
           )}
+          {isClosed && (
+            <span className="text-xs font-bold bg-slate-900/80 text-white px-2.5 py-1 rounded-md border border-white/20">
+              Closed
+            </span>
+          )}
         </div>
       </div>
 
@@ -138,9 +144,10 @@ export function ProgrammeCard({
           <button
             type="button"
             onClick={handleEnrolClick}
-            className="px-4 py-2 text-xs font-bold rounded-xl bg-brand-navy text-white hover:bg-brand-navyDark shadow-sm hover:shadow-md active:scale-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-cyan transition-all"
+            disabled={isClosed}
+            className="px-4 py-2 text-xs font-bold rounded-xl bg-brand-navy text-white hover:bg-brand-navyDark shadow-sm hover:shadow-md active:scale-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-cyan transition-all disabled:cursor-not-allowed disabled:bg-slate-300 disabled:text-slate-500 disabled:shadow-none"
           >
-            Enrol Now →
+            {isClosed ? "Closed" : "Enrol Now →"}
           </button>
         </div>
       </div>
