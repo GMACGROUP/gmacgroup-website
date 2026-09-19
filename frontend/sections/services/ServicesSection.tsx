@@ -59,7 +59,7 @@ export function ServicesSection() {
         </div>
 
         {/* Services Grid */}
-        <div className="mt-14 grid gap-8 md:grid-cols-3">
+        <div className="mt-14 grid gap-6 sm:grid-cols-2 xl:grid-cols-3">
           {services.map((service) => {
             const Icon = service.icon;
             return (

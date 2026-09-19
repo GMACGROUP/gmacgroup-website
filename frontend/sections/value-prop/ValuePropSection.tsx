@@ -32,7 +32,7 @@ export function ValuePropSection() {
         </div>
 
         {/* 3 Domain Pillar Cards (matching reference layout) */}
-        <div className="grid md:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
           
           {/* Card 1: Education & Employability */}
           <div className="group relative bg-white rounded-3xl p-6 sm:p-8 border border-slate-200/90 shadow-sm hover:shadow-card hover:border-brand-navy/30 hover:-translate-y-1 transition-all duration-300 flex flex-col justify-between">

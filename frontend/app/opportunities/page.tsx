@@ -42,7 +42,8 @@ function OpportunitiesPageContent() {
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
-  const requestedOpportunityId = searchParams.get("opportunity");
+  const safePathname = pathname ?? "/";
+  const requestedOpportunityId = searchParams?.get("opportunity") ?? null;
   const [allOpportunities, setAllOpportunities] = useState<Opportunity[]>([]);
   const [loading, setLoading] = useState(true);
   const [typeFilter, setTypeFilter] = useState<string>("all");
@@ -67,8 +68,8 @@ function OpportunitiesPageContent() {
     const requestedOpportunity = opportunities.find((item) => item.id === requestedOpportunityId);
     if (!requestedOpportunity) return;
     setSelectedOpportunity(requestedOpportunity);
-    router.replace(pathname, { scroll: false });
-  }, [loading, opportunities, pathname, requestedOpportunityId, router]);
+    router.replace(safePathname, { scroll: false });
+  }, [loading, opportunities, safePathname, requestedOpportunityId, router]);
 
   const handleTypeFilter = (filter: string) => {
     setSelectedOpportunity(null);
