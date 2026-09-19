@@ -4,10 +4,17 @@ from datetime import datetime, timezone
 from uuid import uuid4
 
 import httpx
-from fastapi import APIRouter, Header, HTTPException, Request, status
+from fastapi import APIRouter, Depends, Header, HTTPException, Request, status
+from sqlalchemy import select
+from sqlalchemy.orm import Session
 
+from app.api.dependencies import get_optional_user
 from app.core.config import get_settings
-from app.data import APPLICATIONS, ENROLMENTS, OPPORTUNITIES, PAYMENTS, PROGRAMMES, new_record
+from app.core.database import get_db
+from app.data import OPPORTUNITIES, PROGRAMMES
+from app.models.opportunity import Application
+from app.models.payment import Payment
+from app.models.programme import ProgrammeEnrolment
 from app.schemas.payment import PaymentInitialize, PaymentInitializeOut, PaymentVerifyOut
 
 router = APIRouter()
@@ -28,48 +35,63 @@ def _find_target(payload: PaymentInitialize) -> tuple[dict, dict]:
     return target, offer
 
 
-def _complete_payment(payment: dict, transaction_status: str, transaction_id: str | None = None) -> dict:
+def _complete_payment(
+    db: Session,
+    payment: Payment,
+    transaction_status: str,
+    transaction_id: str | None = None,
+) -> Payment:
     if transaction_status != "successful":
-        payment["status"] = "failed"
+        payment.status = "failed"
+        db.commit()
         return payment
-    if payment["status"] == "successful":
+    if payment.status == "successful":
         return payment
 
-    payment["status"] = "successful"
-    payment["transaction_id"] = transaction_id
-    payment["paid_at"] = datetime.now(timezone.utc)
-    details = payment["details"]
-    if payment["target_type"] == "programme":
-        ENROLMENTS.append(new_record({
-            "programme_id": payment["target_id"],
-            "programme_title": payment["target_title"],
-            "user_id": payment.get("user_id"),
-            "full_name": payment.get("full_name") or details.get("full_name") or "Applicant",
-            "email": payment["email"],
-            "phone": details.get("phone"),
-            "organization": details.get("organization"),
-            "notes": details.get("notes"),
-            "offer_type": payment["offer_type"],
-            "status": "confirmed",
-        }))
+    payment.status = "successful"
+    payment.provider_transaction_id = transaction_id
+    payment.paid_at = datetime.now(timezone.utc)
+    details = payment.details or {}
+    if payment.target_type == "programme":
+        db.add(ProgrammeEnrolment(
+            programme_id=payment.programme_id or "",
+            programme_title=payment.target_title,
+            user_id=payment.user_id,
+            full_name=payment.full_name or details.get("full_name") or "Applicant",
+            email=payment.email,
+            phone=details.get("phone"),
+            organization=details.get("organization"),
+            notes=details.get("notes"),
+            offer_type=payment.offer_type,
+            payment_status="successful",
+            status="confirmed",
+        ))
     else:
-        APPLICATIONS.append(new_record({
-            "opportunity_id": payment["target_id"],
-            "opportunity_title": payment["target_title"],
-            "user_id": payment.get("user_id"),
-            "applicant_name": payment.get("full_name") or details.get("applicant_name") or "Applicant",
-            "applicant_email": payment["email"],
-            "phone": details.get("phone"),
-            "linkedin_url": details.get("linkedin_url"),
-            "cover_note": details.get("cover_note"),
-            "offer_type": payment["offer_type"],
-            "status": "submitted",
-        }))
+        db.add(Application(
+            opportunity_id=payment.opportunity_id or "",
+            opportunity_title=payment.target_title,
+            user_id=payment.user_id,
+            applicant_name=payment.full_name or details.get("applicant_name") or "Applicant",
+            applicant_email=payment.email,
+            phone=details.get("phone"),
+            linkedin_url=details.get("linkedin_url"),
+            cover_note=details.get("cover_note"),
+            resume_url=details.get("resume_url"),
+            offer_type=payment.offer_type,
+            payment_status="successful",
+            status="submitted",
+        ))
+    db.commit()
     return payment
 
 
 @router.post("/initialize", response_model=PaymentInitializeOut)
-async def initialize_payment(payload: PaymentInitialize, request: Request):
+async def initialize_payment(
+    payload: PaymentInitialize,
+    request: Request,
+    current_user: dict | None = Depends(get_optional_user),
+    db: Session = Depends(get_db),
+):
     target, offer = _find_target(payload)
     if offer["amount"] <= 0:
         return PaymentInitializeOut(status="free", amount=0, currency=offer["currency"])
@@ -77,20 +99,23 @@ async def initialize_payment(payload: PaymentInitialize, request: Request):
         raise HTTPException(status_code=503, detail="Flutterwave payments are not configured")
 
     reference = f"gmac_{uuid4().hex}"
-    payment = new_record({
-        "reference": reference,
-        "target_type": payload.target_type,
-        "target_id": payload.target_id,
-        "target_title": target["title"],
-        "offer_type": payload.offer_type,
-        "amount": offer["amount"],
-        "currency": offer["currency"],
-        "email": str(payload.email),
-        "full_name": payload.full_name,
-        "details": payload.details,
-        "status": "pending",
-    })
-    PAYMENTS.append(payment)
+    payment = Payment(
+        user_id=current_user.get("id") if current_user else None,
+        programme_id=payload.target_id if payload.target_type == "programme" else None,
+        opportunity_id=payload.target_id if payload.target_type == "opportunity" else None,
+        target_type=payload.target_type,
+        target_title=target["title"],
+        offer_type=payload.offer_type,
+        amount=offer["amount"],
+        currency=offer["currency"],
+        email=str(payload.email),
+        full_name=payload.full_name,
+        details=payload.details,
+        provider_reference=reference,
+        status="pending",
+    )
+    db.add(payment)
+    db.commit()
 
     headers = {"Authorization": f"Bearer {settings.FLW_SECRET_KEY}", "Content-Type": "application/json"}
     body = {
@@ -105,17 +130,19 @@ async def initialize_payment(payload: PaymentInitialize, request: Request):
     async with httpx.AsyncClient(timeout=20) as client:
         response = await client.post("https://api.flutterwave.com/v3/payments", json=body, headers=headers)
     if response.status_code >= 400:
-        payment["status"] = "failed"
+        payment.status = "failed"
+        db.commit()
         raise HTTPException(status_code=502, detail="Flutterwave could not initialize checkout")
     checkout_url = response.json().get("data", {}).get("link")
     if not checkout_url:
-        payment["status"] = "failed"
+        payment.status = "failed"
+        db.commit()
         raise HTTPException(status_code=502, detail="Flutterwave returned no checkout URL")
     return PaymentInitializeOut(status="pending", reference=reference, checkout_url=checkout_url, amount=offer["amount"], currency=offer["currency"])
 
 
-async def _verify(reference: str, transaction_id: str | None) -> PaymentVerifyOut:
-    payment = next((item for item in PAYMENTS if item["reference"] == reference), None)
+async def _verify(reference: str, transaction_id: str | None, db: Session) -> PaymentVerifyOut:
+    payment = db.scalar(select(Payment).where(Payment.provider_reference == reference))
     if payment is None:
         raise HTTPException(status_code=404, detail="Payment reference not found")
     if not settings.FLW_SECRET_KEY:
@@ -131,25 +158,29 @@ async def _verify(reference: str, transaction_id: str | None) -> PaymentVerifyOu
         response.status_code < 400
         and data.get("status") == "successful"
         and data.get("tx_ref") == reference
-        and float(data.get("amount", 0)) >= float(payment["amount"])
-        and data.get("currency") == payment["currency"]
+        and float(data.get("amount", 0)) >= float(payment.amount)
+        and data.get("currency") == payment.currency
     )
-    _complete_payment(payment, "successful" if valid else "failed", transaction_id)
-    return PaymentVerifyOut(status=payment["status"], reference=reference, target_type=payment["target_type"], target_id=payment["target_id"])
+    _complete_payment(db, payment, "successful" if valid else "failed", transaction_id)
+    return PaymentVerifyOut(status=payment.status, reference=reference, target_type=payment.target_type, target_id=payment.programme_id or payment.opportunity_id or "")
 
 
 @router.get("/{reference}/verify", response_model=PaymentVerifyOut)
-async def verify_payment(reference: str, transaction_id: str):
-    return await _verify(reference, transaction_id)
+async def verify_payment(reference: str, transaction_id: str, db: Session = Depends(get_db)):
+    return await _verify(reference, transaction_id, db)
 
 
 @router.post("/webhook", status_code=status.HTTP_200_OK)
-async def payment_webhook(request: Request, verif_hash: str | None = Header(default=None, alias="verif-hash")):
+async def payment_webhook(
+    request: Request,
+    verif_hash: str | None = Header(default=None, alias="verif-hash"),
+    db: Session = Depends(get_db),
+):
     if settings.FLW_WEBHOOK_SECRET_HASH and verif_hash != settings.FLW_WEBHOOK_SECRET_HASH:
         raise HTTPException(status_code=401, detail="Invalid webhook signature")
     body = await request.json()
     data = body.get("data", {})
     reference = data.get("tx_ref")
     if reference and data.get("id"):
-        await _verify(reference, str(data["id"]))
+        await _verify(reference, str(data["id"]), db)
     return {"received": True}

@@ -141,6 +141,14 @@ export default function DashboardPage() {
               >
                 {isEditingProfile ? "Close Profile" : "Edit Profile"}
               </button>
+              {user.role === "admin" && (
+                <Link
+                  href="/admin"
+                  className="px-4 py-2.5 rounded-xl font-bold text-xs bg-brand-cyan text-brand-navy hover:bg-white transition-all"
+                >
+                  Operations Console
+                </Link>
+              )}
               <button
                 onClick={handleLogout}
                 className="px-4 py-2.5 rounded-xl font-bold text-xs bg-red-500/20 hover:bg-red-500/30 text-red-200 border border-red-400/30 transition-all"

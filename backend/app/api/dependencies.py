@@ -7,8 +7,24 @@ from typing import Optional
 from fastapi import Depends, HTTPException, status
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 from jose import JWTError, jwt
+from sqlalchemy import select
+from sqlalchemy.orm import Session
 from app.core.config import get_settings
-from app.data import USERS
+from app.core.database import get_db
+from app.models.user import User
+
+
+def user_to_dict(user: User) -> dict:
+    return {
+        "id": user.id,
+        "email": user.email,
+        "full_name": user.full_name,
+        "role": user.role,
+        "created_at": user.created_at,
+        "bio": user.bio,
+        "organization": user.organization,
+        "phone": user.phone,
+    }
 
 bearer_scheme = HTTPBearer(auto_error=False)
 
@@ -27,6 +43,7 @@ def create_access_token(data: dict, expires_delta: Optional[timedelta] = None) -
 
 async def get_current_user(
     credentials: Optional[HTTPAuthorizationCredentials] = Depends(bearer_scheme),
+    db: Session = Depends(get_db),
 ) -> dict:
     """Verify a locally signed JWT and expose the user record."""
     if credentials is None:
@@ -56,28 +73,24 @@ async def get_current_user(
             detail="Token has no subject",
         )
 
-    # Check in-memory USERS or reconstruct from claims
-    user = next((u for u in USERS if u["id"] == subject or u["email"] == claims.get("email")), None)
-    if user:
-        return user
-
-    return {
-        "id": subject,
-        "email": claims.get("email", "unknown@example.com"),
-        "full_name": claims.get("name"),
-        "role": claims.get("role", "student"),
-        "created_at": claims.get("created_at") or datetime.now(timezone.utc),
-    }
+    try:
+        user = db.scalar(select(User).where(User.id == subject))
+    except (ValueError, TypeError):
+        user = None
+    if user is None:
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Account not found")
+    return user_to_dict(user)
 
 
 async def get_optional_user(
     credentials: Optional[HTTPAuthorizationCredentials] = Depends(bearer_scheme),
+    db: Session = Depends(get_db),
 ) -> Optional[dict]:
     """Return the authenticated user if token is provided, or None."""
     if credentials is None:
         return None
     try:
-        return await get_current_user(credentials)
+        return await get_current_user(credentials, db)
     except Exception:
         return None
 

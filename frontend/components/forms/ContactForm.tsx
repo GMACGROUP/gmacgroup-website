@@ -1,11 +1,18 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { apiClient } from "@/lib/api/client";
 
 export function ContactForm() {
   const [submitting, setSubmitting] = useState(false);
   const [feedback, setFeedback] = useState<{ type: "success" | "error"; message: string } | null>(null);
+
+  useEffect(() => {
+    if (!feedback) return;
+
+    const timeout = window.setTimeout(() => setFeedback(null), 5000);
+    return () => window.clearTimeout(timeout);
+  }, [feedback]);
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();

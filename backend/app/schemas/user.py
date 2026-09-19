@@ -3,6 +3,7 @@
 from datetime import datetime
 from enum import Enum
 from typing import Optional
+from uuid import UUID
 from pydantic import BaseModel, ConfigDict, EmailStr
 
 
@@ -39,7 +40,7 @@ class UserUpdate(BaseModel):
 
 
 class UserOut(UserBase):
-    id: str
+    id: UUID
     created_at: datetime
     bio: Optional[str] = None
     organization: Optional[str] = None

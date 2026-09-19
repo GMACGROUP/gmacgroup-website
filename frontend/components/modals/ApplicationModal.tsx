@@ -30,6 +30,7 @@ export function ApplicationModal({
     applicant_email: "",
     phone: "",
     linkedin_url: "",
+    resume_url: "",
     cover_note: "",
   });
 
@@ -226,6 +227,19 @@ export function ApplicationModal({
                     }
                     placeholder="Briefly describe your background, career ambitions, and why you are interested in this position..."
                     className="w-full px-3.5 py-2.5 text-xs sm:text-sm rounded-xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-brand-navy/30 focus:border-brand-navy bg-slate-50 focus:bg-white transition-all text-slate-900 resize-none"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-xs font-bold text-slate-800 uppercase tracking-wider mb-1.5">
+                    CV / Resume URL
+                  </label>
+                  <input
+                    type="url"
+                    value={formData.resume_url || ""}
+                    onChange={(e) => setFormData({ ...formData, resume_url: e.target.value })}
+                    placeholder="https://drive.google.com/..."
+                    className="w-full px-3.5 py-2.5 text-xs sm:text-sm rounded-xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-brand-navy/30 focus:border-brand-navy bg-slate-50 focus:bg-white transition-all text-slate-900"
                   />
                 </div>
 

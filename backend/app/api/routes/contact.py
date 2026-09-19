@@ -2,29 +2,38 @@
 Contact & communication routes: contact forms, newsletter subscriptions.
 """
 
-from fastapi import APIRouter, status
+from fastapi import APIRouter, Depends, status
+from sqlalchemy.orm import Session
+
+from app.core.database import get_db
+from app.models.contact import ContactRequest
 from app.schemas.contact import (
     ContactRequestCreate,
     ContactRequestOut,
     NewsletterSubscribe,
     NewsletterResponse,
 )
-from app.data import CONTACT_REQUESTS, NEWSLETTER_SUBSCRIBERS, new_record
+from app.data import NEWSLETTER_SUBSCRIBERS
 
 router = APIRouter()
 
 
 @router.post("/", response_model=ContactRequestOut, status_code=status.HTTP_201_CREATED)
-async def submit_contact_request(payload: ContactRequestCreate):
+async def submit_contact_request(
+    payload: ContactRequestCreate,
+    db: Session = Depends(get_db),
+):
     """Store a contact request and return its tracking record."""
-    request = new_record({
-        "status": "received",
-        "name": payload.name,
-        "email": payload.email,
-        "subject": payload.subject,
-        "message": payload.message,
-    })
-    CONTACT_REQUESTS.append(request)
+    request = ContactRequest(
+        name=payload.name,
+        email=str(payload.email),
+        subject=payload.subject,
+        message=payload.message,
+        status="received",
+    )
+    db.add(request)
+    db.commit()
+    db.refresh(request)
     return request
 
 

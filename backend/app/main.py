@@ -16,6 +16,7 @@ from app.api.routes import (
     contact,
     ai,
     payments,
+    admin,
 )
 
 settings = get_settings()
@@ -46,6 +47,7 @@ app.include_router(research.router, prefix=f"{API_PREFIX}/research", tags=["Rese
 app.include_router(contact.router, prefix=f"{API_PREFIX}/contact", tags=["Contact"])
 app.include_router(ai.router, prefix=f"{API_PREFIX}/ai", tags=["AI"])
 app.include_router(payments.router, prefix=f"{API_PREFIX}/payments", tags=["Payments"])
+app.include_router(admin.router, prefix=f"{API_PREFIX}/admin", tags=["Admin Operations"])
 
 
 @app.get("/")

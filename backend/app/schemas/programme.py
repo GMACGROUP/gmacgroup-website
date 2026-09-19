@@ -3,6 +3,7 @@
 from datetime import datetime
 from enum import Enum
 from typing import Optional
+from uuid import UUID
 from pydantic import BaseModel, ConfigDict, EmailStr
 
 
@@ -48,10 +49,10 @@ class EnrolmentCreate(BaseModel):
 
 
 class EnrolmentOut(BaseModel):
-    id: str
+    id: UUID
     programme_id: str
     programme_title: Optional[str] = None
-    user_id: Optional[str] = None
+    user_id: Optional[UUID] = None
     full_name: Optional[str] = None
     email: Optional[str] = None
     status: str

@@ -5,13 +5,17 @@ Opportunity routes: internships, jobs, fellowships, and applications.
 from datetime import datetime, timezone
 from typing import List, Optional
 from fastapi import APIRouter, Depends, HTTPException, Query, status
+from sqlalchemy import or_, select
+from sqlalchemy.orm import Session
 from app.api.dependencies import get_current_user, get_optional_user
+from app.core.database import get_db
+from app.models.opportunity import Application
 from app.schemas.opportunity import (
     OpportunityOut,
     ApplicationCreate,
     ApplicationOut,
 )
-from app.data import APPLICATIONS, OPPORTUNITIES, new_record
+from app.data import OPPORTUNITIES
 
 router = APIRouter()
 
@@ -23,14 +27,18 @@ async def list_opportunities(type: str | None = Query(default=None)):
 
 
 @router.get("/my-applications", response_model=List[ApplicationOut])
-async def list_my_applications(current_user: dict = Depends(get_current_user)):
+async def list_my_applications(
+    current_user: dict = Depends(get_current_user),
+    db: Session = Depends(get_db),
+):
     """List all submitted applications for the authenticated user."""
     user_id = current_user.get("id")
     user_email = current_user.get("email", "").lower()
-    return [
-        a for a in APPLICATIONS
-        if a.get("user_id") == user_id or (a.get("applicant_email") and a.get("applicant_email").lower() == user_email)
-    ]
+    return db.scalars(
+        select(Application)
+        .where(or_(Application.user_id == user_id, Application.applicant_email == user_email))
+        .order_by(Application.created_at.desc())
+    ).all()
 
 
 @router.get("/{opportunity_id}", response_model=OpportunityOut)
@@ -47,6 +55,7 @@ async def apply_to_opportunity(
     opportunity_id: str,
     payload: ApplicationCreate,
     current_user: Optional[dict] = Depends(get_optional_user),
+    db: Session = Depends(get_db),
 ):
     """Submit an application for an authenticated user or guest applicant."""
     opportunity = next((item for item in OPPORTUNITIES if item["id"] == opportunity_id), None)
@@ -63,17 +72,20 @@ async def apply_to_opportunity(
     email = current_user.get("email") if current_user else (payload.applicant_email or "applicant@example.com")
     name = current_user.get("full_name") if current_user else (payload.applicant_name or "Applicant")
 
-    application = new_record({
-        "opportunity_id": opportunity_id,
-        "opportunity_title": opportunity["title"],
-        "user_id": user_id,
-        "applicant_name": name,
-        "applicant_email": email,
-        "phone": payload.phone,
-        "linkedin_url": payload.linkedin_url,
-        "cover_note": payload.cover_note,
-        "offer_type": payload.offer_type.value,
-        "status": "submitted",
-    })
-    APPLICATIONS.append(application)
+    application = Application(
+        opportunity_id=opportunity_id,
+        opportunity_title=opportunity["title"],
+        user_id=user_id,
+        applicant_name=name,
+        applicant_email=email,
+        phone=payload.phone,
+        linkedin_url=payload.linkedin_url,
+        cover_note=payload.cover_note,
+        resume_url=payload.resume_url,
+        offer_type=payload.offer_type.value,
+        status="submitted",
+    )
+    db.add(application)
+    db.commit()
+    db.refresh(application)
     return application

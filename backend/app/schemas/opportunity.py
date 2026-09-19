@@ -3,6 +3,7 @@
 from datetime import datetime
 from enum import Enum
 from typing import Optional
+from uuid import UUID
 from pydantic import BaseModel, ConfigDict, EmailStr
 
 
@@ -53,15 +54,17 @@ class ApplicationStatus(str, Enum):
     SUBMITTED = "submitted"
     UNDER_REVIEW = "under_review"
     SHORTLISTED = "shortlisted"
+    INTERVIEW = "interview"
     ACCEPTED = "accepted"
     REJECTED = "rejected"
+    WITHDRAWN = "withdrawn"
 
 
 class ApplicationOut(BaseModel):
-    id: str
+    id: UUID
     opportunity_id: str
     opportunity_title: Optional[str] = None
-    user_id: Optional[str] = None
+    user_id: Optional[UUID] = None
     applicant_name: Optional[str] = None
     applicant_email: Optional[str] = None
     status: ApplicationStatus
