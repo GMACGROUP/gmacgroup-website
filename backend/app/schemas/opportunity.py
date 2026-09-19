@@ -13,6 +13,19 @@ class OpportunityType(str, Enum):
     OTHER = "other"
 
 
+class OfferType(str, Enum):
+    FREE = "free"
+    VIP = "vip"
+    PREMIUM = "premium"
+
+
+class OfferOut(BaseModel):
+    type: OfferType
+    label: str
+    amount: float
+    currency: str = "GHS"
+
+
 class OpportunityOut(BaseModel):
     id: str
     title: str
@@ -21,6 +34,7 @@ class OpportunityOut(BaseModel):
     location: Optional[str] = None
     description: Optional[str] = None
     deadline: Optional[datetime] = None
+    offers: list[OfferOut] = []
 
     model_config = ConfigDict(from_attributes=True)
 
@@ -32,6 +46,7 @@ class ApplicationCreate(BaseModel):
     linkedin_url: Optional[str] = None
     cover_note: Optional[str] = None
     resume_url: Optional[str] = None
+    offer_type: OfferType = OfferType.FREE
 
 
 class ApplicationStatus(str, Enum):

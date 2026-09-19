@@ -106,7 +106,7 @@ export default function DashboardPage() {
   const userDisplayName = user.full_name || user.email.split("@")[0];
 
   return (
-    <div className="bg-slate-50 min-h-screen py-10 sm:py-14">
+    <div className="-mt-16 bg-slate-50 min-h-screen py-10 sm:py-14">
       <div className="container mx-auto px-4 sm:px-6 max-w-6xl space-y-8">
 
         {/* ── Welcome Banner ── */}

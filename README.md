@@ -56,6 +56,14 @@ Copy `.env.example` to `.env` in the root (and/or per-package as needed) and
 fill in real Supabase, database, and provider credentials. **Never commit
 `.env`.**
 
+### Flutterwave payments
+Paid VIP and Premium offers use Flutterwave. Add `FLW_SECRET_KEY` and
+`FLW_WEBHOOK_SECRET_HASH` to the backend environment, set `FRONTEND_URL`, and
+configure the Flutterwave webhook URL as
+`https://your-api-host/api/v1/payments/webhook`. Free offers continue to submit
+without payment. The backend verifies the transaction amount, currency, and
+reference before confirming an enrolment or application.
+
 ## What's implemented vs. stubbed
 
 | Layer | What exists | What's stubbed |

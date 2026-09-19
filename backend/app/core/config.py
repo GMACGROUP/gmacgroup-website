@@ -31,6 +31,11 @@ class Settings(BaseSettings):
     # AI provider (placeholder — TODO: define provider-specific settings)
     AI_PROVIDER_API_KEY: str = ""
 
+    # Flutterwave payments
+    FLW_SECRET_KEY: str = ""
+    FLW_WEBHOOK_SECRET_HASH: str = ""
+    FRONTEND_URL: str = "http://localhost:3000"
+
     model_config = SettingsConfigDict(env_file=".env", extra="ignore")
 
 

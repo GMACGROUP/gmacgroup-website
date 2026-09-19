@@ -13,6 +13,19 @@ class ProgrammeCategory(str, Enum):
     INSTITUTIONAL = "institutional"
 
 
+class OfferType(str, Enum):
+    FREE = "free"
+    VIP = "vip"
+    PREMIUM = "premium"
+
+
+class OfferOut(BaseModel):
+    type: OfferType
+    label: str
+    amount: float
+    currency: str = "GHS"
+
+
 class ProgrammeOut(BaseModel):
     id: str
     title: str
@@ -20,6 +33,7 @@ class ProgrammeOut(BaseModel):
     description: Optional[str] = None
     start_date: Optional[datetime] = None
     end_date: Optional[datetime] = None
+    offers: list[OfferOut] = []
 
     model_config = ConfigDict(from_attributes=True)
 
@@ -30,6 +44,7 @@ class EnrolmentCreate(BaseModel):
     phone: Optional[str] = None
     organization: Optional[str] = None
     notes: Optional[str] = None
+    offer_type: OfferType = OfferType.FREE
 
 
 class EnrolmentOut(BaseModel):

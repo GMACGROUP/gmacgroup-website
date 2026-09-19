@@ -5,7 +5,7 @@ import { MapPinIcon, ClockIcon, MicroscopeIcon, FileTextIcon, AwardIcon } from "
 export function EcosystemSection() {
   const liveOpportunities = [
     {
-      id: "opp-1",
+      id: "opportunity-research-fellowship",
       title: "Research & Policy Impact Fellowship",
       type: "Fellowship",
       badgeCls: "bg-purple-50 text-purple-700 border-purple-200",
@@ -14,7 +14,7 @@ export function EcosystemSection() {
       deadline: "Oct 15, 2026",
     },
     {
-      id: "opp-2",
+      id: "opportunity-strategy-associate",
       title: "Human Capital Strategy Associate",
       type: "Employment",
       badgeCls: "bg-blue-50 text-brand-navy border-blue-200",
@@ -23,7 +23,7 @@ export function EcosystemSection() {
       deadline: "Nov 01, 2026",
     },
     {
-      id: "opp-3",
+      id: "opportunity-research-internship",
       title: "Graduate Analytics & Econometrics Internship",
       type: "Internship",
       badgeCls: "bg-red-50 text-brand-red border-red-200",
@@ -92,7 +92,7 @@ export function EcosystemSection() {
                 </div>
 
                 <Link
-                  href={`/contact?subject=Application for ${encodeURIComponent(opp.title)}`}
+                  href={`/opportunities?opportunity=${encodeURIComponent(opp.id)}`}
                   className="px-4 py-2 rounded-xl text-xs font-bold text-white bg-brand-navy hover:bg-brand-navyDark shadow-xs transition-all shrink-0 text-center"
                 >
                   Apply Now

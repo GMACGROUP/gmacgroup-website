@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import { apiClient } from "@/lib/api/client";
 import { useAuth } from "@/hooks/useAuth";
-import { Programme } from "@/types";
+import { OfferType, Programme } from "@/types";
 import { AcademicCapIcon, CheckCircleIcon, XMarkIcon } from "@/components/common/Icons";
 
 interface EnrolmentModalProps {
@@ -23,6 +23,7 @@ export function EnrolmentModal({
   const [submitting, setSubmitting] = useState(false);
   const [submitted, setSubmitted] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [offerType, setOfferType] = useState<OfferType>("free");
 
   const [formData, setFormData] = useState({
     full_name: "",
@@ -44,6 +45,7 @@ export function EnrolmentModal({
     }
     setSubmitted(false);
     setError(null);
+    setOfferType(programme?.offers?.[0]?.type || "free");
   }, [user, isOpen, programme]);
 
   if (!isOpen || !programme) return null;
@@ -55,7 +57,20 @@ export function EnrolmentModal({
     setError(null);
 
     try {
-      await apiClient.post(`/programmes/${programme.id}/enrol`, formData);
+      const offer = programme.offers?.find((item) => item.type === offerType);
+      if (offer && offer.amount > 0) {
+        const payment = await apiClient.post<{ checkout_url?: string }>("/payments/initialize", {
+          target_type: "programme",
+          target_id: programme.id,
+          offer_type: offer.type,
+          email: formData.email,
+          full_name: formData.full_name,
+          details: formData,
+        });
+        if (payment.checkout_url) window.location.assign(payment.checkout_url);
+        return;
+      }
+      await apiClient.post(`/programmes/${programme.id}/enrol`, { ...formData, offer_type: offerType });
       setSubmitted(true);
       if (onSuccess) onSuccess();
     } catch (err) {
@@ -100,6 +115,23 @@ export function EnrolmentModal({
                   <span> • Starts {new Date(programme.start_date).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })}</span>
                 )}
               </p>
+
+              {programme.offers && programme.offers.length > 0 && (
+                <label className="block mb-5">
+                  <span className="block text-xs font-bold text-slate-800 uppercase tracking-wider mb-1.5">Choose an offer</span>
+                  <select
+                    value={offerType}
+                    onChange={(event) => setOfferType(event.target.value as OfferType)}
+                    className="w-full px-3.5 py-2.5 text-sm rounded-xl border border-slate-300 bg-slate-50 text-slate-900"
+                  >
+                    {programme.offers.map((offer) => (
+                      <option key={offer.type} value={offer.type}>
+                        {offer.amount === 0 ? offer.label : `${offer.label} - ${offer.currency} ${offer.amount}`}
+                      </option>
+                    ))}
+                  </select>
+                </label>
+              )}
 
               <form onSubmit={handleSubmit} className="space-y-4">
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
