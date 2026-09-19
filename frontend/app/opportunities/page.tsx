@@ -41,20 +41,24 @@ const typeImages: Record<string, string> = {
 function OpportunitiesPageContent() {
   const searchParams = useSearchParams();
   const requestedOpportunityId = searchParams.get("opportunity");
-  const [opportunities, setOpportunities] = useState<Opportunity[]>([]);
+  const [allOpportunities, setAllOpportunities] = useState<Opportunity[]>([]);
   const [loading, setLoading] = useState(true);
   const [typeFilter, setTypeFilter] = useState<string>("all");
   const [selectedOpportunity, setSelectedOpportunity] = useState<Opportunity | null>(null);
 
   useEffect(() => {
     setLoading(true);
-    const endpoint = typeFilter === "all" ? "/opportunities/" : `/opportunities/?type=${typeFilter}`;
+    const endpoint = "/opportunities/";
     apiClient
       .get<Opportunity[]>(endpoint)
-      .then((data) => setOpportunities(data))
-      .catch(() => setOpportunities([]))
+      .then((data) => setAllOpportunities(data))
+      .catch(() => setAllOpportunities([]))
       .finally(() => setLoading(false));
-  }, [typeFilter]);
+  }, []);
+
+  const opportunities = typeFilter === "all"
+    ? allOpportunities
+    : allOpportunities.filter((opportunity) => opportunity.type === typeFilter);
 
   useEffect(() => {
     if (!requestedOpportunityId || loading) return;
@@ -186,7 +190,7 @@ function OpportunitiesPageContent() {
                     <div className="mt-6 pt-5 border-t border-slate-100 flex items-center justify-between gap-3">
                       <button
                         onClick={() => setSelectedOpportunity(opp)}
-                        className="btn-primary text-xs px-5 py-2.5 shadow-sm hover:shadow-md"
+                        className="btn-primary text-xs px-5 py-2.5 shadow-sm hover:shadow-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-cyan"
                       >
                         Apply for Opening →
                       </button>

@@ -22,6 +22,7 @@ interface AuthResponse {
 
 const TOKEN_KEY = "gmac_auth_token";
 const USER_KEY = "gmac_auth_user";
+const AUTH_CHANGED_EVENT = "gmac-auth-changed";
 
 export function useAuth() {
   const [user, setUser] = useState<UserProfile | null>(null);
@@ -57,6 +58,29 @@ export function useAuth() {
     } catch {
       setLoading(false);
     }
+  }, []);
+
+  useEffect(() => {
+    const clearAuthState = () => {
+      setUser(null);
+      setToken(null);
+      setLoading(false);
+    };
+
+    const handleStorageChange = (event: StorageEvent) => {
+      if (event.key === TOKEN_KEY || event.key === USER_KEY) {
+        if (!localStorage.getItem(TOKEN_KEY) || !localStorage.getItem(USER_KEY)) {
+          clearAuthState();
+        }
+      }
+    };
+
+    window.addEventListener(AUTH_CHANGED_EVENT, clearAuthState);
+    window.addEventListener("storage", handleStorageChange);
+    return () => {
+      window.removeEventListener(AUTH_CHANGED_EVENT, clearAuthState);
+      window.removeEventListener("storage", handleStorageChange);
+    };
   }, []);
 
   const login = useCallback(async (email: string, password: string): Promise<UserProfile> => {
@@ -110,6 +134,7 @@ export function useAuth() {
     localStorage.removeItem(USER_KEY);
     setUser(null);
     setToken(null);
+    window.dispatchEvent(new Event(AUTH_CHANGED_EVENT));
   }, []);
 
   const updateProfile = useCallback(

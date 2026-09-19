@@ -100,7 +100,7 @@ export default function DashboardPage() {
 
   const handleLogout = () => {
     logout();
-    router.push("/login");
+    router.push("/");
   };
 
   const userDisplayName = user.full_name || user.email.split("@")[0];

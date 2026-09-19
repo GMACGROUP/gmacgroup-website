@@ -38,7 +38,7 @@ export function Navbar() {
 
   const handleLogout = () => {
     logout();
-    router.push("/login");
+    router.push("/");
   };
 
   const displayName =
