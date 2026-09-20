@@ -75,20 +75,22 @@ export default function ServicesPage() {
       <section className="container mx-auto px-4 sm:px-6 py-10 max-w-7xl">
 
         {/* Category Filters — pill-style tab bar */}
-        <div className="flex flex-wrap items-center justify-center gap-2 mb-10">
-          {categories.map((c) => (
-            <button
-              key={c.key}
-              onClick={() => setActiveCategory(c.key)}
-              className={`px-5 py-2.5 rounded-full text-sm font-semibold border transition-all duration-200 ${
-                activeCategory === c.key
-                  ? "bg-brand-navy text-white border-brand-navy shadow-elevate"
-                  : "bg-white text-slate-600 border-slate-200 hover:border-brand-navy/40 hover:text-brand-navy"
-              }`}
-            >
-              {c.label}
-            </button>
-          ))}
+        <div className="mb-8 sm:mb-10 overflow-x-auto pb-1">
+          <div className="flex min-w-max items-center justify-center gap-2">
+            {categories.map((c) => (
+              <button
+                key={c.key}
+                onClick={() => setActiveCategory(c.key)}
+                className={`whitespace-nowrap px-3 py-2 sm:px-5 sm:py-2.5 rounded-full text-xs sm:text-sm font-semibold border transition-all duration-200 ${
+                  activeCategory === c.key
+                    ? "bg-brand-navy text-white border-brand-navy shadow-elevate"
+                    : "bg-white text-slate-600 border-slate-200 hover:border-brand-navy/40 hover:text-brand-navy"
+                }`}
+              >
+                {c.label}
+              </button>
+            ))}
+          </div>
         </div>
 
         {/* Error Alert */}
@@ -104,14 +106,14 @@ export default function ServicesPage() {
 
         {/* Loading Skeleton */}
         {loading && (
-          <div className="grid gap-6 md:grid-cols-3">
+          <div className="grid gap-5 sm:gap-6 grid-cols-1 sm:grid-cols-2 xl:grid-cols-3">
             {[1, 2, 3].map((n) => (
               <div
                 key={n}
                 className="bg-white rounded-2xl border border-slate-200 shadow-card overflow-hidden"
               >
-                <div className="h-44 skeleton-shimmer" />
-                <div className="p-7">
+                <div className="h-40 sm:h-44 skeleton-shimmer" />
+                <div className="p-5 sm:p-7">
                   <div className="w-24 h-5 skeleton-shimmer rounded-full mb-3" />
                   <div className="w-3/5 h-6 skeleton-shimmer rounded mb-3" />
                   <div className="w-full h-3 skeleton-shimmer rounded mb-2" />
@@ -125,7 +127,7 @@ export default function ServicesPage() {
 
         {/* Services Grid */}
         {!loading && filteredServices.length > 0 && (
-          <div className="grid gap-8 md:grid-cols-3">
+          <div className="grid gap-5 sm:gap-6 md:gap-8 grid-cols-1 sm:grid-cols-2 xl:grid-cols-3">
             {filteredServices.map((service) => {
               const catKey = service.category?.toLowerCase() || "";
               const accent = categoryAccents[catKey] || categoryAccents.default;
@@ -164,8 +166,8 @@ export default function ServicesPage() {
                   {/* top accent */}
                   <div className={`h-1 ${accent} w-full`} />
 
-                  <div className="flex flex-col flex-1 p-7">
-                    <h2 className="text-xl font-extrabold text-slate-900 group-hover:text-brand-navy transition-colors font-serif leading-snug mb-3">
+                  <div className="flex flex-col flex-1 p-5 sm:p-7">
+                    <h2 className="text-lg sm:text-xl font-extrabold text-slate-900 group-hover:text-brand-navy transition-colors font-serif leading-snug mb-3">
                       {service.title}
                     </h2>
 
@@ -179,16 +181,16 @@ export default function ServicesPage() {
                       </p>
                     )}
 
-                    <div className="mt-6 pt-5 border-t border-slate-100 flex items-center justify-between">
+                    <div className="mt-6 pt-5 border-t border-slate-100 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
                       <Link
                         href={`/contact?subject=Service Inquiry: ${encodeURIComponent(service.title)}`}
-                        className="btn-primary text-xs px-4 py-2"
+                        className="btn-primary text-xs px-4 py-2 w-full sm:w-auto text-center"
                       >
                         Request Advisory →
                       </Link>
                       <Link
                         href="/contact"
-                        className="text-xs font-semibold text-slate-500 hover:text-brand-navy transition-colors"
+                        className="text-xs font-semibold text-slate-500 hover:text-brand-navy transition-colors text-center sm:text-left"
                       >
                         Enquire Details
                       </Link>

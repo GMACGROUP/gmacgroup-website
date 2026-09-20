@@ -64,6 +64,24 @@ configure the Flutterwave webhook URL as
 without payment. The backend verifies the transaction amount, currency, and
 reference before confirming an enrolment or application.
 
+### Email notifications
+Registration, contact requests, applications, enrolments, status changes, and
+newsletter subscriptions are connected to the backend notification flow. Email
+delivery uses Resend when configured; otherwise local development logs the
+notification and continues without blocking the user action.
+
+Add these values to `backend/.env` for real delivery:
+
+```env
+EMAIL_PROVIDER=resend
+RESEND_API_KEY=re_your_key
+EMAIL_FROM=GMACGROUP <notifications@your-verified-domain.com>
+OPERATIONS_EMAIL=operations@your-company.com
+```
+
+Verify the sender domain in Resend before using a company address. Restart the
+FastAPI server after changing environment variables.
+
 ## What's implemented vs. stubbed
 
 | Layer | What exists | What's stubbed |

@@ -6,9 +6,15 @@ training programmes, institutional programmes, and enrolment.
 from datetime import datetime, timezone
 from typing import List, Optional
 from fastapi import APIRouter, Depends, HTTPException, Query, status
+from sqlalchemy import or_, select
+from sqlalchemy.orm import Session
 from app.api.dependencies import get_current_user, get_optional_user
+from app.core.database import get_db
+from app.models.programme import ProgrammeEnrolment
+from app.models.user import User
+from app.services.notifications import notification_service
 from app.schemas.programme import ProgrammeOut, EnrolmentCreate, EnrolmentOut
-from app.data import ENROLMENTS, PROGRAMMES, new_record
+from app.data import PROGRAMMES
 
 router = APIRouter()
 
@@ -20,14 +26,18 @@ async def list_programmes(category: str | None = Query(default=None)):
 
 
 @router.get("/my-enrolments", response_model=List[EnrolmentOut])
-async def list_my_enrolments(current_user: dict = Depends(get_current_user)):
+async def list_my_enrolments(
+    current_user: dict = Depends(get_current_user),
+    db: Session = Depends(get_db),
+):
     """List all cohort enrolments for the authenticated user."""
     user_id = current_user.get("id")
     user_email = current_user.get("email", "").lower()
-    return [
-        e for e in ENROLMENTS
-        if e.get("user_id") == user_id or (e.get("email") and e.get("email").lower() == user_email)
-    ]
+    return db.scalars(
+        select(ProgrammeEnrolment)
+        .where(or_(ProgrammeEnrolment.user_id == user_id, ProgrammeEnrolment.email == user_email))
+        .order_by(ProgrammeEnrolment.created_at.desc())
+    ).all()
 
 
 @router.get("/{programme_id}", response_model=ProgrammeOut)
@@ -44,6 +54,7 @@ async def enrol_in_programme(
     programme_id: str,
     payload: EnrolmentCreate,
     current_user: Optional[dict] = Depends(get_optional_user),
+    db: Session = Depends(get_db),
 ):
     """Create an enrolment for an authenticated member or guest applicant."""
     programme = next((item for item in PROGRAMMES if item["id"] == programme_id), None)
@@ -58,18 +69,28 @@ async def enrol_in_programme(
     user_id = current_user.get("id") if current_user else None
     email = current_user.get("email") if current_user else (payload.email or "guest@example.com")
     name = current_user.get("full_name") if current_user else (payload.full_name or "Applicant")
+    if user_id is None:
+        matched_user = db.scalar(select(User).where(User.email == str(email).lower()))
+        user_id = matched_user.id if matched_user else None
 
-    enrolment = new_record({
-        "programme_id": programme_id,
-        "programme_title": programme["title"],
-        "user_id": user_id,
-        "full_name": name,
-        "email": email,
-        "phone": payload.phone,
-        "organization": payload.organization,
-        "notes": payload.notes,
-        "offer_type": payload.offer_type.value,
-        "status": "confirmed",
-    })
-    ENROLMENTS.append(enrolment)
+    enrolment = ProgrammeEnrolment(
+        programme_id=programme_id,
+        programme_title=programme["title"],
+        user_id=user_id,
+        full_name=name,
+        email=email,
+        phone=payload.phone,
+        organization=payload.organization,
+        notes=payload.notes,
+        offer_type=payload.offer_type.value,
+        status="confirmed",
+    )
+    db.add(enrolment)
+    db.commit()
+    db.refresh(enrolment)
+    await notification_service.notify_enrolment_submitted(
+        enrolment.email or email,
+        enrolment.full_name or name,
+        enrolment.programme_title or "Programme",
+    )
     return enrolment

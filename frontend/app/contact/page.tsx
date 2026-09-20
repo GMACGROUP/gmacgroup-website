@@ -34,8 +34,8 @@ export default function ContactPage() {
       />
 
       {/* Main Content Area */}
-      <section className="container mx-auto px-4 sm:px-6 py-10 sm:py-12 max-w-6xl">
-        <div className="grid lg:grid-cols-5 gap-8 items-start">
+      <section className="container mx-auto px-4 sm:px-6 py-8 sm:py-12 max-w-6xl">
+        <div className="grid gap-6 lg:grid-cols-5 lg:gap-8 items-start">
 
           {/* ── Left Column: Contact Info ─────────────────────── */}
           <div className="lg:col-span-2 space-y-6">
@@ -73,7 +73,7 @@ export default function ContactPage() {
                 return (
                   <div
                     key={item.label}
-                    className="flex items-start gap-4 p-4 bg-white rounded-2xl border border-slate-200 shadow-card"
+                    className="flex items-start gap-3 sm:gap-4 p-3.5 sm:p-4 bg-white rounded-2xl border border-slate-200 shadow-card"
                   >
                     <div className={`w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0 border ${item.color}`}>
                       <Icon className="w-5 h-5" />
@@ -108,7 +108,7 @@ export default function ContactPage() {
 
           {/* ── Right Column: Form ────────────────────────────── */}
           <div className="lg:col-span-3">
-            <div className="bg-white rounded-3xl border border-slate-200 shadow-card-featured p-8 sm:p-10">
+            <div className="bg-white rounded-3xl border border-slate-200 shadow-card-featured p-5 sm:p-8 lg:p-10">
               <div className="mb-6">
                 <span className="section-label text-brand-red block mb-1">Send a Message</span>
                 <h3 className="text-xl sm:text-2xl font-extrabold text-slate-900 font-serif">

@@ -114,7 +114,7 @@ export default function ResearchPage() {
         </div>
 
         {/* ── Prominent Interactive Navigation Bar ── */}
-        <div className="bg-white rounded-2xl p-2 border border-slate-200 shadow-sm flex flex-col sm:flex-row items-center justify-between gap-3">
+        <div className="bg-white rounded-2xl p-2 border border-slate-200 shadow-sm flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
           <div className="flex flex-wrap items-center gap-1.5 w-full sm:w-auto">
             {TABS.map((tab) => {
               const Icon = tab.icon;
@@ -123,7 +123,7 @@ export default function ResearchPage() {
                 <button
                   key={tab.key}
                   onClick={() => setActiveTab(tab.key)}
-                  className={`flex items-center gap-2 px-4 sm:px-5 py-2.5 rounded-xl text-xs sm:text-sm font-bold transition-all duration-200 ${
+                  className={`flex items-center gap-2 px-3 py-2 sm:px-4 sm:py-2.5 rounded-xl text-[11px] sm:text-sm font-bold transition-all duration-200 ${
                     isActive
                       ? "bg-brand-navy text-white shadow-sm"
                       : "text-slate-600 hover:text-brand-navy hover:bg-slate-100"
@@ -133,7 +133,7 @@ export default function ResearchPage() {
                   <span>{tab.label}</span>
                   {!loading && counts[tab.key] > 0 && (
                     <span
-                      className={`text-[11px] font-extrabold px-2 py-0.5 rounded-md ${
+                      className={`text-[10px] font-extrabold px-1.5 py-0.5 rounded-md ${
                         isActive
                           ? "bg-white/20 text-white"
                           : "bg-slate-100 text-slate-700"
@@ -178,7 +178,7 @@ export default function ResearchPage() {
         {/* ── Tab 1: Research Projects ── */}
         {!loading && activeTab === "projects" && (
           <div className="space-y-6">
-            <div className="grid gap-6 md:grid-cols-2">
+            <div className="grid gap-5 sm:gap-6 grid-cols-1 md:grid-cols-2">
               {projects
                 .filter(
                   (p) =>
@@ -191,8 +191,8 @@ export default function ResearchPage() {
                     className="group relative flex flex-col bg-white rounded-2xl border border-slate-200 shadow-card hover:shadow-card-hover hover:border-brand-navy/30 hover:-translate-y-1 transition-all duration-300 overflow-hidden"
                   >
                     <div className="h-1.5 bg-brand-navy w-full" />
-                    <div className="p-7 flex flex-col flex-1">
-                      <div className="flex items-center justify-between gap-2 mb-4">
+                    <div className="p-5 sm:p-7 flex flex-col flex-1">
+                      <div className="flex flex-wrap items-center justify-between gap-2 mb-4">
                         <span className="badge bg-blue-50 text-brand-navy border-blue-200 uppercase font-bold text-[10px]">
                           {project.status || "Ongoing"}
                         </span>
@@ -252,7 +252,7 @@ export default function ResearchPage() {
               .map((pub) => (
                 <div
                   key={pub.id}
-                  className="group flex flex-col sm:flex-row sm:items-center justify-between gap-4 p-6 bg-white rounded-2xl border border-slate-200 shadow-card hover:shadow-card-hover hover:border-brand-navy/30 transition-all duration-200"
+                  className="group flex flex-col gap-4 p-5 sm:p-6 bg-white rounded-2xl border border-slate-200 shadow-card hover:shadow-card-hover hover:border-brand-navy/30 transition-all duration-200 sm:flex-row sm:items-center sm:justify-between"
                 >
                   <div className="flex items-start gap-4">
                     <div className="w-11 h-11 rounded-xl bg-purple-50 text-purple-700 border border-purple-100 flex items-center justify-center flex-shrink-0 shadow-xs">
@@ -273,7 +273,7 @@ export default function ResearchPage() {
 
                   <button
                     onClick={() => setSelectedPublication(pub)}
-                    className="px-4 py-2 rounded-xl text-xs font-bold text-white bg-purple-700 hover:bg-purple-800 shadow-xs transition-all shrink-0 text-center cursor-pointer"
+                    className="px-4 py-2.5 rounded-xl text-xs font-bold text-white bg-purple-700 hover:bg-purple-800 shadow-xs transition-all shrink-0 text-center cursor-pointer w-full sm:w-auto"
                   >
                     Request Full Paper
                   </button>
@@ -295,7 +295,7 @@ export default function ResearchPage() {
         {/* ── Tab 3: Faculty & Fellow Network ── */}
         {!loading && activeTab === "experts" && (
           <div className="space-y-6">
-            <div className="grid gap-6 md:grid-cols-3">
+            <div className="grid gap-5 sm:gap-6 grid-cols-1 sm:grid-cols-2 xl:grid-cols-3">
               {experts
                 .filter(
                   (exp) =>

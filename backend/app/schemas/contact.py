@@ -1,6 +1,7 @@
 """Pydantic schemas for contact form submissions and newsletter subscriptions."""
 
 from datetime import datetime
+from uuid import UUID
 from pydantic import BaseModel, ConfigDict, EmailStr
 
 
@@ -12,7 +13,7 @@ class ContactRequestCreate(BaseModel):
 
 
 class ContactRequestOut(BaseModel):
-    id: str
+    id: UUID
     name: str
     email: EmailStr
     subject: str

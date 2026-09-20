@@ -25,6 +25,8 @@ export function Navbar() {
 
   if (safePathname.startsWith("/dashboard")) return null;
 
+  const isOperationsPage = safePathname.startsWith("/admin");
+
   const navLinks = [
     { href: "/", label: "Home" },
     { href: "/about", label: "About" },
@@ -119,7 +121,7 @@ export function Navbar() {
                   Logout
                 </button>
               </div>
-            ) : (
+            ) : !isOperationsPage ? (
               <>
                 <Link
                   href="/login"
@@ -134,7 +136,7 @@ export function Navbar() {
                   Join Network
                 </Link>
               </>
-            )}
+            ) : null}
           </div>
 
           {/* Mobile Menu Toggle */}
@@ -205,7 +207,7 @@ export function Navbar() {
                     Sign Out
                   </button>
                 </div>
-              ) : (
+              ) : !isOperationsPage ? (
                 <>
                   <Link
                     href="/login"
@@ -222,7 +224,7 @@ export function Navbar() {
                     Join Network
                   </Link>
                 </>
-              )}
+              ) : null}
             </div>
           </div>
         )}
