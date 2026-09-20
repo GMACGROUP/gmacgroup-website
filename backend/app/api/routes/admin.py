@@ -22,6 +22,7 @@ from app.schemas.admin import (
     AdminPaymentOut,
     StatusUpdate,
 )
+from app.services.notifications import notification_service
 
 router = APIRouter()
 admin_only = require_role("admin")
@@ -98,6 +99,13 @@ async def update_application(
     ))
     db.commit()
     db.refresh(application)
+    if application.applicant_email:
+        await notification_service.notify_status_changed(
+            application.applicant_email,
+            application.applicant_name or "Applicant",
+            application.opportunity_title or "Opportunity",
+            application.status,
+        )
     return application
 
 

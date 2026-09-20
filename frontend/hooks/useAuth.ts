@@ -29,6 +29,17 @@ export function useAuth() {
   const [token, setToken] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
 
+  const refreshUser = useCallback(async (): Promise<UserProfile | null> => {
+    try {
+      const freshUser = await apiClient.get<UserProfile>("/auth/me");
+      setUser(freshUser);
+      localStorage.setItem(USER_KEY, JSON.stringify(freshUser));
+      return freshUser;
+    } catch {
+      return null;
+    }
+  }, []);
+
   // Initialize auth state from localStorage and verify with backend
   useEffect(() => {
     try {
@@ -41,16 +52,7 @@ export function useAuth() {
         setToken(storedToken);
 
         // Verify with backend silently
-        apiClient
-          .get<UserProfile>("/auth/me")
-          .then((freshUser) => {
-            setUser(freshUser);
-            localStorage.setItem(USER_KEY, JSON.stringify(freshUser));
-          })
-          .catch(() => {
-            // Token might be expired or invalid
-            // We can keep local user or let them re-login if endpoint fails
-          })
+        refreshUser()
           .finally(() => setLoading(false));
       } else {
         setLoading(false);
@@ -58,7 +60,7 @@ export function useAuth() {
     } catch {
       setLoading(false);
     }
-  }, []);
+  }, [refreshUser]);
 
   useEffect(() => {
     const clearAuthState = () => {
@@ -160,6 +162,7 @@ export function useAuth() {
     register,
     logout,
     updateProfile,
+    refreshUser,
     isAuthenticated: Boolean(user),
   };
 }

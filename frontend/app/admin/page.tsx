@@ -78,7 +78,7 @@ function StatusPill({ value }: { value: string }) {
 }
 
 export default function AdminPage() {
-  const { user, loading } = useAuth();
+  const { user, loading, refreshUser } = useAuth();
   const [queue, setQueue] = useState<Queue>("applications");
   const [overview, setOverview] = useState<Overview | null>(null);
   const [applications, setApplications] = useState<Application[]>([]);
@@ -115,9 +115,12 @@ export default function AdminPage() {
   }
 
   useEffect(() => {
-    if (user?.role === "admin") loadData();
-    else if (!loading) setLoadingData(false);
-  }, [loading, user]);
+    if (loading) return;
+    refreshUser().then((freshUser) => {
+      if (freshUser?.role === "admin") loadData();
+      else setLoadingData(false);
+    });
+  }, [loading, refreshUser]);
 
   async function changeApplicationStatus(id: string, status: string) {
     try {

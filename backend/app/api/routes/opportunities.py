@@ -10,6 +10,8 @@ from sqlalchemy.orm import Session
 from app.api.dependencies import get_current_user, get_optional_user
 from app.core.database import get_db
 from app.models.opportunity import Application
+from app.models.user import User
+from app.services.notifications import notification_service
 from app.schemas.opportunity import (
     OpportunityOut,
     ApplicationCreate,
@@ -71,6 +73,9 @@ async def apply_to_opportunity(
     user_id = current_user.get("id") if current_user else None
     email = current_user.get("email") if current_user else (payload.applicant_email or "applicant@example.com")
     name = current_user.get("full_name") if current_user else (payload.applicant_name or "Applicant")
+    if user_id is None:
+        matched_user = db.scalar(select(User).where(User.email == str(email).lower()))
+        user_id = matched_user.id if matched_user else None
 
     application = Application(
         opportunity_id=opportunity_id,
@@ -88,4 +93,9 @@ async def apply_to_opportunity(
     db.add(application)
     db.commit()
     db.refresh(application)
+    await notification_service.notify_application_submitted(
+        application.applicant_email or email,
+        application.applicant_name or name,
+        application.opportunity_title or "Opportunity",
+    )
     return application

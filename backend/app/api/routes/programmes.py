@@ -11,6 +11,8 @@ from sqlalchemy.orm import Session
 from app.api.dependencies import get_current_user, get_optional_user
 from app.core.database import get_db
 from app.models.programme import ProgrammeEnrolment
+from app.models.user import User
+from app.services.notifications import notification_service
 from app.schemas.programme import ProgrammeOut, EnrolmentCreate, EnrolmentOut
 from app.data import PROGRAMMES
 
@@ -67,6 +69,9 @@ async def enrol_in_programme(
     user_id = current_user.get("id") if current_user else None
     email = current_user.get("email") if current_user else (payload.email or "guest@example.com")
     name = current_user.get("full_name") if current_user else (payload.full_name or "Applicant")
+    if user_id is None:
+        matched_user = db.scalar(select(User).where(User.email == str(email).lower()))
+        user_id = matched_user.id if matched_user else None
 
     enrolment = ProgrammeEnrolment(
         programme_id=programme_id,
@@ -83,4 +88,9 @@ async def enrol_in_programme(
     db.add(enrolment)
     db.commit()
     db.refresh(enrolment)
+    await notification_service.notify_enrolment_submitted(
+        enrolment.email or email,
+        enrolment.full_name or name,
+        enrolment.programme_title or "Programme",
+    )
     return enrolment

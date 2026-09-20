@@ -14,6 +14,8 @@ from app.schemas.contact import (
     NewsletterResponse,
 )
 from app.data import NEWSLETTER_SUBSCRIBERS
+from app.models.newsletter import NewsletterSubscriber
+from app.services.notifications import notification_service
 
 router = APIRouter()
 
@@ -34,15 +36,23 @@ async def submit_contact_request(
     db.add(request)
     db.commit()
     db.refresh(request)
+    await notification_service.notify_contact_request(
+        request.name,
+        request.email,
+        request.subject,
+        request.message,
+    )
     return request
 
 
 @router.post("/newsletter", response_model=NewsletterResponse)
-async def subscribe_newsletter(payload: NewsletterSubscribe):
+async def subscribe_newsletter(payload: NewsletterSubscribe, db: Session = Depends(get_db)):
     """Subscribe an email to the GMAC Insights newsletter."""
     email_lower = payload.email.lower().strip()
-    if email_lower not in NEWSLETTER_SUBSCRIBERS:
-        NEWSLETTER_SUBSCRIBERS.append(email_lower)
+    subscriber = db.query(NewsletterSubscriber).filter(NewsletterSubscriber.email == email_lower).first()
+    if subscriber is None:
+        db.add(NewsletterSubscriber(email=email_lower))
+        db.commit()
 
     return {
         "status": "subscribed",

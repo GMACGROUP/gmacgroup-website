@@ -10,6 +10,7 @@ from app.core.database import get_db
 from app.core.passwords import hash_password, verify_password
 from app.models.user import User
 from app.schemas.user import AuthResponse, UserCreate, UserLogin, UserOut
+from app.services.notifications import notification_service
 
 router = APIRouter()
 
@@ -43,6 +44,7 @@ async def register(payload: UserCreate, db: Session = Depends(get_db)):
     db.add(user)
     db.commit()
     db.refresh(user)
+    await notification_service.notify_member_registered(user.email, user.full_name or "Member")
 
     token = create_access_token({
         "sub": str(user.id),
