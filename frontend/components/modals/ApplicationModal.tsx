@@ -5,6 +5,7 @@ import { apiClient } from "@/lib/api/client";
 import { useAuth } from "@/hooks/useAuth";
 import { OfferType, Opportunity } from "@/types";
 import { BriefcaseIcon, CheckCircleIcon, XMarkIcon } from "@/components/common/Icons";
+import { DocumentUploadDropzone } from "@/components/forms/DocumentUploadDropzone";
 
 interface ApplicationModalProps {
   opportunity: Opportunity | null;
@@ -230,18 +231,11 @@ export function ApplicationModal({
                   />
                 </div>
 
-                <div>
-                  <label className="block text-xs font-bold text-slate-800 uppercase tracking-wider mb-1.5">
-                    CV / Resume URL
-                  </label>
-                  <input
-                    type="url"
-                    value={formData.resume_url || ""}
-                    onChange={(e) => setFormData({ ...formData, resume_url: e.target.value })}
-                    placeholder="https://drive.google.com/..."
-                    className="w-full px-3.5 py-2.5 text-xs sm:text-sm rounded-xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-brand-navy/30 focus:border-brand-navy bg-slate-50 focus:bg-white transition-all text-slate-900"
-                  />
-                </div>
+                <DocumentUploadDropzone
+                  label="Curriculum Vitae / Resume"
+                  value={formData.resume_url}
+                  onChange={(url) => setFormData((prev) => ({ ...prev, resume_url: url }))}
+                />
 
                 {error && (
                   <p className="p-3 rounded-xl bg-red-50 text-xs font-semibold text-brand-red border border-red-200 text-center">

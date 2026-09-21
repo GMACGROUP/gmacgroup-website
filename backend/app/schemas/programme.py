@@ -39,6 +39,24 @@ class ProgrammeOut(BaseModel):
     model_config = ConfigDict(from_attributes=True)
 
 
+class ProgrammeCreate(BaseModel):
+    title: str
+    category: ProgrammeCategory = ProgrammeCategory.STUDENT
+    description: Optional[str] = None
+    start_date: Optional[datetime] = None
+    end_date: Optional[datetime] = None
+    offers: list[OfferOut] = []
+
+
+class ProgrammeUpdate(BaseModel):
+    title: Optional[str] = None
+    category: Optional[ProgrammeCategory] = None
+    description: Optional[str] = None
+    start_date: Optional[datetime] = None
+    end_date: Optional[datetime] = None
+    offers: Optional[list[OfferOut]] = None
+
+
 class EnrolmentCreate(BaseModel):
     full_name: Optional[str] = None
     email: Optional[EmailStr] = None

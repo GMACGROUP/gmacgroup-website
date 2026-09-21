@@ -152,3 +152,160 @@ async def contacts(_: dict = Depends(admin_only), db: Session = Depends(get_db))
 @router.get("/payments", response_model=list[AdminPaymentOut])
 async def payments(_: dict = Depends(admin_only), db: Session = Depends(get_db)):
     return db.scalars(select(Payment).order_by(Payment.created_at.desc())).all()
+
+
+# ---------------------------------------------------------------------------
+# Dynamic Catalog Management (Programmes & Opportunities)
+# ---------------------------------------------------------------------------
+
+from uuid import uuid4
+import re
+from app.data import PROGRAMMES, OPPORTUNITIES
+from app.schemas.programme import ProgrammeCreate, ProgrammeOut, ProgrammeUpdate
+from app.schemas.opportunity import OpportunityCreate, OpportunityOut, OpportunityUpdate
+
+
+def _slugify(text: str) -> str:
+    clean = re.sub(r"[^a-zA-Z0-9\s-]", "", text).strip().lower()
+    return re.sub(r"[\s-]+", "-", clean)
+
+
+@router.post("/programmes", response_model=ProgrammeOut, status_code=status.HTTP_201_CREATED)
+async def create_programme(payload: ProgrammeCreate, _: dict = Depends(admin_only)):
+    """Create a new cohort programme."""
+    slug = f"programme-{_slugify(payload.title)[:30]}-{uuid4().hex[:6]}"
+    category_val = payload.category.value if hasattr(payload.category, "value") else str(payload.category)
+    
+    new_item = {
+        "id": slug,
+        "title": payload.title,
+        "category": category_val,
+        "description": payload.description,
+        "start_date": payload.start_date.isoformat() if payload.start_date else None,
+        "end_date": payload.end_date.isoformat() if payload.end_date else None,
+        "offers": [
+            {
+                "type": o.type.value if hasattr(o.type, "value") else str(o.type),
+                "label": o.label,
+                "amount": o.amount,
+                "currency": o.currency,
+            }
+            for o in payload.offers
+        ] if payload.offers else [
+            {"type": "free", "label": "Free", "amount": 0, "currency": "GHS"}
+        ],
+    }
+    PROGRAMMES.insert(0, new_item)
+    return new_item
+
+
+@router.put("/programmes/{programme_id}", response_model=ProgrammeOut)
+async def update_programme(programme_id: str, payload: ProgrammeUpdate, _: dict = Depends(admin_only)):
+    """Update an existing cohort programme."""
+    prog = next((item for item in PROGRAMMES if item["id"] == programme_id), None)
+    if prog is None:
+        raise HTTPException(status_code=404, detail="Programme not found")
+
+    if payload.title is not None:
+        prog["title"] = payload.title
+    if payload.category is not None:
+        prog["category"] = payload.category.value if hasattr(payload.category, "value") else str(payload.category)
+    if payload.description is not None:
+        prog["description"] = payload.description
+    if payload.start_date is not None:
+        prog["start_date"] = payload.start_date.isoformat()
+    if payload.end_date is not None:
+        prog["end_date"] = payload.end_date.isoformat()
+    if payload.offers is not None:
+        prog["offers"] = [
+            {
+                "type": o.type.value if hasattr(o.type, "value") else str(o.type),
+                "label": o.label,
+                "amount": o.amount,
+                "currency": o.currency,
+            }
+            for o in payload.offers
+        ]
+    return prog
+
+
+@router.delete("/programmes/{programme_id}", status_code=status.HTTP_200_OK)
+async def delete_programme(programme_id: str, _: dict = Depends(admin_only)):
+    """Remove a cohort programme from active catalogue."""
+    index = next((i for i, item in enumerate(PROGRAMMES) if item["id"] == programme_id), None)
+    if index is None:
+        raise HTTPException(status_code=404, detail="Programme not found")
+    removed = PROGRAMMES.pop(index)
+    return {"status": "deleted", "id": programme_id, "title": removed["title"]}
+
+
+@router.post("/opportunities", response_model=OpportunityOut, status_code=status.HTTP_201_CREATED)
+async def create_opportunity(payload: OpportunityCreate, _: dict = Depends(admin_only)):
+    """Create a new job, internship, or fellowship opportunity."""
+    slug = f"opportunity-{_slugify(payload.title)[:30]}-{uuid4().hex[:6]}"
+    type_val = payload.type.value if hasattr(payload.type, "value") else str(payload.type)
+
+    new_item = {
+        "id": slug,
+        "title": payload.title,
+        "type": type_val,
+        "organization": payload.organization or "GMAC GROUP",
+        "location": payload.location or "Accra / Hybrid",
+        "description": payload.description,
+        "deadline": payload.deadline.isoformat() if payload.deadline else None,
+        "offers": [
+            {
+                "type": o.type.value if hasattr(o.type, "value") else str(o.type),
+                "label": o.label,
+                "amount": o.amount,
+                "currency": o.currency,
+            }
+            for o in payload.offers
+        ] if payload.offers else [
+            {"type": "free", "label": "Free Application", "amount": 0, "currency": "GHS"}
+        ],
+    }
+    OPPORTUNITIES.insert(0, new_item)
+    return new_item
+
+
+@router.put("/opportunities/{opportunity_id}", response_model=OpportunityOut)
+async def update_opportunity(opportunity_id: str, payload: OpportunityUpdate, _: dict = Depends(admin_only)):
+    """Update an existing opportunity."""
+    opp = next((item for item in OPPORTUNITIES if item["id"] == opportunity_id), None)
+    if opp is None:
+        raise HTTPException(status_code=404, detail="Opportunity not found")
+
+    if payload.title is not None:
+        opp["title"] = payload.title
+    if payload.type is not None:
+        opp["type"] = payload.type.value if hasattr(payload.type, "value") else str(payload.type)
+    if payload.organization is not None:
+        opp["organization"] = payload.organization
+    if payload.location is not None:
+        opp["location"] = payload.location
+    if payload.description is not None:
+        opp["description"] = payload.description
+    if payload.deadline is not None:
+        opp["deadline"] = payload.deadline.isoformat()
+    if payload.offers is not None:
+        opp["offers"] = [
+            {
+                "type": o.type.value if hasattr(o.type, "value") else str(o.type),
+                "label": o.label,
+                "amount": o.amount,
+                "currency": o.currency,
+            }
+            for o in payload.offers
+        ]
+    return opp
+
+
+@router.delete("/opportunities/{opportunity_id}", status_code=status.HTTP_200_OK)
+async def delete_opportunity(opportunity_id: str, _: dict = Depends(admin_only)):
+    """Remove an opportunity from active catalogue."""
+    index = next((i for i, item in enumerate(OPPORTUNITIES) if item["id"] == opportunity_id), None)
+    if index is None:
+        raise HTTPException(status_code=404, detail="Opportunity not found")
+    removed = OPPORTUNITIES.pop(index)
+    return {"status": "deleted", "id": opportunity_id, "title": removed["title"]}

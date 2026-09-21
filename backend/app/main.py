@@ -1,11 +1,10 @@
-"""
-GMACGROUP API — application entrypoint.
-"""
-
+import logging
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from sqlalchemy import text
 
 from app.core.config import get_settings
+from app.core.database import engine
 from app.api.routes import (
     auth,
     users,
@@ -17,8 +16,10 @@ from app.api.routes import (
     ai,
     payments,
     admin,
+    uploads,
 )
 
+logger = logging.getLogger(__name__)
 settings = get_settings()
 
 app = FastAPI(
@@ -26,6 +27,21 @@ app = FastAPI(
     description="Backend API powering the GMACGROUP digital platform.",
     version="0.1.0",
 )
+
+@app.on_event("startup")
+async def ensure_db_constraints():
+    """Verify and update database constraints on startup."""
+    try:
+        with engine.begin() as conn:
+            conn.execute(text("ALTER TABLE users DROP CONSTRAINT IF EXISTS users_role_check;"))
+            conn.execute(text(
+                "ALTER TABLE users ADD CONSTRAINT users_role_check "
+                "CHECK (role IN ('student', 'professional', 'researcher', 'employer', 'institution', 'employee', 'admin'));"
+            ))
+            logger.info("Database users_role_check constraint synced successfully.")
+    except Exception as exc:
+        logger.warning(f"Could not automatically sync users_role_check constraint: {exc}")
+
 
 app.add_middleware(
     CORSMiddleware,
@@ -48,6 +64,7 @@ app.include_router(contact.router, prefix=f"{API_PREFIX}/contact", tags=["Contac
 app.include_router(ai.router, prefix=f"{API_PREFIX}/ai", tags=["AI"])
 app.include_router(payments.router, prefix=f"{API_PREFIX}/payments", tags=["Payments"])
 app.include_router(admin.router, prefix=f"{API_PREFIX}/admin", tags=["Admin Operations"])
+app.include_router(uploads.router, prefix=f"{API_PREFIX}/uploads", tags=["Document Uploads"])
 
 
 @app.get("/")

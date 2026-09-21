@@ -40,6 +40,26 @@ class OpportunityOut(BaseModel):
     model_config = ConfigDict(from_attributes=True)
 
 
+class OpportunityCreate(BaseModel):
+    title: str
+    type: OpportunityType = OpportunityType.INTERNSHIP
+    organization: Optional[str] = None
+    location: Optional[str] = None
+    description: Optional[str] = None
+    deadline: Optional[datetime] = None
+    offers: list[OfferOut] = []
+
+
+class OpportunityUpdate(BaseModel):
+    title: Optional[str] = None
+    type: Optional[OpportunityType] = None
+    organization: Optional[str] = None
+    location: Optional[str] = None
+    description: Optional[str] = None
+    deadline: Optional[datetime] = None
+    offers: Optional[list[OfferOut]] = None
+
+
 class ApplicationCreate(BaseModel):
     applicant_name: Optional[str] = None
     applicant_email: Optional[EmailStr] = None
