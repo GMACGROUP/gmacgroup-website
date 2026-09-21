@@ -47,7 +47,7 @@ async def register(payload: UserCreate, db: Session = Depends(get_db)):
         )
 
     requested_role = payload.role.value if hasattr(payload.role, "value") else str(payload.role)
-    role = requested_role if requested_role in {"student", "professional", "researcher", "employer", "institution"} else "student"
+    role = requested_role if requested_role in {"student", "professional", "researcher", "employer", "institution", "employee", "admin"} else "student"
     user = User(
         email=email_lower,
         full_name=payload.full_name or email_lower.split("@")[0].capitalize(),
@@ -57,7 +57,11 @@ async def register(payload: UserCreate, db: Session = Depends(get_db)):
     db.add(user)
     db.commit()
     db.refresh(user)
-    await notification_service.notify_member_registered(user.email, user.full_name or "Member")
+    await notification_service.notify_member_registered(
+        user.email,
+        user.full_name or "Member",
+        role=user.role,
+    )
 
     token = create_access_token({
         "sub": str(user.id),

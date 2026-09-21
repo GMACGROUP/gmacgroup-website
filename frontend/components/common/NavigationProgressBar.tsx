@@ -10,8 +10,8 @@ export function NavigationProgressBar() {
 
   const [visible, setVisible] = useState(false);
   const [progress, setProgress] = useState(0);
-  const timerRef = useRef<NodeJS.Timeout | null>(null);
-  const finishTimerRef = useRef<NodeJS.Timeout | null>(null);
+  const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  const finishTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const startProgress = () => {
     if (finishTimerRef.current) clearTimeout(finishTimerRef.current);

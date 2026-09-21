@@ -111,37 +111,37 @@ export function Footer() {
             </h4>
             <ul className="space-y-2.5 text-sm">
               <li>
-                <Link href="/about" className="hover:text-brand-cyan transition-colors">
+                <Link href="/about" prefetch={true} className="hover:text-brand-cyan transition-colors">
                   About Us
                 </Link>
               </li>
               <li>
-                <Link href="/services" className="hover:text-brand-cyan transition-colors">
+                <Link href="/services" prefetch={true} className="hover:text-brand-cyan transition-colors">
                   Strategic Services
                 </Link>
               </li>
               <li>
-                <Link href="/programmes" className="hover:text-brand-cyan transition-colors">
+                <Link href="/programmes" prefetch={true} className="hover:text-brand-cyan transition-colors">
                   Development Programmes
                 </Link>
               </li>
               <li>
-                <Link href="/opportunities" className="hover:text-brand-cyan transition-colors">
+                <Link href="/opportunities" prefetch={true} className="hover:text-brand-cyan transition-colors">
                   Career & Fellowship Openings
                 </Link>
               </li>
               <li>
-                <Link href="/research" className="hover:text-brand-cyan transition-colors">
+                <Link href="/research" prefetch={true} className="hover:text-brand-cyan transition-colors">
                   Research & Publications
                 </Link>
               </li>
               <li>
-                <Link href="/insights" className="hover:text-brand-cyan transition-colors">
+                <Link href="/insights" prefetch={true} className="hover:text-brand-cyan transition-colors">
                   Insights & Blog
                 </Link>
               </li>
               <li>
-                <Link href="/contact" className="hover:text-brand-cyan transition-colors">
+                <Link href="/contact" prefetch={true} className="hover:text-brand-cyan transition-colors">
                   Contact & Advisory Request
                 </Link>
               </li>
@@ -155,27 +155,27 @@ export function Footer() {
             </h4>
             <ul className="space-y-2.5 text-sm">
               <li>
-                <Link href="/services#education-employability" className="hover:text-brand-cyan transition-colors">
+                <Link href="/services#education-employability" prefetch={true} className="hover:text-brand-cyan transition-colors">
                   Education & Employability
                 </Link>
               </li>
               <li>
-                <Link href="/services#research-and-training" className="hover:text-brand-cyan transition-colors">
+                <Link href="/services#research-and-training" prefetch={true} className="hover:text-brand-cyan transition-colors">
                   Research & Capacity Building
                 </Link>
               </li>
               <li>
-                <Link href="/services#consulting-and-advisory" className="hover:text-brand-cyan transition-colors">
+                <Link href="/services#consulting-and-advisory" prefetch={true} className="hover:text-brand-cyan transition-colors">
                   Human Capital Advisory
                 </Link>
               </li>
               <li>
-                <Link href="/programmes" className="hover:text-brand-cyan transition-colors">
+                <Link href="/programmes" prefetch={true} className="hover:text-brand-cyan transition-colors">
                   Career Readiness Labs
                 </Link>
               </li>
               <li>
-                <Link href="/research" className="hover:text-brand-cyan transition-colors">
+                <Link href="/research" prefetch={true} className="hover:text-brand-cyan transition-colors">
                   Evidence-to-Policy Network
                 </Link>
               </li>
@@ -225,13 +225,13 @@ export function Footer() {
         <div className="mt-12 pt-8 border-t border-slate-800 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-slate-500">
           <p>© {new Date().getFullYear()} GMAC GROUP. All rights reserved.</p>
           <div className="flex items-center gap-6">
-            <Link href="/about" className="hover:text-slate-300 transition-colors">
+            <Link href="/about" prefetch={true} className="hover:text-slate-300 transition-colors">
               Privacy Policy
             </Link>
-            <Link href="/about" className="hover:text-slate-300 transition-colors">
+            <Link href="/about" prefetch={true} className="hover:text-slate-300 transition-colors">
               Terms of Engagement
             </Link>
-            <Link href="/contact" className="hover:text-slate-300 transition-colors">
+            <Link href="/contact" prefetch={true} className="hover:text-slate-300 transition-colors">
               Support
             </Link>
           </div>

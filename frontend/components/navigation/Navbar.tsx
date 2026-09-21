@@ -75,6 +75,7 @@ export function Navbar() {
                   <li key={link.href}>
                     <Link
                       href={link.href}
+                      prefetch={true}
                       className={`flex items-center gap-1.5 px-3 xl:px-4 py-1.5 rounded-full text-xs xl:text-[13px] font-semibold transition-all duration-200 ${
                         active
                           ? "bg-white text-brand-navy font-bold shadow-sm border border-slate-200/60"
@@ -98,18 +99,13 @@ export function Navbar() {
               <div className="flex items-center gap-2">
                 <Link
                   href="/dashboard"
+                  prefetch={true}
                   className="flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-800 text-xs font-bold transition-all border border-slate-200"
                 >
                   <span className="w-6 h-6 rounded-full bg-brand-navy text-white flex items-center justify-center text-[10px] uppercase font-bold">
                     {displayName.slice(0, 2)}
                   </span>
                   <span className="truncate max-w-[110px]">{displayName}</span>
-                </Link>
-                <Link
-                  href="/dashboard"
-                  className="px-3.5 py-1.5 text-xs font-bold text-white bg-brand-navy hover:bg-brand-navyDark rounded-full shadow-sm transition-all duration-200 hover:scale-105"
-                >
-                  Dashboard
                 </Link>
                 <button
                   type="button"
@@ -120,16 +116,18 @@ export function Navbar() {
                   Logout
                 </button>
               </div>
-            ) : !isOperationsPage && !isDashboardPage ? (
+            ) : !loading && !isOperationsPage && !isDashboardPage ? (
               <>
                 <Link
                   href="/login"
+                  prefetch={true}
                   className="px-4 py-2 text-xs xl:text-sm font-semibold text-slate-700 hover:text-brand-navy hover:bg-slate-100 rounded-full transition-all duration-200"
                 >
                   Login
                 </Link>
                 <Link
                   href="/register"
+                  prefetch={true}
                   className="px-4 xl:px-5 py-2 text-xs xl:text-sm font-bold text-white bg-brand-red hover:bg-brand-redDark shadow-md hover:shadow-lg rounded-full transition-all duration-200 hover:scale-105 active:scale-95"
                 >
                   Join Network
@@ -161,12 +159,13 @@ export function Navbar() {
 
         {/* Mobile Navigation Drawer */}
         {mobileMenuOpen && (
-          <div className="lg:hidden mt-2 rounded-2xl border border-slate-200 bg-white/95 p-3 shadow-lg shadow-slate-200/60 backdrop-blur-sm">
+          <div className="lg:hidden mt-2 rounded-2xl border border-slate-200 bg-white/95 p-3 shadow-lg shadow-slate-200/60 backdrop-blur-sm animate-fadeIn">
             <ul className="space-y-1.5">
               {navLinks.map((link) => (
                 <li key={link.href}>
                   <Link
                     href={link.href}
+                    prefetch={true}
                     onClick={() => setMobileMenuOpen(false)}
                     className={`flex min-h-11 items-center gap-2 px-3 py-2.5 rounded-xl text-sm font-medium transition-colors ${
                       isActive(link.href)
@@ -185,15 +184,13 @@ export function Navbar() {
             <div className="mt-3 pt-3 border-t border-slate-100 flex flex-col gap-2">
               {!loading && user ? (
                 <div className="space-y-2">
-                  <div className="px-3 py-2 bg-slate-50 rounded-xl text-xs font-medium text-slate-600">
-                    Signed in as <strong className="text-slate-900">{displayName}</strong>
-                  </div>
                   <Link
                     href="/dashboard"
+                    prefetch={true}
                     onClick={() => setMobileMenuOpen(false)}
-                    className="w-full block text-center px-4 py-2.5 text-sm font-bold text-white bg-brand-navy rounded-xl"
+                    className="block px-3 py-2 bg-slate-50 rounded-xl text-xs font-medium text-slate-600 hover:bg-slate-100"
                   >
-                    Go to Dashboard
+                    Signed in as <strong className="text-slate-900">{displayName}</strong>
                   </Link>
                   <button
                     type="button"
@@ -206,10 +203,11 @@ export function Navbar() {
                     Sign Out
                   </button>
                 </div>
-              ) : !isOperationsPage && !isDashboardPage ? (
+              ) : !loading && !isOperationsPage && !isDashboardPage ? (
                 <>
                   <Link
                     href="/login"
+                    prefetch={true}
                     onClick={() => setMobileMenuOpen(false)}
                     className="w-full text-center px-4 py-2.5 text-sm font-semibold text-brand-navy border border-slate-200 rounded-xl hover:bg-slate-50"
                   >
@@ -217,6 +215,7 @@ export function Navbar() {
                   </Link>
                   <Link
                     href="/register"
+                    prefetch={true}
                     onClick={() => setMobileMenuOpen(false)}
                     className="w-full text-center px-4 py-2.5 text-sm font-bold text-white bg-brand-red rounded-xl shadow-sm hover:bg-brand-redDark"
                   >

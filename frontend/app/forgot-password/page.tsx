@@ -45,7 +45,7 @@ export default function ForgotPasswordPage() {
 
         {sent ? (
           /* ─── Success State ─── */
-          <div className="text-center space-y-5 py-4">
+          <div className="text-center space-y-5 py-4 animate-fadeIn">
             <div className="mx-auto w-16 h-16 rounded-full bg-emerald-50 border border-emerald-200 flex items-center justify-center">
               <svg xmlns="http://www.w3.org/2000/svg" className="w-8 h-8 text-emerald-600" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" d="M21.75 6.75v10.5a2.25 2.25 0 01-2.25 2.25H4.5a2.25 2.25 0 01-2.25-2.25V6.75m19.5 0A2.25 2.25 0 0019.5 4.5h-15a2.25 2.25 0 00-2.25 2.25m19.5 0l-9.75 6.75L2.25 6.75" />
@@ -71,6 +71,7 @@ export default function ForgotPasswordPage() {
             </p>
             <Link
               href="/login"
+              prefetch={true}
               className="block text-xs font-bold text-brand-red hover:underline"
             >
               ← Back to Sign In
@@ -78,7 +79,7 @@ export default function ForgotPasswordPage() {
           </div>
         ) : (
           /* ─── Request Form ─── */
-          <form onSubmit={handleSubmit} className="flex flex-col gap-4">
+          <form onSubmit={handleSubmit} className="flex flex-col gap-4 animate-fadeIn">
             <div>
               <label
                 htmlFor="reset-email"
@@ -108,14 +109,14 @@ export default function ForgotPasswordPage() {
             </button>
 
             {error && (
-              <p role="alert" className="p-3 rounded-xl bg-red-50 text-xs font-semibold text-brand-red border border-red-200 text-center">
+              <p role="alert" className="p-3 rounded-xl bg-red-50 text-xs font-semibold text-brand-red border border-red-200 text-center animate-shake">
                 {error}
               </p>
             )}
 
             <div className="pt-4 border-t border-slate-200 text-center text-xs text-slate-600 font-medium">
               Remember your password?{" "}
-              <Link href="/login" className="font-bold text-brand-red hover:underline ml-1">
+              <Link href="/login" prefetch={true} className="font-bold text-brand-red hover:underline ml-1">
                 Sign in →
               </Link>
             </div>

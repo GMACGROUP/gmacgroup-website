@@ -6,6 +6,22 @@ import Link from "next/link";
 import { apiClient } from "@/lib/api/client";
 import { Logo } from "@/components/common/Logo";
 
+function ResetPasswordFormSkeleton() {
+  return (
+    <div className="space-y-4 animate-pulse">
+      <div className="space-y-1.5">
+        <div className="h-3.5 w-24 bg-slate-200 rounded" />
+        <div className="h-12 w-full bg-slate-100 rounded-xl border border-slate-200" />
+      </div>
+      <div className="space-y-1.5">
+        <div className="h-3.5 w-28 bg-slate-200 rounded" />
+        <div className="h-12 w-full bg-slate-100 rounded-xl border border-slate-200" />
+      </div>
+      <div className="h-12 w-full bg-brand-navy/20 rounded-xl mt-2" />
+    </div>
+  );
+}
+
 function ResetPasswordForm() {
   const searchParams = useSearchParams();
   const router = useRouter();
@@ -45,8 +61,8 @@ function ResetPasswordForm() {
         new_password: newPassword,
       });
       setSuccess(true);
-      // Auto-redirect to login after 3s
-      setTimeout(() => router.push("/login"), 3000);
+      // Auto-redirect to login after 2s
+      setTimeout(() => router.push("/login"), 2000);
     } catch (err) {
       setError(err instanceof Error ? err.message : "Password reset failed. The link may be expired.");
     } finally {
@@ -56,7 +72,7 @@ function ResetPasswordForm() {
 
   if (!token) {
     return (
-      <div className="text-center space-y-5 py-4">
+      <div className="text-center space-y-5 py-4 animate-fadeIn">
         <div className="mx-auto w-16 h-16 rounded-full bg-amber-50 border border-amber-200 flex items-center justify-center">
           <svg xmlns="http://www.w3.org/2000/svg" className="w-8 h-8 text-amber-500" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor">
             <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126zM12 15.75h.007v.008H12v-.008z" />
@@ -68,6 +84,7 @@ function ResetPasswordForm() {
         </p>
         <Link
           href="/forgot-password"
+          prefetch={true}
           className="inline-block mt-2 px-6 py-2.5 rounded-xl font-bold text-sm text-white bg-brand-navy hover:bg-brand-navyDark transition-colors shadow-sm"
         >
           Request New Link →
@@ -78,7 +95,7 @@ function ResetPasswordForm() {
 
   if (success) {
     return (
-      <div className="text-center space-y-5 py-4">
+      <div className="text-center space-y-5 py-4 animate-fadeIn">
         <div className="mx-auto w-16 h-16 rounded-full bg-emerald-50 border border-emerald-200 flex items-center justify-center">
           <svg xmlns="http://www.w3.org/2000/svg" className="w-8 h-8 text-emerald-600" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor">
             <path strokeLinecap="round" strokeLinejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
@@ -92,6 +109,7 @@ function ResetPasswordForm() {
         </div>
         <Link
           href="/login"
+          prefetch={true}
           className="inline-block px-6 py-2.5 rounded-xl font-bold text-sm text-white bg-brand-navy hover:bg-brand-navyDark transition-colors shadow-sm"
         >
           Sign In Now →
@@ -105,7 +123,7 @@ function ResetPasswordForm() {
   const strengthColor = ["", "bg-red-400", "bg-amber-400", "bg-emerald-500"][strengthScore];
 
   return (
-    <form onSubmit={handleSubmit} className="flex flex-col gap-4">
+    <form onSubmit={handleSubmit} className="flex flex-col gap-4 animate-fadeIn">
       {/* New Password */}
       <div>
         <label
@@ -201,13 +219,13 @@ function ResetPasswordForm() {
       </button>
 
       {error && (
-        <p role="alert" className="p-3 rounded-xl bg-red-50 text-xs font-semibold text-brand-red border border-red-200 text-center">
+        <p role="alert" className="p-3 rounded-xl bg-red-50 text-xs font-semibold text-brand-red border border-red-200 text-center animate-shake">
           {error}
         </p>
       )}
 
       <div className="pt-4 border-t border-slate-200 text-center text-xs text-slate-600 font-medium">
-        <Link href="/login" className="font-bold text-brand-red hover:underline">
+        <Link href="/login" prefetch={true} className="font-bold text-brand-red hover:underline">
           ← Back to Sign In
         </Link>
       </div>
@@ -233,8 +251,8 @@ export default function ResetPasswordPage() {
           </p>
         </div>
 
-        {/* Suspense boundary required for useSearchParams in Next.js App Router */}
-        <Suspense fallback={<div className="h-48 flex items-center justify-center text-sm text-slate-400">Loading…</div>}>
+        {/* Suspense boundary with instant form skeleton */}
+        <Suspense fallback={<ResetPasswordFormSkeleton />}>
           <ResetPasswordForm />
         </Suspense>
       </div>

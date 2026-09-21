@@ -1,8 +1,8 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { Suspense, useEffect, useState } from "react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { useAuth } from "@/hooks/useAuth";
 import { apiClient } from "@/lib/api/client";
 import {
@@ -29,10 +29,14 @@ interface ApplicationItem {
   created_at: string;
 }
 
-export default function DashboardPage() {
+function DashboardContent() {
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const isNewWelcome = searchParams?.get("welcome") === "1";
+
   const { user, loading, logout, updateProfile } = useAuth();
 
+  const [showWelcomeAlert, setShowWelcomeAlert] = useState(isNewWelcome);
   const [enrolments, setEnrolments] = useState<EnrolmentItem[]>([]);
   const [applications, setApplications] = useState<ApplicationItem[]>([]);
   const [loadingData, setLoadingData] = useState(true);
@@ -109,12 +113,38 @@ export default function DashboardPage() {
     <div className="bg-slate-50 min-h-screen py-10 sm:py-14">
       <div className="container mx-auto px-4 sm:px-6 max-w-6xl space-y-8">
 
+        {/* ── New Member Welcome Alert ── */}
+        {showWelcomeAlert && (
+          <div className="relative p-5 sm:p-6 rounded-3xl bg-gradient-to-r from-emerald-600 via-teal-700 to-brand-navy text-white shadow-elevate flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 animate-fadeIn border border-emerald-400/30">
+            <div className="flex items-start gap-4">
+              <div className="w-12 h-12 rounded-2xl bg-white/15 border border-white/20 flex items-center justify-center shrink-0">
+                <span className="text-2xl">🎉</span>
+              </div>
+              <div className="space-y-1">
+                <h3 className="text-base sm:text-lg font-bold font-serif">
+                  Welcome to GMACGROUP, {userDisplayName}!
+                </h3>
+                <p className="text-xs sm:text-sm text-emerald-100 leading-relaxed max-w-2xl">
+                  Your member account is active and a welcome orientation email has been dispatched to{" "}
+                  <strong className="text-white font-semibold">{user.email}</strong>. Explore programmes, submit fellowship applications, or complete your profile below.
+                </p>
+              </div>
+            </div>
+            <button
+              onClick={() => setShowWelcomeAlert(false)}
+              className="px-4 py-2 rounded-xl text-xs font-bold bg-white/20 hover:bg-white/30 text-white transition-colors border border-white/25 shrink-0 self-end sm:self-center"
+            >
+              Dismiss ✕
+            </button>
+          </div>
+        )}
+
         {/* ── Welcome Banner ── */}
         <div className="relative rounded-3xl bg-brand-navy text-white p-8 sm:p-10 shadow-elevate overflow-hidden border border-brand-navyLight/20">
           <div className="absolute top-0 right-0 w-96 h-96 bg-brand-cyan/10 rounded-full blur-3xl pointer-events-none" />
           <div className="absolute bottom-0 right-48 w-80 h-80 bg-brand-red/10 rounded-full blur-3xl pointer-events-none" />
 
-            <div className="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-6">
+          <div className="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-6">
             <div className="space-y-2">
               <div className="flex items-center gap-2">
                 <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-white/10 text-brand-cyan text-xs font-bold uppercase tracking-wider border border-white/15">
@@ -134,7 +164,7 @@ export default function DashboardPage() {
               </p>
             </div>
 
-              <div className="flex flex-wrap items-center gap-2 sm:gap-3 shrink-0">
+            <div className="flex flex-wrap items-center gap-2 sm:gap-3 shrink-0">
               <button
                 onClick={() => setIsEditingProfile(!isEditingProfile)}
                 className="px-4 py-2.5 rounded-xl font-bold text-xs bg-white/10 hover:bg-white/20 border border-white/20 text-white transition-all"
@@ -144,6 +174,7 @@ export default function DashboardPage() {
               {user.role === "admin" && (
                 <Link
                   href="/admin"
+                  prefetch={true}
                   className="px-4 py-2.5 rounded-xl font-bold text-xs bg-brand-cyan text-brand-navy hover:bg-white transition-all"
                 >
                   Operations Console
@@ -163,209 +194,218 @@ export default function DashboardPage() {
         {isEditingProfile && (
           <div className="bg-white rounded-3xl p-6 sm:p-8 border border-slate-200 shadow-card animate-fadeIn">
             <div className="mb-6">
-              <h3 className="text-lg font-bold text-slate-900 font-serif">Update Profile Details</h3>
-              <p className="text-xs text-slate-500 mt-1">Keep your contact and institutional information up to date.</p>
+              <h3 className="text-lg font-bold text-slate-900 font-serif">Edit Member Profile</h3>
+              <p className="text-xs text-slate-500">Update your public biographical and professional details.</p>
             </div>
 
-            <form onSubmit={handleProfileSave} className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              <div>
-                <label className="block text-xs font-bold text-slate-800 uppercase tracking-wider mb-1.5">
-                  Full Name
-                </label>
-                <input
-                  type="text"
-                  value={editForm.full_name}
-                  onChange={(e) => setEditForm({ ...editForm, full_name: e.target.value })}
-                  className="w-full px-3.5 py-2.5 text-xs sm:text-sm rounded-xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-brand-navy/30 focus:border-brand-navy bg-slate-50 focus:bg-white text-slate-900"
-                />
+            <form onSubmit={handleProfileSave} className="space-y-4 max-w-2xl">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">
+                    Full Name
+                  </label>
+                  <input
+                    type="text"
+                    value={editForm.full_name}
+                    onChange={(e) => setEditForm({ ...editForm, full_name: e.target.value })}
+                    className="w-full px-4 py-2.5 text-sm rounded-xl border border-slate-300 focus:outline-none focus:border-brand-navy"
+                  />
+                </div>
+                <div>
+                  <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">
+                    Organization / Institution
+                  </label>
+                  <input
+                    type="text"
+                    value={editForm.organization}
+                    onChange={(e) => setEditForm({ ...editForm, organization: e.target.value })}
+                    placeholder="e.g. University of Ghana"
+                    className="w-full px-4 py-2.5 text-sm rounded-xl border border-slate-300 focus:outline-none focus:border-brand-navy"
+                  />
+                </div>
               </div>
 
               <div>
-                <label className="block text-xs font-bold text-slate-800 uppercase tracking-wider mb-1.5">
-                  Institution / Organization
-                </label>
-                <input
-                  type="text"
-                  value={editForm.organization}
-                  onChange={(e) => setEditForm({ ...editForm, organization: e.target.value })}
-                  placeholder="e.g. University / Enterprise"
-                  className="w-full px-3.5 py-2.5 text-xs sm:text-sm rounded-xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-brand-navy/30 focus:border-brand-navy bg-slate-50 focus:bg-white text-slate-900"
-                />
-              </div>
-
-              <div>
-                <label className="block text-xs font-bold text-slate-800 uppercase tracking-wider mb-1.5">
+                <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">
                   Phone Number
                 </label>
                 <input
                   type="tel"
                   value={editForm.phone}
                   onChange={(e) => setEditForm({ ...editForm, phone: e.target.value })}
-                  placeholder="+233 24 123 4567"
-                  className="w-full px-3.5 py-2.5 text-xs sm:text-sm rounded-xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-brand-navy/30 focus:border-brand-navy bg-slate-50 focus:bg-white text-slate-900"
+                  placeholder="+233 50 123 4567"
+                  className="w-full px-4 py-2.5 text-sm rounded-xl border border-slate-300 focus:outline-none focus:border-brand-navy"
                 />
               </div>
 
               <div>
-                <label className="block text-xs font-bold text-slate-800 uppercase tracking-wider mb-1.5">
-                  Professional Bio / Research Focus
+                <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">
+                  Bio / Focus Areas
                 </label>
-                <input
-                  type="text"
+                <textarea
+                  rows={3}
                   value={editForm.bio}
                   onChange={(e) => setEditForm({ ...editForm, bio: e.target.value })}
-                  placeholder="e.g. Econometrician & Labor Policy Fellow"
-                  className="w-full px-3.5 py-2.5 text-xs sm:text-sm rounded-xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-brand-navy/30 focus:border-brand-navy bg-slate-50 focus:bg-white text-slate-900"
+                  placeholder="Share a short summary of your professional background, goals, or research interests..."
+                  className="w-full px-4 py-2.5 text-sm rounded-xl border border-slate-300 focus:outline-none focus:border-brand-navy"
                 />
               </div>
 
-              <div className="sm:col-span-2 pt-2 flex items-center justify-between">
-                {profileSuccess ? (
-                  <span className="text-xs font-bold text-emerald-700 bg-emerald-50 px-3 py-1.5 rounded-lg border border-emerald-200 flex items-center gap-1.5">
-                    <CheckCircleIcon className="w-4 h-4" /> Profile updated successfully!
+              <div className="flex items-center gap-3 pt-2">
+                <button
+                  type="submit"
+                  disabled={savingProfile}
+                  className="px-5 py-2.5 rounded-xl font-bold text-xs text-white bg-brand-navy hover:bg-brand-navyDark transition-colors disabled:opacity-50"
+                >
+                  {savingProfile ? "Saving…" : "Save Changes"}
+                </button>
+                {profileSuccess && (
+                  <span className="text-xs font-bold text-emerald-600 flex items-center gap-1 animate-fadeIn">
+                    <CheckCircleIcon className="w-4 h-4 text-emerald-500" />
+                    Profile updated successfully!
                   </span>
-                ) : (
-                  <span />
                 )}
-
-                <div className="flex gap-2">
-                  <button
-                    type="button"
-                    onClick={() => setIsEditingProfile(false)}
-                    className="px-4 py-2 rounded-xl text-xs font-bold text-slate-600 hover:bg-slate-100"
-                  >
-                    Cancel
-                  </button>
-                  <button
-                    type="submit"
-                    disabled={savingProfile}
-                    className="px-5 py-2 rounded-xl text-xs font-bold text-white bg-brand-navy hover:bg-brand-navyDark shadow-sm disabled:opacity-50"
-                  >
-                    {savingProfile ? "Saving..." : "Save Changes"}
-                  </button>
-                </div>
               </div>
             </form>
           </div>
         )}
 
-        {/* ── Key Stats ── */}
+        {/* ── Metric Snapshot Cards ── */}
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
-          <div className="p-6 rounded-2xl bg-white border border-slate-200 shadow-card flex items-center justify-between">
-            <div>
-              <div className="text-xs font-bold text-slate-400 uppercase tracking-wider">Active Cohorts</div>
-              <div className="text-3xl font-extrabold text-brand-navy mt-1">
-                {loadingData ? "…" : enrolments.length}
-              </div>
-              <Link href="/programmes" className="text-xs text-brand-red font-semibold hover:underline mt-2 inline-block">
-                Browse cohorts →
-              </Link>
-            </div>
-            <div className="w-12 h-12 rounded-xl bg-blue-50 text-brand-navy flex items-center justify-center border border-blue-100">
+          <div className="p-6 rounded-3xl bg-white border border-slate-200 shadow-card flex items-center gap-4">
+            <div className="w-12 h-12 rounded-2xl bg-brand-ice flex items-center justify-center text-brand-navy shrink-0">
               <AcademicCapIcon className="w-6 h-6 text-brand-navy" />
             </div>
+            <div>
+              <p className="text-xs font-bold text-slate-500 uppercase tracking-wider">
+                Cohort Enrolments
+              </p>
+              <h3 className="text-2xl font-extrabold text-slate-900 mt-0.5 font-serif">
+                {loadingData ? "…" : enrolments.length}
+              </h3>
+            </div>
           </div>
 
-          <div className="p-6 rounded-2xl bg-white border border-slate-200 shadow-card flex items-center justify-between">
+          <div className="p-6 rounded-3xl bg-white border border-slate-200 shadow-card flex items-center gap-4">
+            <div className="w-12 h-12 rounded-2xl bg-amber-50 flex items-center justify-center text-amber-600 shrink-0">
+              <BriefcaseIcon className="w-6 h-6 text-amber-600" />
+            </div>
             <div>
-              <div className="text-xs font-bold text-slate-400 uppercase tracking-wider">Applications</div>
-              <div className="text-3xl font-extrabold text-slate-900 mt-1">
+              <p className="text-xs font-bold text-slate-500 uppercase tracking-wider">
+                Applications
+              </p>
+              <h3 className="text-2xl font-extrabold text-slate-900 mt-0.5 font-serif">
                 {loadingData ? "…" : applications.length}
-              </div>
-              <Link href="/opportunities" className="text-xs text-brand-navy font-semibold hover:underline mt-2 inline-block">
-                View openings →
-              </Link>
-            </div>
-            <div className="w-12 h-12 rounded-xl bg-purple-50 text-purple-700 flex items-center justify-center border border-purple-100">
-              <BriefcaseIcon className="w-6 h-6 text-purple-700" />
+              </h3>
             </div>
           </div>
 
-          <div className="p-6 rounded-2xl bg-white border border-slate-200 shadow-card flex items-center justify-between">
-            <div>
-              <div className="text-xs font-bold text-slate-400 uppercase tracking-wider">Membership</div>
-              <div className="text-sm font-bold text-emerald-700 bg-emerald-50 border border-emerald-200 px-2.5 py-1 rounded-full w-fit mt-2">
-                ● Verified Member
-              </div>
-              <p className="text-[11px] text-slate-400 mt-1.5">{user.email}</p>
+          <div className="p-6 rounded-3xl bg-white border border-slate-200 shadow-card flex items-center gap-4">
+            <div className="w-12 h-12 rounded-2xl bg-emerald-50 flex items-center justify-center text-emerald-600 shrink-0">
+              <CheckCircleIcon className="w-6 h-6 text-emerald-600" />
             </div>
-            <div className="w-12 h-12 rounded-xl bg-emerald-50 text-emerald-700 flex items-center justify-center border border-emerald-100">
-              <ShieldCheckIcon className="w-6 h-6 text-emerald-700" />
+            <div>
+              <p className="text-xs font-bold text-slate-500 uppercase tracking-wider">
+                Account Status
+              </p>
+              <h3 className="text-sm font-bold text-emerald-600 mt-0.5 flex items-center gap-1.5">
+                <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+                Active Member
+              </h3>
             </div>
           </div>
         </div>
 
-        {/* ── Main Dashboard Content Grid ── */}
-        <div className="grid md:grid-cols-2 gap-8">
+        {/* ── Two Column Activities ── */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
 
-          {/* Section 1: Enrolled Programmes */}
-          <div className="p-5 sm:p-8 rounded-3xl bg-white border border-slate-200 shadow-card space-y-5 flex flex-col">
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+          {/* Enrolled Programmes */}
+          <div className="bg-white rounded-3xl p-6 sm:p-8 border border-slate-200 shadow-card space-y-5">
+            <div className="flex items-center justify-between border-b border-slate-100 pb-4">
               <div>
-                <h2 className="text-xl font-bold text-slate-900 font-serif">My Cohorts & Enrolments</h2>
-                <p className="text-xs text-slate-500 mt-0.5">Development pathways and workshops registered to your profile</p>
+                <h3 className="text-lg font-bold text-slate-900 font-serif">My Programmes</h3>
+                <p className="text-xs text-slate-500">Active and upcoming cohort tracks</p>
               </div>
-              <Link href="/programmes" className="text-xs font-bold text-brand-navy hover:text-brand-red">
-                + Enrol
+              <Link
+                href="/programmes"
+                prefetch={true}
+                className="text-xs font-bold text-brand-navy hover:text-brand-red transition-colors"
+              >
+                Browse All →
               </Link>
             </div>
 
-            <div className="flex-1 space-y-3">
-              {enrolments.length > 0 ? (
-                enrolments.map((enrol) => (
+            <div className="space-y-3">
+              {loadingData ? (
+                <div className="space-y-3 animate-pulse">
+                  <div className="h-16 bg-slate-100 rounded-2xl" />
+                  <div className="h-16 bg-slate-100 rounded-2xl" />
+                </div>
+              ) : enrolments.length > 0 ? (
+                enrolments.map((item) => (
                   <div
-                    key={enrol.id}
-                    className="p-4 rounded-2xl bg-slate-50 border border-slate-200 flex items-start justify-between gap-3 hover:bg-slate-100/80 transition-colors"
+                    key={item.id}
+                    className="p-4 rounded-2xl bg-slate-50 border border-slate-200/80 flex items-center justify-between gap-4"
                   >
-                    <div className="space-y-1">
+                    <div>
                       <h4 className="text-sm font-bold text-slate-900">
-                        {enrol.programme_title || enrol.programme_id}
+                        {item.programme_title || item.programme_id}
                       </h4>
                       <p className="text-[11px] text-slate-500 flex items-center gap-1">
                         <ClockIcon className="w-3.5 h-3.5 text-slate-400" />
-                        Enrolled {new Date(enrol.created_at).toLocaleDateString()}
+                        Enrolled {new Date(item.created_at).toLocaleDateString()}
                       </p>
                     </div>
                     <span className="text-[10px] font-bold uppercase tracking-wider bg-emerald-50 text-emerald-700 border border-emerald-200 px-2.5 py-1 rounded-full whitespace-nowrap">
-                      {enrol.status || "Confirmed"}
+                      {item.status || "Enrolled"}
                     </span>
                   </div>
                 ))
               ) : (
                 <div className="p-8 rounded-2xl bg-slate-50 border border-dashed border-slate-200 text-center space-y-2">
                   <AcademicCapIcon className="w-8 h-8 text-slate-300 mx-auto" />
-                  <p className="text-xs text-slate-500">You have not enrolled in any cohorts yet.</p>
+                  <p className="text-xs text-slate-500">You are not enrolled in any programmes yet.</p>
                   <Link
                     href="/programmes"
-                    className="inline-block text-xs font-bold text-brand-red hover:underline pt-1"
+                    prefetch={true}
+                    className="inline-block text-xs font-bold text-brand-navy hover:underline pt-1"
                   >
-                    Explore upcoming cohorts →
+                    Explore Programmes catalogue →
                   </Link>
                 </div>
               )}
             </div>
           </div>
 
-          {/* Section 2: Opportunity Applications */}
-          <div className="p-5 sm:p-8 rounded-3xl bg-white border border-slate-200 shadow-card space-y-5 flex flex-col">
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+          {/* Submitted Applications */}
+          <div className="bg-white rounded-3xl p-6 sm:p-8 border border-slate-200 shadow-card space-y-5">
+            <div className="flex items-center justify-between border-b border-slate-100 pb-4">
               <div>
-                <h2 className="text-xl font-bold text-slate-900 font-serif">Application History</h2>
-                <p className="text-xs text-slate-500 mt-0.5">Internship and fellowship submissions</p>
+                <h3 className="text-lg font-bold text-slate-900 font-serif">My Applications</h3>
+                <p className="text-xs text-slate-500">Submitted fellowship & opening dossiers</p>
               </div>
-              <Link href="/opportunities" className="text-xs font-bold text-brand-navy hover:text-brand-red">
-                + Apply
+              <Link
+                href="/opportunities"
+                prefetch={true}
+                className="text-xs font-bold text-brand-navy hover:text-brand-red transition-colors"
+              >
+                View Openings →
               </Link>
             </div>
 
-            <div className="flex-1 space-y-3">
-              {applications.length > 0 ? (
+            <div className="space-y-3">
+              {loadingData ? (
+                <div className="space-y-3 animate-pulse">
+                  <div className="h-16 bg-slate-100 rounded-2xl" />
+                  <div className="h-16 bg-slate-100 rounded-2xl" />
+                </div>
+              ) : applications.length > 0 ? (
                 applications.map((app) => (
                   <div
                     key={app.id}
-                    className="p-4 rounded-2xl bg-slate-50 border border-slate-200 flex items-start justify-between gap-3 hover:bg-slate-100/80 transition-colors"
+                    className="p-4 rounded-2xl bg-slate-50 border border-slate-200/80 flex items-center justify-between gap-4"
                   >
-                    <div className="space-y-1">
+                    <div>
                       <h4 className="text-sm font-bold text-slate-900">
                         {app.opportunity_title || app.opportunity_id}
                       </h4>
@@ -385,6 +425,7 @@ export default function DashboardPage() {
                   <p className="text-xs text-slate-500">No active applications submitted yet.</p>
                   <Link
                     href="/opportunities"
+                    prefetch={true}
                     className="inline-block text-xs font-bold text-brand-navy hover:underline pt-1"
                   >
                     Browse open fellowships & roles →
@@ -398,5 +439,19 @@ export default function DashboardPage() {
 
       </div>
     </div>
+  );
+}
+
+export default function DashboardPage() {
+  return (
+    <Suspense
+      fallback={
+        <div className="min-h-[70vh] flex items-center justify-center">
+          <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-brand-navy" />
+        </div>
+      }
+    >
+      <DashboardContent />
+    </Suspense>
   );
 }
