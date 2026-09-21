@@ -174,3 +174,37 @@ export function XMarkIcon({ className = "w-5 h-5", ...props }: IconProps) {
     </svg>
   );
 }
+
+export function LinkedInIcon({ className = "w-5 h-5", ...props }: IconProps) {
+  return (
+    <svg className={className} viewBox="0 0 24 24" fill="currentColor" aria-hidden="true" {...props}>
+      <path d="M6.5 8.5H3.25V21H6.5V8.5ZM4.88 3A1.88 1.88 0 1 0 4.88 6.75 1.88 1.88 0 0 0 4.88 3ZM21 13.84C21 10.07 18.99 8.3 16.31 8.3c-2.16 0-3.12 1.19-3.66 2.03V8.5H9.4V21h3.25v-6.19c0-1.63.31-3.21 2.33-3.21 1.99 0 2.02 1.87 2.02 3.32V21H21v-7.16Z" />
+    </svg>
+  );
+}
+
+export function XSocialIcon({ className = "w-5 h-5", ...props }: IconProps) {
+  return (
+    <svg className={className} viewBox="0 0 24 24" fill="currentColor" aria-hidden="true" {...props}>
+      <path d="M18.9 2H22l-6.77 7.74L23.2 22h-6.24l-4.89-6.39L6.48 22H3.37l7.24-8.28L3 2h6.4l4.42 5.84L18.9 2Zm-1.1 17.88h1.73L8.46 4h-1.86L17.8 19.88Z" />
+    </svg>
+  );
+}
+
+export function InstagramIcon({ className = "w-5 h-5", ...props }: IconProps) {
+  return (
+    <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.9" aria-hidden="true" {...props}>
+      <rect x="3" y="3" width="18" height="18" rx="5" />
+      <circle cx="12" cy="12" r="4" />
+      <circle cx="17.5" cy="6.5" r="1" fill="currentColor" stroke="none" />
+    </svg>
+  );
+}
+
+export function FacebookIcon({ className = "w-5 h-5", ...props }: IconProps) {
+  return (
+    <svg className={className} viewBox="0 0 24 24" fill="currentColor" aria-hidden="true" {...props}>
+      <path d="M13.5 21v-8h2.75l.42-3.1H13.5V7.92c0-.9.25-1.52 1.56-1.52h1.67V3.63c-.29-.04-1.29-.13-2.46-.13-2.44 0-4.11 1.49-4.11 4.23V9.9H7.4V13h2.76v8h3.34Z" />
+    </svg>
+  );
+}

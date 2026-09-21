@@ -5,7 +5,13 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { apiClient } from "@/lib/api/client";
 import { Logo } from "@/components/common/Logo";
-import { CheckCircleIcon } from "@/components/common/Icons";
+import {
+  CheckCircleIcon,
+  FacebookIcon,
+  InstagramIcon,
+  LinkedInIcon,
+  XSocialIcon,
+} from "@/components/common/Icons";
 
 export function Footer() {
   const pathname = usePathname();
@@ -65,7 +71,7 @@ export function Footer() {
                   aria-label="GMACGROUP on LinkedIn"
                   className="flex h-9 w-9 items-center justify-center rounded-lg border border-white/15 bg-white/10 text-xs font-extrabold text-brand-cyan transition-all hover:-translate-y-0.5 hover:border-brand-cyan hover:bg-brand-cyan hover:text-brand-navyDeep"
                 >
-                  in
+                  <LinkedInIcon className="h-4 w-4" />
                 </a>
                 <a
                   href="https://twitter.com/gmacgroup"
@@ -74,7 +80,7 @@ export function Footer() {
                   aria-label="GMACGROUP on X"
                   className="flex h-9 w-9 items-center justify-center rounded-lg border border-white/15 bg-white/10 text-sm font-bold text-white transition-all hover:-translate-y-0.5 hover:border-white hover:bg-white hover:text-brand-navyDeep"
                 >
-                  X
+                  <XSocialIcon className="h-4 w-4" />
                 </a>
                 <a
                   href="https://www.instagram.com/gmacgroup"
@@ -83,7 +89,7 @@ export function Footer() {
                   aria-label="GMACGROUP on Instagram"
                   className="flex h-9 w-9 items-center justify-center rounded-lg border border-white/15 bg-white/10 text-sm font-extrabold text-brand-red transition-all hover:-translate-y-0.5 hover:border-brand-red hover:bg-brand-red hover:text-white"
                 >
-                  ◎
+                  <InstagramIcon className="h-5 w-5" />
                 </a>
                 <a
                   href="https://www.facebook.com/gmacgroup"
@@ -92,7 +98,7 @@ export function Footer() {
                   aria-label="GMACGROUP on Facebook"
                   className="flex h-9 w-9 items-center justify-center rounded-lg border border-white/15 bg-white/10 text-sm font-extrabold text-brand-cyan transition-all hover:-translate-y-0.5 hover:border-brand-cyan hover:bg-brand-cyan hover:text-brand-navyDeep"
                 >
-                  f
+                  <FacebookIcon className="h-5 w-5" />
                 </a>
               </div>
             </div>

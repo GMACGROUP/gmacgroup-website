@@ -23,9 +23,8 @@ export function Navbar() {
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
-  if (safePathname.startsWith("/dashboard")) return null;
-
   const isOperationsPage = safePathname.startsWith("/admin");
+  const isDashboardPage = safePathname.startsWith("/dashboard");
 
   const navLinks = [
     { href: "/", label: "Home" },
@@ -121,7 +120,7 @@ export function Navbar() {
                   Logout
                 </button>
               </div>
-            ) : !isOperationsPage ? (
+            ) : !isOperationsPage && !isDashboardPage ? (
               <>
                 <Link
                   href="/login"
@@ -207,7 +206,7 @@ export function Navbar() {
                     Sign Out
                   </button>
                 </div>
-              ) : !isOperationsPage ? (
+              ) : !isOperationsPage && !isDashboardPage ? (
                 <>
                   <Link
                     href="/login"
