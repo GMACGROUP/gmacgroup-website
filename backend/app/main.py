@@ -28,21 +28,6 @@ app = FastAPI(
     version="0.1.0",
 )
 
-@app.on_event("startup")
-async def ensure_db_constraints():
-    """Verify and update database constraints on startup."""
-    try:
-        with engine.begin() as conn:
-            conn.execute(text("ALTER TABLE users DROP CONSTRAINT IF EXISTS users_role_check;"))
-            conn.execute(text(
-                "ALTER TABLE users ADD CONSTRAINT users_role_check "
-                "CHECK (role IN ('student', 'professional', 'researcher', 'employer', 'institution', 'employee', 'admin'));"
-            ))
-            logger.info("Database users_role_check constraint synced successfully.")
-    except Exception as exc:
-        logger.warning(f"Could not automatically sync users_role_check constraint: {exc}")
-
-
 app.add_middleware(
     CORSMiddleware,
     allow_origins=settings.ALLOWED_ORIGINS + ["http://127.0.0.1:3000", "http://localhost:3000"],

@@ -25,6 +25,8 @@ const USER_KEY = "gmac_auth_user";
 const AUTH_CHANGED_EVENT = "gmac-auth-changed";
 
 export function useAuth() {
+  // Keep the initial render identical on the server and in the browser.
+  // Browser storage is restored after hydration in the effect below.
   const [user, setUser] = useState<UserProfile | null>(null);
   const [token, setToken] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
@@ -40,26 +42,27 @@ export function useAuth() {
     }
   }, []);
 
-  // Initialize auth state from localStorage and verify with backend
+  // On mount: restore and silently verify the stored session.
   useEffect(() => {
-    try {
-      const storedToken = localStorage.getItem(TOKEN_KEY);
-      const storedUser = localStorage.getItem(USER_KEY);
+    const storedToken = localStorage.getItem(TOKEN_KEY);
+    const storedUser = localStorage.getItem(USER_KEY);
 
-      if (storedToken && storedUser) {
-        const parsedUser = JSON.parse(storedUser);
-        setUser(parsedUser);
-        setToken(storedToken);
-
-        // Verify with backend silently
-        refreshUser()
-          .finally(() => setLoading(false));
-      } else {
-        setLoading(false);
-      }
-    } catch {
+    if (!storedToken || !storedUser) {
       setLoading(false);
+      return;
     }
+
+    try {
+      setUser(JSON.parse(storedUser) as UserProfile);
+      setToken(storedToken);
+    } catch {
+      localStorage.removeItem(TOKEN_KEY);
+      localStorage.removeItem(USER_KEY);
+      setLoading(false);
+      return;
+    }
+
+    refreshUser().finally(() => setLoading(false));
   }, [refreshUser]);
 
   useEffect(() => {
@@ -86,21 +89,19 @@ export function useAuth() {
   }, []);
 
   const login = useCallback(async (email: string, password: string): Promise<UserProfile> => {
-    setLoading(true);
-    try {
-      const res = await apiClient.post<AuthResponse>("/auth/login", {
-        email: email.trim().toLowerCase(),
-        password,
-      });
+    // Don't set loading=true here — it hides the user avatar in the navbar
+    // on redirect. The credential exchange is fast enough.
+    const res = await apiClient.post<AuthResponse>("/auth/login", {
+      email: email.trim().toLowerCase(),
+      password,
+    });
 
-      localStorage.setItem(TOKEN_KEY, res.access_token);
-      localStorage.setItem(USER_KEY, JSON.stringify(res.user));
-      setUser(res.user);
-      setToken(res.access_token);
-      return res.user;
-    } finally {
-      setLoading(false);
-    }
+    localStorage.setItem(TOKEN_KEY, res.access_token);
+    localStorage.setItem(USER_KEY, JSON.stringify(res.user));
+    setUser(res.user);
+    setToken(res.access_token);
+    setLoading(false);
+    return res.user;
   }, []);
 
   const register = useCallback(
@@ -110,23 +111,19 @@ export function useAuth() {
       password: string;
       role?: string;
     }): Promise<UserProfile> => {
-      setLoading(true);
-      try {
-        const res = await apiClient.post<AuthResponse>("/auth/register", {
-          full_name: payload.full_name,
-          email: payload.email.trim().toLowerCase(),
-          password: payload.password,
-          role: payload.role || "student",
-        });
+      const res = await apiClient.post<AuthResponse>("/auth/register", {
+        full_name: payload.full_name,
+        email: payload.email.trim().toLowerCase(),
+        password: payload.password,
+        role: payload.role || "student",
+      });
 
-        localStorage.setItem(TOKEN_KEY, res.access_token);
-        localStorage.setItem(USER_KEY, JSON.stringify(res.user));
-        setUser(res.user);
-        setToken(res.access_token);
-        return res.user;
-      } finally {
-        setLoading(false);
-      }
+      localStorage.setItem(TOKEN_KEY, res.access_token);
+      localStorage.setItem(USER_KEY, JSON.stringify(res.user));
+      setUser(res.user);
+      setToken(res.access_token);
+      setLoading(false);
+      return res.user;
     },
     []
   );

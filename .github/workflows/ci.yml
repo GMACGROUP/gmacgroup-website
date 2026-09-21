@@ -26,10 +26,46 @@ jobs:
     defaults:
       run:
         working-directory: backend
+
+    # PostgreSQL service — credentials match the default DATABASE_URL in config.py
+    services:
+      postgres:
+        image: postgres:15
+        env:
+          POSTGRES_USER: user
+          POSTGRES_PASSWORD: password
+          POSTGRES_DB: gmacgroup
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    env:
+      DATABASE_URL: postgresql://user:password@localhost:5432/gmacgroup
+      EMAIL_PROVIDER: none
+      JWT_SECRET: ci-test-secret-key-not-for-production
+
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
         with:
           python-version: "3.11"
       - run: python -m pip install -r requirements.txt
+      - name: Wait for PostgreSQL
+        run: |
+          until pg_isready -h localhost -p 5432 -U user; do
+            echo "Waiting for postgres..."
+            sleep 2
+          done
+      - name: Create database tables
+        run: |
+          python -c "
+          from app.core.database import Base, engine
+          Base.metadata.create_all(bind=engine)
+          print('Tables created successfully')
+          "
       - run: python -m pytest
+
