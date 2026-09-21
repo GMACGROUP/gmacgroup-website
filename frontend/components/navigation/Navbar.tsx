@@ -59,10 +59,10 @@ export function Navbar() {
       }`}
     >
       <div className="w-full max-w-screen-xl mx-auto px-3 sm:px-6 lg:px-10">
-        <nav className="flex items-center justify-between gap-2 sm:gap-4">
+        <nav className="flex min-h-10 items-center justify-between gap-2 overflow-hidden sm:gap-4">
 
           {/* Far Left: Brand Logo */}
-          <div className="flex-shrink-0 flex items-center min-w-0">
+          <div className="min-w-0 flex-1 overflow-hidden flex items-center">
             <Logo size="sm" showTagline={!isScrolled && false} />
           </div>
 
@@ -137,7 +137,7 @@ export function Navbar() {
           </div>
 
           {/* Mobile Menu Toggle */}
-          <div className="flex lg:hidden items-center ml-auto">
+          <div className="flex flex-shrink-0 lg:hidden items-center ml-auto">
             <button
               type="button"
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
@@ -159,7 +159,7 @@ export function Navbar() {
 
         {/* Mobile Navigation Drawer */}
         {mobileMenuOpen && (
-          <div className="lg:hidden mt-2 rounded-2xl border border-slate-200 bg-white/95 p-3 shadow-lg shadow-slate-200/60 backdrop-blur-sm animate-fadeIn">
+          <div className="lg:hidden mt-2 max-h-[calc(100dvh-5rem)] overflow-y-auto rounded-2xl border border-slate-200 bg-white/95 p-3 shadow-lg shadow-slate-200/60 backdrop-blur-sm animate-fadeIn">
             <ul className="space-y-1.5">
               {navLinks.map((link) => (
                 <li key={link.href}>
