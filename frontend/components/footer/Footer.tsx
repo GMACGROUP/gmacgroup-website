@@ -53,6 +53,49 @@ export function Footer() {
                 Global Reach
               </span>
             </div>
+            <div className="pt-3">
+              <p className="text-[11px] font-bold uppercase tracking-widest text-slate-500 mb-3">
+                Follow GMACGROUP
+              </p>
+              <div className="flex items-center gap-2.5">
+                <a
+                  href="https://www.linkedin.com/company/gmacgroup"
+                  target="_blank"
+                  rel="noreferrer"
+                  aria-label="GMACGROUP on LinkedIn"
+                  className="flex h-9 w-9 items-center justify-center rounded-lg border border-white/15 bg-white/10 text-xs font-extrabold text-brand-cyan transition-all hover:-translate-y-0.5 hover:border-brand-cyan hover:bg-brand-cyan hover:text-brand-navyDeep"
+                >
+                  in
+                </a>
+                <a
+                  href="https://twitter.com/gmacgroup"
+                  target="_blank"
+                  rel="noreferrer"
+                  aria-label="GMACGROUP on X"
+                  className="flex h-9 w-9 items-center justify-center rounded-lg border border-white/15 bg-white/10 text-sm font-bold text-white transition-all hover:-translate-y-0.5 hover:border-white hover:bg-white hover:text-brand-navyDeep"
+                >
+                  X
+                </a>
+                <a
+                  href="https://www.instagram.com/gmacgroup"
+                  target="_blank"
+                  rel="noreferrer"
+                  aria-label="GMACGROUP on Instagram"
+                  className="flex h-9 w-9 items-center justify-center rounded-lg border border-white/15 bg-white/10 text-sm font-extrabold text-brand-red transition-all hover:-translate-y-0.5 hover:border-brand-red hover:bg-brand-red hover:text-white"
+                >
+                  ◎
+                </a>
+                <a
+                  href="https://www.facebook.com/gmacgroup"
+                  target="_blank"
+                  rel="noreferrer"
+                  aria-label="GMACGROUP on Facebook"
+                  className="flex h-9 w-9 items-center justify-center rounded-lg border border-white/15 bg-white/10 text-sm font-extrabold text-brand-cyan transition-all hover:-translate-y-0.5 hover:border-brand-cyan hover:bg-brand-cyan hover:text-brand-navyDeep"
+                >
+                  f
+                </a>
+              </div>
+            </div>
           </div>
 
           {/* Column 2: Navigation */}

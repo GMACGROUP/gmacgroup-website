@@ -237,6 +237,23 @@ html {
   to { opacity: 1; transform: translateY(0) scale(1); }
 }
 
+@keyframes heroPillarFlip {
+  from { opacity: 0; transform: translateX(64px); }
+  65% { opacity: 1; transform: translateX(-5px); }
+  to { opacity: 1; transform: translateX(0); }
+}
+
+.hero-pillar-card {
+  animation: heroPillarFlip 850ms cubic-bezier(0.2, 0.75, 0.25, 1) both;
+  will-change: transform, opacity;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hero-pillar-card {
+    animation: none;
+  }
+}
+
 .modal-backdrop-in {
   animation: modalBackdropIn 180ms ease-out both;
 }

@@ -1,5 +1,8 @@
+"use client";
+
 import Link from "next/link";
 import Image from "next/image";
+import { useEffect, useState } from "react";
 import { AcademicCapIcon, MicroscopeIcon, BriefcaseIcon, GlobeIcon } from "@/components/common/Icons";
 
 export function Hero() {
@@ -28,7 +31,57 @@ export function Hero() {
       subtitle: "Accra Hub & Global Network",
       color: "text-brand-cyan",
     },
+    {
+      icon: AcademicCapIcon,
+      title: "Future Skills",
+      subtitle: "Digital Fluency & Leadership",
+      color: "text-brand-cyan",
+    },
+    {
+      icon: BriefcaseIcon,
+      title: "Career Launchpad",
+      subtitle: "Internships & Fellowships",
+      color: "text-brand-red",
+    },
+    {
+      icon: MicroscopeIcon,
+      title: "Evidence Lab",
+      subtitle: "Data, Insights & Impact",
+      color: "text-white",
+    },
+    {
+      icon: GlobeIcon,
+      title: "Institutional Growth",
+      subtitle: "Partnerships That Perform",
+      color: "text-brand-cyan",
+    },
+    {
+      icon: BriefcaseIcon,
+      title: "Talent Strategy",
+      subtitle: "People, Systems & Results",
+      color: "text-brand-red",
+    },
+    {
+      icon: AcademicCapIcon,
+      title: "Research Fellows",
+      subtitle: "Mentorship & Publication",
+      color: "text-brand-cyan",
+    },
   ];
+  const [activePillar, setActivePillar] = useState(0);
+  const [isPillarsPaused, setIsPillarsPaused] = useState(false);
+
+  useEffect(() => {
+    if (isPillarsPaused) return;
+
+    const rotation = window.setInterval(() => {
+      setActivePillar((current) => (current + 4) % pillars.length);
+    }, 4200);
+
+    return () => window.clearInterval(rotation);
+  }, [isPillarsPaused, pillars.length]);
+
+  const visiblePillars = Array.from({ length: 4 }, (_, offset) => pillars[(activePillar + offset) % pillars.length]);
 
   return (
     <section className="relative min-h-[540px] sm:min-h-[620px] lg:min-h-[700px] flex items-center justify-center overflow-hidden bg-brand-navyDeep">
@@ -93,16 +146,25 @@ export function Hero() {
         </div>
 
         {/* Institutional Pillars Bar */}
-        <div className="mt-10 sm:mt-16 pt-6 sm:pt-10 border-t border-white/10 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-3 sm:gap-6 max-w-4xl mx-auto">
-          {pillars.map((p) => {
-            const Icon = p.icon;
+        <div
+          className="mt-10 sm:mt-16 pt-6 sm:pt-10 border-t border-white/10 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-3 sm:gap-6 max-w-4xl mx-auto"
+          onMouseEnter={() => setIsPillarsPaused(true)}
+          onMouseLeave={() => setIsPillarsPaused(false)}
+          aria-label="GMACGROUP focus areas"
+        >
+          {visiblePillars.map((pillar, offset) => {
+            const Icon = pillar.icon;
             return (
-              <div key={p.title} className="p-3 sm:p-4 rounded-2xl bg-white/5 backdrop-blur-sm border border-white/10 text-left hover:bg-white/10 transition-colors">
+              <div
+                key={`${pillar.title}-${activePillar}`}
+                className="hero-pillar-card p-3 sm:p-4 rounded-2xl bg-white/5 backdrop-blur-sm border border-white/10 text-left hover:bg-white/10 transition-colors"
+                style={{ animationDelay: `${offset * 90}ms` }}
+              >
                 <div className="flex items-center gap-2 mb-2">
-                  <Icon className={`w-4 h-4 sm:w-5 sm:h-5 ${p.color}`} />
-                  <span className={`text-xs sm:text-sm md:text-base font-extrabold ${p.color}`}>{p.title}</span>
+                  <Icon className={`w-4 h-4 sm:w-5 sm:h-5 ${pillar.color}`} />
+                  <span className={`text-xs sm:text-sm md:text-base font-extrabold ${pillar.color}`}>{pillar.title}</span>
                 </div>
-                <p className="text-[10px] sm:text-[11px] md:text-xs text-slate-300 font-medium leading-relaxed">{p.subtitle}</p>
+                <p className="text-[10px] sm:text-[11px] md:text-xs text-slate-300 font-medium leading-relaxed">{pillar.subtitle}</p>
               </div>
             );
           })}
