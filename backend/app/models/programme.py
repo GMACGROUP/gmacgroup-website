@@ -38,7 +38,7 @@ class ProgrammeEnrolment(Base):
     notes: Mapped[str | None] = mapped_column(Text, nullable=True)
     offer_type: Mapped[str] = mapped_column(String, default="free")
     payment_status: Mapped[str] = mapped_column(String, default="not_required")
-    status: Mapped[str] = mapped_column(String, default="pending")
+    status: Mapped[str] = mapped_column(String, default="pending", server_default=text("'pending'"))
     created_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True),
         server_default=text("now()"),
