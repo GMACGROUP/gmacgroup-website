@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import "../styles/globals.css";
 import { Navbar } from "@/components/navigation/Navbar";
 import { Footer } from "@/components/footer/Footer";
+import { ScrollProgress } from "@/components/common/ScrollProgress";
 
 export const metadata: Metadata = {
   title: "GMACGROUP — Bridging Learning, Opportunity, and Impact",
@@ -21,6 +22,7 @@ export default function RootLayout({
         <Navbar />
         <main className="flex-1 pt-16">{children}</main>
         <Footer />
+        <ScrollProgress />
       </body>
     </html>
   );
