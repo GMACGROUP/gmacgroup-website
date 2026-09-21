@@ -102,9 +102,12 @@ export default function LoginPage() {
               <label className="block text-xs font-bold text-slate-800 uppercase tracking-wider">
                 Password
               </label>
-              <span className="text-[11px] text-slate-400 font-medium">
-                (Default: password123)
-              </span>
+              <Link
+                href="/forgot-password"
+                className="text-[11px] font-bold text-brand-navy hover:text-brand-red hover:underline transition-colors"
+              >
+                Forgot password?
+              </Link>
             </div>
             <input
               name="password"
@@ -132,11 +135,13 @@ export default function LoginPage() {
           )}
         </form>
 
-        <div className="mt-6 pt-6 border-t border-slate-200 text-center text-xs text-slate-600 font-medium">
-          Don&apos;t have an account yet?{" "}
-          <Link href="/register" className="font-bold text-brand-red hover:underline ml-1">
-            Register here →
-          </Link>
+        <div className="mt-6 pt-6 border-t border-slate-200 text-center text-xs text-slate-600 font-medium space-y-2">
+          <p>
+            Don&apos;t have an account yet?{" "}
+            <Link href="/register" className="font-bold text-brand-red hover:underline ml-1">
+              Register here →
+            </Link>
+          </p>
         </div>
       </div>
     </div>

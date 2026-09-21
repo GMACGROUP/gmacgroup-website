@@ -36,11 +36,25 @@ class Settings(BaseSettings):
     FLW_WEBHOOK_SECRET_HASH: str = ""
     FRONTEND_URL: str = "http://localhost:3000"
 
-    # Email notifications (Resend)
+    # Email notifications (Resend or SMTP / Gmail)
     EMAIL_PROVIDER: str = "none"
     RESEND_API_KEY: str = ""
     EMAIL_FROM: str = "GMACGROUP <notifications@gmacgroup.org>"
     OPERATIONS_EMAIL: str = ""
+
+    # SMTP configuration (for sending from Gmail / standard SMTP without custom domain)
+    SMTP_HOST: str = "smtp.gmail.com"
+    SMTP_PORT: int = 587
+    SMTP_USER: str = ""
+    SMTP_PASSWORD: str = ""
+    SMTP_TLS: bool = True
+
+
+    # Document & file storage (local / supabase / s3)
+    STORAGE_PROVIDER: str = "local"
+    UPLOAD_DIR: str = "uploads"
+    STORAGE_BUCKET: str = "resumes"
+    MAX_UPLOAD_SIZE_MB: int = 10
 
     model_config = SettingsConfigDict(env_file=".env", extra="ignore")
 
