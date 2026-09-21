@@ -25,6 +25,8 @@ export function Navbar() {
 
   const isOperationsPage = safePathname.startsWith("/admin");
   const isDashboardPage = safePathname.startsWith("/dashboard");
+  const isAuthPage = safePathname === "/login" || safePathname === "/register";
+  const showPublicAuthActions = !loading || isAuthPage;
 
   const navLinks = [
     { href: "/", label: "Home" },
@@ -116,7 +118,7 @@ export function Navbar() {
                   Logout
                 </button>
               </div>
-            ) : !loading && !isOperationsPage && !isDashboardPage ? (
+            ) : showPublicAuthActions && !isOperationsPage && !isDashboardPage ? (
               <>
                 <Link
                   href="/login"
@@ -203,7 +205,7 @@ export function Navbar() {
                     Sign Out
                   </button>
                 </div>
-              ) : !loading && !isOperationsPage && !isDashboardPage ? (
+              ) : showPublicAuthActions && !isOperationsPage && !isDashboardPage ? (
                 <>
                   <Link
                     href="/login"
