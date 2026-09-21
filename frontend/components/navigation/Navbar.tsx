@@ -25,8 +25,10 @@ export function Navbar() {
 
   const isOperationsPage = safePathname.startsWith("/admin");
   const isDashboardPage = safePathname.startsWith("/dashboard");
-  const isAuthPage = safePathname === "/login" || safePathname === "/register";
-  const showPublicAuthActions = !loading || isAuthPage;
+  // Only show Login/Register when we are CERTAIN there is no logged-in user.
+  // While loading is true, render nothing in the auth slot to prevent the
+  // Login/Register buttons from flashing for already-authenticated users.
+  const showPublicAuthActions = !loading && !user && !isOperationsPage && !isDashboardPage;
 
   const navLinks = [
     { href: "/", label: "Home" },
@@ -97,7 +99,7 @@ export function Navbar() {
 
           {/* Far Right: Auth / Member CTAs */}
           <div className="hidden lg:flex items-center gap-2 flex-shrink-0">
-            {!loading && user ? (
+            {user ? (
               <div className="flex items-center gap-2">
                 <Link
                   href="/dashboard"
@@ -118,7 +120,7 @@ export function Navbar() {
                   Logout
                 </button>
               </div>
-            ) : showPublicAuthActions && !isOperationsPage && !isDashboardPage ? (
+            ) : showPublicAuthActions ? (
               <>
                 <Link
                   href="/login"
@@ -184,7 +186,7 @@ export function Navbar() {
               ))}
             </ul>
             <div className="mt-3 pt-3 border-t border-slate-100 flex flex-col gap-2">
-              {!loading && user ? (
+              {user ? (
                 <div className="space-y-2">
                   <Link
                     href="/dashboard"
@@ -205,7 +207,7 @@ export function Navbar() {
                     Sign Out
                   </button>
                 </div>
-              ) : showPublicAuthActions && !isOperationsPage && !isDashboardPage ? (
+              ) : showPublicAuthActions ? (
                 <>
                   <Link
                     href="/login"
