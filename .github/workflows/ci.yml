@@ -69,5 +69,5 @@ jobs:
           print('Tables created successfully')
           "
       - run: python -m pytest
-          - run: python -m compileall -q app
+      - run: python -m compileall -q app
 
