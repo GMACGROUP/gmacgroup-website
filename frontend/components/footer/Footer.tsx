@@ -69,7 +69,7 @@ export function Footer() {
               </p>
               <div className="flex items-center gap-2.5">
                 <a
-                  href="https://www.linkedin.com/company/gmacgroup"
+                  href="https://www.linkedin.com/company/gmac-group/?viewAsMember=true"
                   target="_blank"
                   rel="noreferrer"
                   aria-label="GMACGROUP on LinkedIn"
