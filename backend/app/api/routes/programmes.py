@@ -92,5 +92,15 @@ async def enrol_in_programme(
         enrolment.email or email,
         enrolment.full_name or name,
         enrolment.programme_title or "Programme",
+        "\n".join(
+            detail
+            for detail in (
+                f"Phone: {enrolment.phone}" if enrolment.phone else "",
+                f"Organization: {enrolment.organization}" if enrolment.organization else "",
+                f"Notes: {enrolment.notes}" if enrolment.notes else "",
+                f"Offer: {enrolment.offer_type}" if enrolment.offer_type else "",
+            )
+            if detail
+        ),
     )
     return enrolment

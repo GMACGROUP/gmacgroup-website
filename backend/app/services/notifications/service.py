@@ -154,6 +154,18 @@ class NotificationService:
                 f"From: {name} <{email}>\n\n{message}",
             )
 
+    async def notify_operations(self, subject: str, body: str):
+        """Send an incoming business event to the operations inbox."""
+        settings = get_settings()
+        if settings.OPERATIONS_EMAIL:
+            await self.send_email(settings.OPERATIONS_EMAIL, subject, body)
+
+    async def notify_member_registration(self, email: str, name: str, role: str):
+        await self.notify_operations(
+            "New GMAC GROUP member registration",
+            f"Name: {name}\nEmail: {email}\nRole: {role}",
+        )
+
     async def notify_member_registered(self, email: str, name: str, role: str = "student"):
         """Welcome email on account creation."""
         settings = get_settings()
@@ -172,7 +184,7 @@ class NotificationService:
         programmes_url = f"{frontend_url}/programmes"
         opportunities_url = f"{frontend_url}/opportunities"
         research_url = f"{frontend_url}/research"
-        support_email = settings.OPERATIONS_EMAIL or "info@gmacgroup.org"
+        support_email = settings.OPERATIONS_EMAIL or "info@gmac-group.com"
         first_name = name.split()[0] if name else "there"
 
         subject = f"Hi {first_name}, you are in - GMAC GROUP"
@@ -197,7 +209,13 @@ class NotificationService:
 
         await self.send_email(email, subject, plain_text)
 
-    async def notify_application_submitted(self, email: str, name: str, title: str):
+    async def notify_application_submitted(
+        self,
+        email: str,
+        name: str,
+        title: str,
+        details: str = "",
+    ):
         settings = get_settings()
         first_name = name.split()[0] if name else name
         subject = f"Got your application, {first_name}"
@@ -210,8 +228,18 @@ class NotificationService:
             f"The GMAC GROUP Team"
         )
         await self.send_email(email, subject, plain_text)
+        await self.notify_operations(
+            f"New application: {title}",
+            f"Applicant: {name}\nEmail: {email}\nOpportunity: {title}\n{details}".rstrip(),
+        )
 
-    async def notify_enrolment_submitted(self, email: str, name: str, title: str):
+    async def notify_enrolment_submitted(
+        self,
+        email: str,
+        name: str,
+        title: str,
+        details: str = "",
+    ):
         settings = get_settings()
         first_name = name.split()[0] if name else name
         subject = f"Enrolment received for {title}"
@@ -224,6 +252,16 @@ class NotificationService:
             f"The GMAC GROUP Team"
         )
         await self.send_email(email, subject, plain_text)
+        await self.notify_operations(
+            f"New programme enrolment: {title}",
+            f"Applicant: {name}\nEmail: {email}\nProgramme: {title}\n{details}".rstrip(),
+        )
+
+    async def notify_newsletter_subscription(self, email: str):
+        await self.notify_operations(
+            "New newsletter subscription",
+            f"Subscriber email: {email}",
+        )
 
     async def notify_status_changed(self, email: str, name: str, title: str, status: str):
         first_name = name.split()[0] if name else name

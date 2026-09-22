@@ -16,6 +16,7 @@ from app.models.opportunity import Application
 from app.models.payment import Payment
 from app.models.programme import ProgrammeEnrolment
 from app.schemas.payment import PaymentInitialize, PaymentInitializeOut, PaymentVerifyOut
+from app.services.notifications import notification_service
 
 router = APIRouter()
 settings = get_settings()
@@ -35,7 +36,7 @@ def _find_target(payload: PaymentInitialize) -> tuple[dict, dict]:
     return target, offer
 
 
-def _complete_payment(
+async def _complete_payment(
     db: Session,
     payment: Payment,
     transaction_status: str,
@@ -53,7 +54,7 @@ def _complete_payment(
     payment.paid_at = datetime.now(timezone.utc)
     details = payment.details or {}
     if payment.target_type == "programme":
-        db.add(ProgrammeEnrolment(
+        enrolment = ProgrammeEnrolment(
             programme_id=payment.programme_id or "",
             programme_title=payment.target_title,
             user_id=payment.user_id,
@@ -65,9 +66,10 @@ def _complete_payment(
             offer_type=payment.offer_type,
             payment_status="successful",
             status="confirmed",
-        ))
+        )
+        db.add(enrolment)
     else:
-        db.add(Application(
+        application = Application(
             opportunity_id=payment.opportunity_id or "",
             opportunity_title=payment.target_title,
             user_id=payment.user_id,
@@ -80,8 +82,44 @@ def _complete_payment(
             offer_type=payment.offer_type,
             payment_status="successful",
             status="submitted",
-        ))
+        )
+        db.add(application)
     db.commit()
+    if payment.target_type == "programme":
+        await notification_service.notify_enrolment_submitted(
+            enrolment.email,
+            enrolment.full_name or "Applicant",
+            enrolment.programme_title or "Programme",
+            "\n".join(
+                detail
+                for detail in (
+                    f"Phone: {enrolment.phone}" if enrolment.phone else "",
+                    f"Organization: {enrolment.organization}" if enrolment.organization else "",
+                    f"Notes: {enrolment.notes}" if enrolment.notes else "",
+                    f"Offer: {enrolment.offer_type}" if enrolment.offer_type else "",
+                    f"Payment: {payment.amount} {payment.currency}",
+                )
+                if detail
+            ),
+        )
+    else:
+        await notification_service.notify_application_submitted(
+            application.applicant_email,
+            application.applicant_name or "Applicant",
+            application.opportunity_title or "Opportunity",
+            "\n".join(
+                detail
+                for detail in (
+                    f"Phone: {application.phone}" if application.phone else "",
+                    f"LinkedIn: {application.linkedin_url}" if application.linkedin_url else "",
+                    f"Cover note: {application.cover_note}" if application.cover_note else "",
+                    f"Resume: {application.resume_url}" if application.resume_url else "",
+                    f"Offer: {application.offer_type}" if application.offer_type else "",
+                    f"Payment: {payment.amount} {payment.currency}",
+                )
+                if detail
+            ),
+        )
     return payment
 
 
@@ -161,7 +199,7 @@ async def _verify(reference: str, transaction_id: str | None, db: Session) -> Pa
         and float(data.get("amount", 0)) >= float(payment.amount)
         and data.get("currency") == payment.currency
     )
-    _complete_payment(db, payment, "successful" if valid else "failed", transaction_id)
+    await _complete_payment(db, payment, "successful" if valid else "failed", transaction_id)
     return PaymentVerifyOut(status=payment.status, reference=reference, target_type=payment.target_type, target_id=payment.programme_id or payment.opportunity_id or "")
 
 
