@@ -88,14 +88,15 @@ function OpportunitiesPageContent() {
       <section className="container mx-auto px-4 sm:px-6 py-10 max-w-6xl">
 
         {/* Filter Tabs */}
-        <div className="flex flex-wrap items-center justify-center gap-2 mb-10">
-          {typeTabs.map((tab) => {
+        <div className="-mx-4 mb-10 overflow-x-auto px-4 pb-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden sm:mx-0 sm:overflow-visible sm:px-0">
+          <div className="flex min-w-max flex-nowrap items-center justify-center gap-2 sm:min-w-0 sm:flex-wrap">
+            {typeTabs.map((tab) => {
             const Icon = tab.icon;
             return (
               <button
                 key={tab.key}
                 onClick={() => handleTypeFilter(tab.key)}
-                className={`flex items-center gap-2 px-5 py-2.5 rounded-full text-sm font-semibold border transition-all duration-200 ${
+                className={`flex shrink-0 items-center gap-2 whitespace-nowrap rounded-full border px-5 py-2.5 text-sm font-semibold transition-all duration-200 ${
                   typeFilter === tab.key
                     ? "bg-brand-navy text-white border-brand-navy shadow-elevate"
                     : "bg-white text-slate-600 border-slate-200 hover:border-brand-navy/40 hover:text-brand-navy"
@@ -105,7 +106,8 @@ function OpportunitiesPageContent() {
                 <span>{tab.label}</span>
               </button>
             );
-          })}
+            })}
+          </div>
         </div>
 
         {/* Loading Skeletons */}
@@ -147,7 +149,7 @@ function OpportunitiesPageContent() {
                   className={`group relative flex flex-col rounded-2xl border shadow-card transition-all duration-300 overflow-hidden ${isClosed ? "bg-slate-100 border-slate-300 opacity-75" : "bg-white border-slate-200 hover:shadow-card-hover hover:border-brand-navy/25 hover:-translate-y-1"}`}
                 >
                   {/* Photo Banner */}
-                  <div className="relative h-36 w-full bg-slate-100 overflow-hidden">
+                  <div className="relative h-32 w-full overflow-hidden bg-slate-100 sm:h-36">
                     <Image
                       src={imageSrc}
                       alt={opp.title}
@@ -155,29 +157,29 @@ function OpportunitiesPageContent() {
                       className="object-cover group-hover:scale-105 transition-transform duration-500"
                     />
                     <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/25 to-transparent" />
-                    <div className="absolute top-3 left-3">
-                      <span className={`badge ${isClosed ? "bg-slate-700 text-white border-slate-500" : badgeCls} capitalize shadow-sm`}>
+                    <div className="absolute left-2.5 top-2.5 sm:left-3 sm:top-3">
+                      <span className={`badge px-2 py-0.5 text-[9px] sm:px-3 sm:py-1 sm:text-[11px] ${isClosed ? "bg-slate-700 text-white border-slate-500" : badgeCls} capitalize shadow-sm`}>
                         {isClosed ? "Closed" : opp.type}
                       </span>
                     </div>
                     {opp.deadline && (
-                      <div className="absolute top-3 right-3">
-                        <span className="flex items-center gap-1.5 text-xs text-white font-bold bg-black/50 backdrop-blur-md px-3 py-1 rounded-full border border-white/20 whitespace-nowrap">
-                          <ClockIcon className="w-3.5 h-3.5 text-brand-cyan" />
+                      <div className="absolute right-2.5 top-2.5 sm:right-3 sm:top-3">
+                        <span className="flex items-center gap-1 rounded-full border border-white/20 bg-black/50 px-2 py-0.5 text-[10px] font-bold text-white backdrop-blur-md sm:gap-1.5 sm:px-3 sm:py-1 sm:text-xs">
+                          <ClockIcon className="h-3 w-3 text-brand-cyan sm:h-3.5 sm:w-3.5" />
                           Closes {new Date(opp.deadline).toLocaleDateString("en-GB", { day: "numeric", month: "short" })}
                         </span>
                       </div>
                     )}
-                    <div className="absolute bottom-3 left-4 right-4 flex items-center gap-4 text-xs text-slate-200">
+                    <div className="absolute bottom-2 left-3 right-3 flex items-center gap-2 text-[10px] text-slate-200 sm:bottom-3 sm:left-4 sm:right-4 sm:gap-4 sm:text-xs">
                       {opp.organization && (
                         <span className="flex items-center gap-1 font-semibold truncate">
-                          <BuildingIcon className="w-3.5 h-3.5 text-slate-300 shrink-0" />
+                          <BuildingIcon className="h-3 w-3 shrink-0 text-slate-300 sm:h-3.5 sm:w-3.5" />
                           <span className="truncate">{opp.organization}</span>
                         </span>
                       )}
                       {opp.location && (
                         <span className="flex items-center gap-1 font-semibold shrink-0">
-                          <MapPinIcon className="w-3.5 h-3.5 text-brand-cyan shrink-0" />
+                          <MapPinIcon className="h-3 w-3 shrink-0 text-brand-cyan sm:h-3.5 sm:w-3.5" />
                           {opp.location}
                         </span>
                       )}
@@ -187,28 +189,28 @@ function OpportunitiesPageContent() {
                   {/* top accent strip */}
                   <div className={`h-1 w-full ${accent}`} />
 
-                  <div className="flex flex-col flex-1 p-6">
-                    <h2 className="text-lg font-extrabold text-slate-900 group-hover:text-brand-navy transition-colors font-serif leading-snug mb-2.5">
+                  <div className="flex flex-1 flex-col p-4 sm:p-6">
+                    <h2 className="mb-2 text-base font-extrabold leading-snug text-slate-900 transition-colors group-hover:text-brand-navy sm:text-lg">
                       {opp.title}
                     </h2>
 
                     {opp.description && (
-                      <p className="text-slate-600 text-sm leading-relaxed flex-1 line-clamp-3">
+                      <p className="line-clamp-3 flex-1 text-xs leading-relaxed text-slate-600 sm:text-sm">
                         {opp.description}
                       </p>
                     )}
 
-                    <div className="mt-6 pt-5 border-t border-slate-100 flex flex-wrap items-center justify-between gap-3">
+                    <div className="mt-4 flex flex-wrap items-center justify-between gap-2 border-t border-slate-100 pt-4 sm:mt-6 sm:gap-3 sm:pt-5">
                       <button
                         onClick={() => setSelectedOpportunity(opp)}
                         disabled={isClosed}
-                        className="btn-primary text-xs px-5 py-2.5 shadow-sm hover:shadow-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-cyan disabled:cursor-not-allowed disabled:bg-slate-300 disabled:text-slate-500 disabled:shadow-none"
+                        className="btn-primary px-3 py-2 text-[10px] shadow-sm hover:shadow-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-cyan disabled:cursor-not-allowed disabled:bg-slate-300 disabled:text-slate-500 disabled:shadow-none sm:px-5 sm:py-2.5 sm:text-xs"
                       >
                         {isClosed ? "Closed" : "Apply for Opening →"}
                       </button>
                       <Link
                         href={`/contact?subject=Opportunity Inquiry: ${encodeURIComponent(opp.title)}`}
-                        className="text-xs font-bold text-slate-500 hover:text-brand-navy transition-colors"
+                        className="text-[10px] font-bold text-slate-500 transition-colors hover:text-brand-navy sm:text-xs"
                       >
                         Enquire Details
                       </Link>

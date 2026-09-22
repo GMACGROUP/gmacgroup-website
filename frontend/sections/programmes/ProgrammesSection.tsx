@@ -37,13 +37,14 @@ export function ProgrammesSection() {
       <div className="container mx-auto px-4 sm:px-6">
         <div className="flex flex-col md:flex-row md:items-end justify-between mb-14 gap-6">
           <div className="max-w-2xl">
-            <span className="section-label text-brand-red block mb-2">
+            <span className="section-label bg-red-50 border border-red-200/80 text-brand-red mb-3">
+              <span className="h-1.5 w-1.5 rounded-full bg-brand-red animate-pulse" />
               Featured Pathways
             </span>
-            <h2 className="section-title">
+            <h2 className="section-title mt-2">
               Flagship Development Programmes
             </h2>
-            <p className="section-subtitle mt-3">
+            <p className="section-subtitle mt-4">
               Curated, high-impact cohorts engineered to accelerate talent growth and drive institutional innovation.
             </p>
           </div>

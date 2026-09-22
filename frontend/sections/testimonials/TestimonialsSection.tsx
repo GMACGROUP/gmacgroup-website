@@ -1,101 +1,120 @@
-import Image from "next/image";
-import { AwardIcon } from "@/components/common/Icons";
+"use client";
 
-const testimonials = [
-  {
-    quote:
-      "GMAC GROUP's Career Readiness Lab completely transformed how our graduates transition into the workforce. The practical framework, econometric grounding, and institutional mentorship are second to none.",
-    author: "Dr. Kwesi Mensah",
-    role: "Dean of Academic Affairs, West Africa Institute",
-    badge: "Institutional Partner",
-    badgeColor: "bg-blue-50 text-brand-navy border-blue-200",
-    accentColor: "bg-brand-navy",
-    image: "/images/testimonial-mensah.jpg",
-  },
-  {
-    quote:
-      "The Research and Impact Fellowship gave me direct hands-on experience on complex human-capital studies. It accelerated my entry into international policy consulting with measurable authority.",
-    author: "Ama Serwaa",
-    role: "Policy Analyst & Fellowship Alum",
-    badge: "Fellowship Graduate",
-    badgeColor: "bg-red-50 text-brand-red border-red-200",
-    accentColor: "bg-brand-red",
-    image: "/images/about-team.jpg",
-  },
-  {
-    quote:
-      "Their strategic talent advisory provided our executive leadership team with data-driven workforce planning models that reduced time-to-competence and elevated operational capability across our pan-African teams.",
-    author: "Marcus Chen",
-    role: "Chief People Officer, Apex Global Ventures",
-    badge: "Advisory Client",
-    badgeColor: "bg-emerald-50 text-emerald-700 border-emerald-200",
-    accentColor: "bg-emerald-500",
-    image: "/images/services-advisory.jpg",
-  },
+import { useEffect, useState } from "react";
+
+const people = [
+  { name: "Richard", role: "Business Development Intern", country: "Ghana", unit: "Business Development & Partnerships", unitNumber: "01", accent: "#14639A" },
+  { name: "Saani", role: "Research Lead", country: "Ghana", unit: "Research", unitNumber: "02", accent: "#E51924" },
+  { name: "Oluwafemi", role: "Research Consultant", country: "Nigeria", unit: "Research", unitNumber: "02", accent: "#E51924" },
+  { name: "Domson", role: "Research Consultant", country: "United States", unit: "Research", unitNumber: "02", accent: "#E51924" },
+  { name: "Evans", role: "Research Consultant", country: "Ghana", unit: "Research", unitNumber: "02", accent: "#E51924" },
+  { name: "Benjamin", role: "Research Consultant", country: "Ghana", unit: "Research", unitNumber: "02", accent: "#E51924" },
+  { name: "Maureen Mushwimba", role: "Head of Marketing and Communications", country: "Zambia", unit: "Marketing & Communications", unitNumber: "03", accent: "#D7B56D" },
+  { name: "Victoria", role: "Marketing and Communications Intern", country: "Ghana", unit: "Marketing & Communications", unitNumber: "03", accent: "#D7B56D" },
+  { name: "Favour", role: "Marketing and Communications Intern", country: "Nigeria", unit: "Marketing & Communications", unitNumber: "03", accent: "#D7B56D" },
+  { name: "Yolanda", role: "Design Lead", country: "Zimbabwe", unit: "Graphic Design & Web", unitNumber: "04", accent: "#8B5CF6" },
+  { name: "Silas", role: "Designer", country: "Rwanda", unit: "Graphic Design & Web", unitNumber: "04", accent: "#8B5CF6" },
+  { name: "Christian", role: "Designer", country: "Ghana", unit: "Graphic Design & Web", unitNumber: "04", accent: "#8B5CF6" },
+  { name: "Wendy", role: "Designer", country: "Ghana", unit: "Graphic Design & Web", unitNumber: "04", accent: "#8B5CF6" },
+  { name: "Maranatha", role: "Design Intern", country: "Ghana", unit: "Graphic Design & Web", unitNumber: "04", accent: "#8B5CF6" },
+  { name: "Ramadhani", role: "Programme Manager", country: "Tanzania", unit: "Operations & Programmes", unitNumber: "05", accent: "#0EA5A4" },
+  { name: "Samantha", role: "Programme Manager", country: "Nigeria", unit: "Operations & Programmes", unitNumber: "05", accent: "#0EA5A4" },
+  { name: "Edwin", role: "Programme Manager", country: "Cameroon", unit: "Operations & Programmes", unitNumber: "05", accent: "#0EA5A4" },
+  { name: "Delasi", role: "Programmes Intern", country: "Ghana", unit: "Operations & Programmes", unitNumber: "05", accent: "#0EA5A4" },
+  { name: "Faustino", role: "Programmes Intern", country: "Burkina Faso", unit: "Operations & Programmes", unitNumber: "05", accent: "#0EA5A4" },
+  { name: "Richmond", role: "Programmes Intern", country: "Ghana", unit: "Operations & Programmes", unitNumber: "05", accent: "#0EA5A4" },
+  { name: "Thole", role: "Programmes Intern", country: "Botswana", unit: "Operations & Programmes", unitNumber: "05", accent: "#0EA5A4" },
+  { name: "Emmanuel", role: "Programmes Intern", country: "Ghana", unit: "Operations & Programmes", unitNumber: "05", accent: "#0EA5A4" },
 ];
 
+function initials(name: string) {
+  return name.split(" ").map((part) => part[0]).join("").slice(0, 2).toUpperCase();
+}
+
 export function TestimonialsSection() {
+  const [activePerson, setActivePerson] = useState(0);
+
+  useEffect(() => {
+    const rotation = window.setInterval(() => {
+      setActivePerson((current) => (current + 1) % people.length);
+    }, 4200);
+    return () => window.clearInterval(rotation);
+  }, []);
+
+  const person = people[activePerson];
+  const move = (direction: number) => {
+    setActivePerson((current) => (current + direction + people.length) % people.length);
+  };
+
   return (
-    <section className="py-20 lg:py-24 bg-white border-t border-slate-200">
-      <div className="container mx-auto px-4 sm:px-6">
-        {/* Section Header */}
-        <div className="max-w-3xl mx-auto text-center mb-14">
-          <span className="section-label text-brand-red block mb-2">Voices of Impact</span>
-          <h2 className="text-3xl sm:text-4xl font-extrabold text-slate-900 font-serif">
-            Trusted by Leaders, Scholars & Institutions
+    <section className="border-t border-slate-200/80 bg-white py-16 sm:py-20 lg:py-24">
+      <div className="container mx-auto max-w-5xl px-4 sm:px-6 lg:px-8">
+        <div className="mx-auto mb-10 max-w-3xl text-center sm:mb-12">
+          <span className="section-label mb-3 border border-blue-200/80 bg-blue-50 text-brand-navy">
+            <span className="h-1.5 w-1.5 rounded-full bg-brand-navy" />
+            Our people
+          </span>
+          <h2 className="mt-2 font-serif text-3xl font-extrabold leading-[1.12] tracking-tight text-slate-900 sm:text-4xl lg:text-[2.75rem]">
+            Twenty-two colleagues, ten countries.
           </h2>
-          <p className="mt-3 text-slate-600 text-base sm:text-lg">
-            Real outcomes from our institutional partners, fellowship alumni, and advisory clients.
+          <p className="mx-auto mt-4 max-w-2xl text-base leading-relaxed text-slate-600 sm:text-lg">
+            A distributed team building evidence, developing people, and opening doors across Africa and beyond.
           </p>
         </div>
 
-        <div className="grid gap-6 sm:grid-cols-2 xl:grid-cols-3">
-          {testimonials.map((t, idx) => (
-            <div
-              key={idx}
-              className="group relative flex flex-col bg-white rounded-2xl border border-slate-200 shadow-card hover:shadow-card-hover hover:border-brand-navy/25 hover:-translate-y-1 transition-all duration-300 overflow-hidden"
-            >
-              {/* Top accent */}
-              <div className={`h-1.5 w-full ${t.accentColor}`} />
-
-              <div className="flex flex-col flex-1 p-7">
-                {/* Five Star Rating */}
-                <div className="flex items-center gap-1 text-amber-500 mb-5">
-                  {[...Array(5)].map((_, i) => (
-                    <svg key={i} className="w-4 h-4 fill-current" viewBox="0 0 20 20">
-                      <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
-                    </svg>
-                  ))}
-                </div>
-
-                {/* Quote */}
-                <p className="text-slate-700 text-sm sm:text-base leading-relaxed font-serif italic flex-1">
-                  &ldquo;{t.quote}&rdquo;
+        <div className="relative mx-auto max-w-3xl overflow-hidden rounded-3xl border border-slate-200 bg-slate-50 shadow-card">
+          <div className="h-1.5 w-full" style={{ backgroundColor: person.accent }} />
+          <div className="flex min-h-[320px] flex-col justify-between p-7 sm:min-h-[300px] sm:p-10">
+            <div className="flex items-start justify-between gap-5">
+              <div>
+                <p className="text-xs font-bold uppercase tracking-[0.18em]" style={{ color: person.accent }}>
+                  Unit {person.unitNumber}
                 </p>
+                <p className="mt-2 text-sm font-semibold text-slate-500">{person.unit}</p>
+              </div>
+              <span className="font-serif text-6xl font-bold leading-none text-slate-200" aria-hidden="true">
+                {person.unitNumber}
+              </span>
+            </div>
 
-                {/* Author & Portrait */}
-                <div className="mt-7 pt-6 border-t border-slate-100 flex items-center justify-between gap-3">
-                  <div className="flex items-center gap-3">
-                    <div className="relative w-12 h-12 rounded-full overflow-hidden border-2 border-slate-200 flex-shrink-0 shadow-sm">
-                      <Image
-                        src={t.image}
-                        alt={t.author}
-                        fill
-                        className="object-cover"
-                      />
-                    </div>
-                    <div>
-                      <h4 className="font-bold text-slate-900 text-sm leading-tight">{t.author}</h4>
-                      <p className="text-xs text-slate-500 mt-0.5">{t.role}</p>
-                    </div>
-                  </div>
-                  <span className={`badge ${t.badgeColor} text-[10px] whitespace-nowrap`}>
-                    {t.badge}
-                  </span>
-                </div>
+            <div className="mt-8 flex items-center gap-5">
+              <div
+                className="flex h-20 w-20 flex-shrink-0 items-center justify-center rounded-full border-4 border-white text-2xl font-bold text-white shadow-md"
+                style={{ backgroundColor: person.accent }}
+                aria-hidden="true"
+              >
+                {initials(person.name)}
+              </div>
+              <div>
+                <h3 className="font-serif text-3xl font-bold leading-tight text-slate-900 sm:text-4xl">{person.name}</h3>
+                <p className="mt-1 text-sm font-medium text-slate-600 sm:text-base">{person.role} · {person.country}</p>
               </div>
             </div>
-          ))}
+
+            <div className="mt-8 flex items-center justify-between border-t border-slate-200 pt-5">
+              <span className="text-xs font-semibold uppercase tracking-[0.16em] text-slate-400">
+                {String(activePerson + 1).padStart(2, "0")} / {String(people.length).padStart(2, "0")}
+              </span>
+              <div className="flex items-center gap-2">
+                <button
+                  type="button"
+                  onClick={() => move(-1)}
+                  className="flex h-10 w-10 items-center justify-center rounded-full border border-slate-300 text-slate-700 transition-colors hover:border-brand-navy hover:bg-brand-navy hover:text-white"
+                  aria-label="Previous colleague"
+                >
+                  <span aria-hidden="true" className="text-xl leading-none">&larr;</span>
+                </button>
+                <button
+                  type="button"
+                  onClick={() => move(1)}
+                  className="flex h-10 w-10 items-center justify-center rounded-full border border-slate-300 text-slate-700 transition-colors hover:border-brand-navy hover:bg-brand-navy hover:text-white"
+                  aria-label="Next colleague"
+                >
+                  <span aria-hidden="true" className="text-xl leading-none">&rarr;</span>
+                </button>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
     </section>

@@ -1,22 +1,23 @@
 import type { Metadata } from "next";
 import { Suspense } from "react";
-import { Inter, Playfair_Display } from "next/font/google";
+import { Cormorant_Garamond, Libre_Franklin } from "next/font/google";
 import "../styles/globals.css";
 import { Navbar } from "@/components/navigation/Navbar";
 import { Footer } from "@/components/footer/Footer";
 import { ScrollProgress } from "@/components/common/ScrollProgress";
 import { NavigationProgressBar } from "@/components/common/NavigationProgressBar";
 
-const inter = Inter({
+const libreFranklin = Libre_Franklin({
   subsets: ["latin"],
-  variable: "--font-inter",
+  variable: "--font-libre-franklin",
   display: "swap",
   preload: true,
 });
 
-const playfair = Playfair_Display({
+const cormorant = Cormorant_Garamond({
   subsets: ["latin"],
-  variable: "--font-playfair",
+  weight: ["400", "500", "600", "700"],
+  variable: "--font-cormorant",
   display: "swap",
   preload: true,
 });
@@ -33,7 +34,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en" className={`${inter.variable} ${playfair.variable}`}>
+    <html lang="en" className={`${libreFranklin.variable} ${cormorant.variable}`}>
       <body className="min-h-screen flex flex-col font-sans">
         <Suspense fallback={null}>
           <NavigationProgressBar />

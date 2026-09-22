@@ -86,10 +86,10 @@ export default function AboutPage() {
               INSTITUTIONAL HERITAGE
             </span>
             <h2 className="text-2xl sm:text-3xl font-extrabold text-slate-900 font-serif leading-snug">
-              Bridging Capability with Real-World Impact
+              Build the people and build the evidence at the same time
             </h2>
             <p className="text-slate-600 text-xs sm:text-sm leading-relaxed">
-              At GMAC GROUP, we believe talent is universally distributed, but structured pathways to professional excellence are often fragmented. Headquartered in Accra with a global advisory outlook, we design cohort-driven talent pipelines, publish applied workforce studies, and advise forward-thinking institutions.
+              Gmac Group began with a gap visible from both sides of the same room: graduates were leaving university with credentials but without a route into work, while institutions were making decisions without reliable evidence. We started by training, coaching, and convening, then built a research practice led by doctoral researchers to produce evidence about African markets from within the continent itself.
             </p>
             <div className="pt-1 flex flex-wrap items-center gap-2">
               <span className="px-3 py-1.5 rounded-lg text-xs font-bold bg-blue-50 text-brand-navy border border-blue-200 shadow-xs">
@@ -125,11 +125,11 @@ export default function AboutPage() {
             <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-cyan-50 border border-cyan-200/80 text-cyan-600 text-[11px] font-bold tracking-wider uppercase mb-2">
               OUR METHODOLOGY
             </span>
-            <h2 className="text-2xl sm:text-3xl font-extrabold text-slate-900 font-sans tracking-tight">
-              Built on Three Enduring Principles
+            <h2 className="text-2xl sm:text-3xl font-extrabold text-slate-900 font-serif tracking-tight">
+              Built on three enduring principles
             </h2>
-            <p className="mt-2 text-slate-500 text-xs sm:text-sm">
-              Our model connects learners, researchers, and enterprise leadership with actionable capability.
+            <p className="mt-2 text-slate-600 text-sm sm:text-base leading-relaxed">
+              We work with evidence before advice, specialists rather than generalists, and scope that is written down before work begins.
             </p>
           </div>
 
@@ -140,22 +140,22 @@ export default function AboutPage() {
                 return (
                   <div
                     key={item.num}
-                    className="group relative bg-[#072448] text-white rounded-3xl p-6 sm:p-7 shadow-card hover:shadow-elevate hover:-translate-y-1 transition-all duration-300 flex flex-col justify-between overflow-hidden border border-brand-navy"
+                    className="group relative bg-[#072448] text-white rounded-2xl p-6 sm:p-7 shadow-card hover:shadow-elevate hover:-translate-y-1.5 transition-all duration-300 flex flex-col justify-between overflow-hidden border border-brand-navy"
                   >
                     <div className="absolute -top-12 -right-12 w-32 h-32 bg-brand-cyan/20 rounded-full blur-2xl pointer-events-none" />
                     <div className="relative z-10">
                       <div className="flex items-center justify-between">
-                        <div className="w-11 h-11 rounded-xl bg-white/10 border border-white/20 backdrop-blur-md flex items-center justify-center text-brand-cyan group-hover:scale-105 transition-transform">
+                        <div className="w-11 h-11 rounded-xl bg-white/10 border border-white/20 backdrop-blur-md flex items-center justify-center text-brand-cyan group-hover:scale-110 transition-transform">
                           <Icon className="w-5 h-5 text-brand-cyan" />
                         </div>
-                        <span className="text-2xl sm:text-3xl font-extrabold text-white/25 font-sans tracking-tight">
+                        <span className="text-2xl sm:text-3xl font-extrabold text-white/30 font-sans tracking-tight">
                           {item.num}
                         </span>
                       </div>
-                      <h3 className="text-lg font-bold text-white mt-6 mb-2">
+                      <h3 className="text-lg sm:text-xl font-bold font-serif text-white mt-6 mb-2.5">
                         {item.title}
                       </h3>
-                      <p className="text-slate-200 text-xs sm:text-sm leading-relaxed">
+                      <p className="text-slate-200 text-sm leading-relaxed">
                         {item.body}
                       </p>
                     </div>
@@ -165,21 +165,21 @@ export default function AboutPage() {
               return (
                 <div
                   key={item.num}
-                  className="group relative bg-white rounded-3xl p-6 sm:p-7 border border-slate-200/90 shadow-sm hover:shadow-card hover:border-brand-navy/30 hover:-translate-y-1 transition-all duration-300 flex flex-col justify-between"
+                  className="group relative bg-white rounded-2xl p-6 sm:p-7 border border-slate-200/90 shadow-card hover:shadow-card-hover hover:border-brand-navy/30 hover:-translate-y-1.5 transition-all duration-300 flex flex-col justify-between"
                 >
                   <div>
                     <div className="flex items-center justify-between">
-                      <div className="w-11 h-11 rounded-xl bg-cyan-50 border border-cyan-100 flex items-center justify-center text-cyan-600 group-hover:scale-105 transition-transform">
+                      <div className="w-11 h-11 rounded-xl bg-cyan-50 border border-cyan-100 flex items-center justify-center text-cyan-600 group-hover:scale-110 transition-transform">
                         <Icon className="w-5 h-5 text-cyan-600" />
                       </div>
                       <span className="text-2xl sm:text-3xl font-extrabold text-slate-300 font-sans tracking-tight">
                         {item.num}
                       </span>
                     </div>
-                    <h3 className="text-lg font-bold text-slate-900 mt-6 mb-2">
+                    <h3 className="text-lg sm:text-xl font-bold font-serif text-slate-900 mt-6 mb-2.5">
                       {item.title}
                     </h3>
-                    <p className="text-slate-500 text-xs sm:text-sm leading-relaxed">
+                    <p className="text-slate-600 text-sm leading-relaxed">
                       {item.body}
                     </p>
                   </div>
@@ -196,24 +196,24 @@ export default function AboutPage() {
             return (
               <div
                 key={p.title}
-                className="relative bg-white rounded-2xl border border-slate-200 shadow-card p-6 sm:p-8 overflow-hidden"
+                className="group relative bg-white rounded-2xl border border-slate-200/90 shadow-card hover:shadow-card-hover hover:-translate-y-1 transition-all p-6 sm:p-8 overflow-hidden"
               >
                 <div className={`absolute top-0 left-0 right-0 h-1.5 ${p.accent}`} />
-                <div className={`w-11 h-11 rounded-xl flex items-center justify-center mb-4 border ${p.color} shadow-xs`}>
+                <div className={`w-11 h-11 rounded-xl flex items-center justify-center mb-4 border ${p.color} shadow-xs group-hover:scale-105 transition-transform`}>
                   <IconComp className="w-5 h-5" />
                 </div>
-                <h2 className="text-xl font-bold text-slate-900 font-serif mb-2">{p.title}</h2>
-                <p className="text-slate-600 text-xs sm:text-sm leading-relaxed">{p.body}</p>
+                <h2 className="text-xl sm:text-2xl font-bold text-slate-900 font-serif mb-2.5">{p.title}</h2>
+                <p className="text-slate-600 text-sm leading-relaxed">{p.body}</p>
               </div>
             );
           })}
         </div>
 
         {/* Operational Focus Areas */}
-        <div className="bg-white rounded-3xl border border-slate-200 shadow-card p-6 sm:p-8">
+        <div className="bg-white rounded-3xl border border-slate-200/90 shadow-card p-6 sm:p-8">
           <div className="max-w-xl mb-6">
-            <span className="section-label text-brand-red">Operational Capabilities</span>
-            <h2 className="text-xl sm:text-2xl font-extrabold text-slate-900 font-serif mt-1">
+            <span className="section-label bg-red-50 border border-red-200/80 text-brand-red mb-2">Operational Capabilities</span>
+            <h2 className="text-2xl sm:text-3xl font-extrabold text-slate-900 font-serif mt-1">
               Delivering Sustainable Solutions
             </h2>
           </div>
@@ -222,42 +222,15 @@ export default function AboutPage() {
             {focusAreas.map((area) => {
               const Icon = area.icon;
               return (
-                <div key={area.title} className="p-4 rounded-xl bg-slate-50 border border-slate-200/80 hover:border-brand-navy/30 hover:bg-white transition-all group">
-                  <div className="w-9 h-9 rounded-lg bg-white border border-slate-200 text-brand-navy flex items-center justify-center mb-3 group-hover:bg-brand-navy group-hover:text-white transition-colors shadow-xs">
-                    <Icon className="w-4 h-4" />
+                <div key={area.title} className="p-5 rounded-2xl bg-slate-50 border border-slate-200/80 hover:border-brand-navy/30 hover:bg-white hover:shadow-sm transition-all group">
+                  <div className="w-10 h-10 rounded-xl bg-white border border-slate-200 text-brand-navy flex items-center justify-center mb-3 group-hover:bg-brand-navy group-hover:text-white transition-colors shadow-xs">
+                    <Icon className="w-5 h-5" />
                   </div>
-                  <h3 className="font-bold text-slate-900 text-sm mb-1">{area.title}</h3>
-                  <p className="text-xs text-slate-500 leading-relaxed">{area.body}</p>
+                  <h3 className="font-bold text-slate-900 text-base mb-1 font-serif">{area.title}</h3>
+                  <p className="text-xs sm:text-sm text-slate-600 leading-relaxed">{area.body}</p>
                 </div>
               );
             })}
-          </div>
-        </div>
-
-        {/* CTA Box */}
-        <div className="relative bg-gradient-to-br from-brand-navyDeep via-brand-navy to-brand-navyDark rounded-3xl p-8 sm:p-10 text-white overflow-hidden text-center">
-          <div className="absolute -top-16 -right-16 w-64 h-64 rounded-full bg-brand-cyan opacity-15 blur-3xl pointer-events-none" />
-          <div className="absolute -bottom-16 -left-16 w-64 h-64 rounded-full bg-brand-red opacity-15 blur-3xl pointer-events-none" />
-
-          <span className="badge bg-white/10 text-brand-cyan border-white/20 mb-3 px-3.5 py-1 text-xs font-bold tracking-wider">
-            PARTNER WITH GMAC
-          </span>
-          <h2 className="text-2xl sm:text-3xl font-extrabold font-serif mt-1 mb-3">
-            Ready to Accelerate Your Impact?
-          </h2>
-          <p className="text-slate-200 text-xs sm:text-sm max-w-xl mx-auto mb-6 leading-relaxed">
-            Whether you are an educational institution looking to upgrade graduate employability, or an enterprise seeking high-caliber talent and advisory, let&apos;s collaborate.
-          </p>
-          <div className="flex flex-wrap justify-center gap-3">
-            <Link href="/contact" className="btn-primary shadow-glow-red text-xs sm:text-sm px-6 py-3">
-              Contact Advisory Team →
-            </Link>
-            <Link
-              href="/services"
-              className="inline-flex items-center gap-2 px-6 py-3 rounded-xl font-bold text-xs sm:text-sm text-white bg-white/10 hover:bg-white/20 border border-white/20 transition-all"
-            >
-              Explore Strategic Services
-            </Link>
           </div>
         </div>
       </section>

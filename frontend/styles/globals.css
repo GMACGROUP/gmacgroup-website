@@ -4,12 +4,12 @@
 
 @layer base {
   body {
-    @apply bg-slate-50 text-slate-800 antialiased font-sans selection:bg-brand-red selection:text-white;
+    @apply bg-brand-ivory text-brand-navy antialiased font-sans selection:bg-brand-red selection:text-white;
     overflow-x: hidden;
   }
 
   h1, h2, h3, h4, h5, h6 {
-    @apply text-slate-900 tracking-tight;
+    @apply font-serif text-brand-navy tracking-tight;
   }
 
   /* Increase base body font-size slightly for legibility */
@@ -21,70 +21,74 @@
 @layer components {
   /* ─── Card System ──────────────────────────────────────── */
   .card {
-    @apply bg-white rounded-2xl border border-slate-200 shadow-card transition-all duration-300;
+    @apply bg-white rounded-2xl border border-slate-200/90 shadow-card transition-all duration-300;
   }
 
   .card-hover {
-    @apply hover:shadow-card-hover hover:border-brand-navy/25 hover:-translate-y-1;
+    @apply hover:shadow-card-hover hover:border-brand-navy/30 hover:-translate-y-1.5 transition-all duration-300;
   }
 
   .card-featured {
-    @apply bg-white rounded-2xl border-2 border-brand-navy/20 shadow-card-featured;
+    @apply bg-white rounded-2xl border-2 border-brand-navy/25 shadow-card-featured;
   }
 
   /* ─── Section Backgrounds ──────────────────────────────── */
   .section-light {
-    @apply bg-slate-50;
+    @apply bg-brand-warm border-b border-brand-navy/10;
   }
 
   .section-white {
-    @apply bg-white border-y border-slate-100;
+    @apply bg-brand-ivory border-b border-brand-navy/10;
   }
 
   .section-navy {
-    @apply bg-gradient-to-br from-brand-navyDeep via-brand-navy to-brand-navyDark text-white;
+    @apply bg-brand-navyDeep text-white;
   }
 
   /* ─── Badge Variants ───────────────────────────────────── */
   .badge {
-    @apply inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold border tracking-wide;
+    @apply inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[11px] font-bold border tracking-wider uppercase;
   }
 
   .badge-red {
-    @apply bg-red-50 text-brand-red border-red-200;
+    @apply bg-red-50 text-brand-red border-red-200/80;
   }
 
   .badge-navy {
-    @apply bg-blue-50 text-brand-navy border-blue-200;
+    @apply bg-blue-50 text-brand-navy border-blue-200/80;
   }
 
   .badge-cyan {
-    @apply bg-cyan-50 text-cyan-700 border-cyan-200;
+    @apply bg-cyan-50 text-cyan-700 border-cyan-200/80;
   }
 
   .badge-green {
-    @apply bg-emerald-50 text-emerald-700 border-emerald-200;
+    @apply bg-emerald-50 text-emerald-700 border-emerald-200/80;
   }
 
   .badge-purple {
-    @apply bg-purple-50 text-purple-700 border-purple-200;
+    @apply bg-purple-50 text-purple-700 border-purple-200/80;
   }
 
   .badge-slate {
-    @apply bg-slate-100 text-slate-600 border-slate-200;
+    @apply bg-slate-100 text-slate-700 border-slate-200/80;
   }
 
   /* ─── Typography Helpers ───────────────────────────────── */
   .section-label {
-    @apply text-xs sm:text-[13px] font-bold tracking-widest uppercase;
+    @apply inline-flex items-center gap-2 px-3.5 py-1 rounded-full text-[11px] font-bold tracking-[0.16em] uppercase;
+  }
+
+  .page-header-badge {
+    @apply mb-3 inline-block rounded-full border border-[#D7B56D]/50 bg-white/5 px-3.5 py-1 text-[11px] font-bold uppercase tracking-[0.2em] text-[#F3E7C9] shadow-sm;
   }
 
   .section-title {
-    @apply text-2xl sm:text-3xl lg:text-4xl font-extrabold font-serif text-slate-900 tracking-tight;
+    @apply text-3xl sm:text-4xl lg:text-[2.75rem] font-serif font-bold text-brand-navy tracking-tight leading-[1.08];
   }
 
   .section-subtitle {
-    @apply text-sm sm:text-base text-slate-600 leading-relaxed max-w-2xl;
+    @apply text-base sm:text-lg text-brand-navy/70 leading-relaxed max-w-3xl;
   }
 
   /* ─── Filter Tab Bar ───────────────────────────────────── */
@@ -106,25 +110,54 @@
 
   /* ─── CTA Button Variants ──────────────────────────────── */
   .btn-primary {
-    @apply inline-flex items-center gap-2 px-5 py-2.5 rounded-xl font-bold text-sm text-white bg-brand-red hover:bg-brand-redDark shadow-elevate-red hover:shadow-lg active:scale-95 transition-all duration-200;
+    @apply inline-flex items-center justify-center gap-2 px-6 py-3 rounded-full font-bold text-sm text-brand-ivory bg-brand-red hover:bg-brand-redDark shadow-elevate-red hover:shadow-lg hover:-translate-y-0.5 active:scale-95 transition-all duration-200;
   }
 
   .btn-secondary {
-    @apply inline-flex items-center gap-2 px-5 py-2.5 rounded-xl font-bold text-sm text-brand-navy bg-brand-ice hover:bg-blue-100 border border-blue-200 active:scale-95 transition-all duration-200;
+    @apply inline-flex items-center justify-center gap-2 px-6 py-3 rounded-full font-bold text-sm text-brand-navy bg-brand-warm hover:bg-brand-gold/30 border border-brand-navy/15 hover:-translate-y-0.5 active:scale-95 transition-all duration-200;
   }
 
   .btn-ghost {
-    @apply inline-flex items-center gap-2 px-5 py-2.5 rounded-xl font-semibold text-sm text-slate-600 hover:text-brand-navy hover:bg-slate-100 transition-all duration-200;
+    @apply inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-full font-semibold text-sm text-brand-navy/70 hover:text-brand-navy hover:bg-brand-warm transition-all duration-200;
   }
 
   /* ─── Stat Number ──────────────────────────────────────── */
   .stat-number {
-    @apply text-3xl sm:text-4xl font-extrabold tracking-tight;
+    @apply text-3xl sm:text-4xl lg:text-5xl font-sans font-extrabold tracking-tight text-brand-navy;
   }
 
   /* ─── Empty State ──────────────────────────────────────── */
   .empty-state {
     @apply flex flex-col items-center justify-center text-center py-16 px-8 rounded-2xl bg-white border-2 border-dashed border-slate-200 max-w-lg mx-auto;
+  }
+
+  .site-section {
+    @apply py-14 sm:py-16 lg:py-[72px];
+  }
+
+  .woven-band {
+    background: repeating-linear-gradient(115deg, #16294B 0 16px, #9A3722 16px 30px, #E7C67C 30px 44px, #2A8C8C 44px 58px);
+    background-size: 116px 100%;
+  }
+}
+
+@media (max-width: 639px) {
+  .badge {
+    font-size: 10px;
+    letter-spacing: 0.08em;
+    padding: 0.25rem 0.625rem;
+  }
+
+  .section-label {
+    font-size: 10px;
+    letter-spacing: 0.1em;
+    padding: 0.25rem 0.625rem;
+  }
+
+  .page-header-badge {
+    font-size: 10px;
+    letter-spacing: 0.12em;
+    padding: 0.25rem 0.625rem;
   }
 }
 

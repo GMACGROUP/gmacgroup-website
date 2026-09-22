@@ -13,14 +13,14 @@ const contactDetails = [
   {
     icon: MailIcon,
     color: "bg-red-50 text-brand-red border-red-200",
-    label: "Official Advisory Email",
-    value: "info@gmacgroup.org",
+    label: "General Enquiries",
+    value: "info@gmac-group.com",
   },
   {
     icon: ClockIcon,
     color: "bg-emerald-50 text-emerald-700 border-emerald-200",
-    label: "Office & Advisory Hours",
-    value: "Monday – Friday: 8:30 AM – 5:30 PM GMT",
+    label: "Phone",
+    value: "+233 20 215 4828 • +234 814 498 8398",
   },
 ];
 
@@ -28,9 +28,9 @@ export default function ContactPage() {
   return (
     <div className="bg-slate-50 min-h-screen">
       <PageHeader
-        badge="Let's Collaborate"
-        title="Contact GMAC GROUP"
-        subtitle="Reach out for institutional partnerships, bespoke human capital advisory, research collaboration, or fellowship inquiries."
+        badge="Begin a conversation"
+        title="Contact Gmac Group"
+        subtitle="Whether you are commissioning research, building a workforce, sponsoring a convening, or looking for investable projects, the first step is the same: a short conversation to establish fit and scope."
       />
 
       {/* Main Content Area */}
@@ -42,8 +42,11 @@ export default function ContactPage() {
 
             {/* Section label */}
             <div>
-              <span className="section-label text-brand-red block mb-1">Direct Contact</span>
-              <h2 className="text-2xl font-extrabold text-slate-900 font-serif">
+              <span className="section-label bg-red-50 border border-red-200/80 text-brand-red mb-3">
+                <span className="h-1.5 w-1.5 rounded-full bg-brand-red animate-pulse" />
+                Direct Contact
+              </span>
+              <h2 className="text-2xl sm:text-3xl font-extrabold text-slate-900 font-serif">
                 We&apos;re Here to Help
               </h2>
               <p className="mt-2 text-slate-600 text-sm leading-relaxed">
@@ -52,12 +55,12 @@ export default function ContactPage() {
             </div>
 
             {/* Advisory Hub Photo */}
-            <div className="relative h-44 w-full rounded-2xl overflow-hidden border border-slate-200 shadow-md">
+            <div className="relative h-44 w-full rounded-2xl overflow-hidden border border-slate-200 shadow-md group">
               <Image
                 src="/images/services-advisory.jpg"
                 alt="GMAC Advisory Office in Accra"
                 fill
-                className="object-cover"
+                className="object-cover group-hover:scale-105 transition-transform duration-500"
               />
               <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent" />
               <div className="absolute bottom-3 left-4 right-4 text-white">
@@ -73,7 +76,7 @@ export default function ContactPage() {
                 return (
                   <div
                     key={item.label}
-                    className="flex items-start gap-3 sm:gap-4 p-3.5 sm:p-4 bg-white rounded-2xl border border-slate-200 shadow-card"
+                    className="flex items-start gap-3 sm:gap-4 p-4 bg-white rounded-2xl border border-slate-200/90 shadow-card hover:shadow-card-hover hover:border-brand-navy/30 hover:-translate-y-0.5 transition-all duration-300"
                   >
                     <div className={`w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0 border ${item.color}`}>
                       <Icon className="w-5 h-5" />

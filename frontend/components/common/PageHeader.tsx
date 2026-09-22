@@ -15,25 +15,25 @@ export function PageHeader({
 }: PageHeaderProps) {
   return (
     <section
-      className={`relative bg-gradient-to-r from-brand-navyDeep via-brand-navy to-brand-navyDeep text-white py-10 sm:py-12 lg:py-14 border-b border-brand-navyLight/20 overflow-hidden ${className}`}
+      className={`relative overflow-hidden border-b border-[#D7B56D]/20 bg-[#061C30] py-10 text-white sm:py-12 lg:py-14 ${className}`}
     >
-      {/* Subtle Ambient Background Accent Pattern */}
+      <div className="absolute inset-x-0 top-0 h-4 bg-[linear-gradient(90deg,#D7B56D_0%,#D7B56D_20%,#E56F42_20%,#E56F42_40%,#F4C95D_40%,#F4C95D_60%,#2C6EAD_60%,#2C6EAD_80%,#D7B56D_80%,#D7B56D_100%)]" />
       <div className="absolute inset-0 opacity-20 pointer-events-none">
-        <div className="absolute -top-12 -right-12 w-64 h-64 rounded-full bg-brand-cyan blur-3xl" />
-        <div className="absolute -bottom-12 -left-12 w-64 h-64 rounded-full bg-brand-red blur-3xl" />
+        <div className="absolute -top-12 -right-12 h-64 w-64 rounded-full bg-[#D7B56D] blur-3xl" />
+        <div className="absolute -bottom-12 -left-12 h-64 w-64 rounded-full bg-[#2C6EAD] blur-3xl" />
       </div>
 
-      <div className="container relative z-10 mx-auto px-4 sm:px-6 text-center max-w-4xl">
+      <div className="container relative z-10 mx-auto max-w-4xl px-4 text-center sm:px-6">
         {badge && (
-          <span className="inline-block text-[11px] sm:text-xs font-bold tracking-widest text-brand-cyan uppercase px-3.5 py-1 rounded-full bg-white/10 mb-3 border border-white/20 shadow-sm">
+          <span className="page-header-badge">
             {badge}
           </span>
         )}
-        <h1 className="text-2xl sm:text-3xl lg:text-4xl font-extrabold text-white font-serif tracking-tight leading-snug drop-shadow-sm">
+        <h1 className="font-serif text-2xl font-extrabold leading-snug tracking-tight text-[#F3E7C9] drop-shadow-sm sm:text-3xl lg:text-4xl">
           {title}
         </h1>
         {subtitle && (
-          <p className="mt-2.5 text-xs sm:text-sm md:text-base text-slate-200 max-w-2xl mx-auto leading-relaxed font-normal">
+          <p className="mx-auto mt-2.5 max-w-2xl text-xs font-normal leading-relaxed text-slate-200 sm:text-sm md:text-base">
             {subtitle}
           </p>
         )}
