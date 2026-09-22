@@ -338,27 +338,35 @@ export default function AdminPage() {
     try {
       const [summary, applicationPage, enrolmentPage, memberPage, contactPage, paymentPage] =
         await Promise.all([
-          apiClient.get<Overview>("/admin/overview"),
-          apiClient.get<AdminPage<Application>>("/admin/applications?page=1&page_size=20"),
-          apiClient.get<AdminPage<Enrolment>>("/admin/enrolments?page=1&page_size=20"),
-          apiClient.get<AdminPage<Member>>("/admin/members?page=1&page_size=20"),
-          apiClient.get<AdminPage<ContactRequest>>("/admin/contacts?page=1&page_size=20"),
-          apiClient.get<AdminPage<Payment>>("/admin/payments?page=1&page_size=20"),
+          apiClient.get<Overview>("/admin/overview").catch(() => null),
+          apiClient.get<AdminPage<Application>>("/admin/applications?page=1&page_size=20").catch(() => null),
+          apiClient.get<AdminPage<Enrolment>>("/admin/enrolments?page=1&page_size=20").catch(() => null),
+          apiClient.get<AdminPage<Member>>("/admin/members?page=1&page_size=20").catch(() => null),
+          apiClient.get<AdminPage<ContactRequest>>("/admin/contacts?page=1&page_size=20").catch(() => null),
+          apiClient.get<AdminPage<Payment>>("/admin/payments?page=1&page_size=20").catch(() => null),
         ]);
       await loadCatalogue();
-      setOverview(summary);
-      setApplications(applicationPage.items);
-      setEnrolments(enrolmentPage.items);
-      setMembers(memberPage.items);
-      setContacts(contactPage.items);
-      setPayments(paymentPage.items);
-      setPagination({
-        applications: { page: applicationPage.page, pageSize: applicationPage.page_size, total: applicationPage.total },
-        enrolments: { page: enrolmentPage.page, pageSize: enrolmentPage.page_size, total: enrolmentPage.total },
-        members: { page: memberPage.page, pageSize: memberPage.page_size, total: memberPage.total },
-        contacts: { page: contactPage.page, pageSize: contactPage.page_size, total: contactPage.total },
-        payments: { page: paymentPage.page, pageSize: paymentPage.page_size, total: paymentPage.total },
-      });
+      if (summary) setOverview(summary);
+      if (applicationPage) {
+        setApplications(applicationPage.items);
+        setPagination((previous) => ({ ...previous, applications: { page: applicationPage.page, pageSize: applicationPage.page_size, total: applicationPage.total } }));
+      }
+      if (enrolmentPage) {
+        setEnrolments(enrolmentPage.items);
+        setPagination((previous) => ({ ...previous, enrolments: { page: enrolmentPage.page, pageSize: enrolmentPage.page_size, total: enrolmentPage.total } }));
+      }
+      if (memberPage) {
+        setMembers(memberPage.items);
+        setPagination((previous) => ({ ...previous, members: { page: memberPage.page, pageSize: memberPage.page_size, total: memberPage.total } }));
+      }
+      if (contactPage) {
+        setContacts(contactPage.items);
+        setPagination((previous) => ({ ...previous, contacts: { page: contactPage.page, pageSize: contactPage.page_size, total: contactPage.total } }));
+      }
+      if (paymentPage) {
+        setPayments(paymentPage.items);
+        setPagination((previous) => ({ ...previous, payments: { page: paymentPage.page, pageSize: paymentPage.page_size, total: paymentPage.total } }));
+      }
     } catch (err) {
       setError(err instanceof Error ? err.message : "Could not load operations data");
     } finally {
