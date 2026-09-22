@@ -9,7 +9,7 @@ export function EcosystemSection() {
       title: "Applied Research and Policy Consulting",
       description: "Decision-ready evidence, produced inside the markets it describes.",
       badge: "Research",
-      image: "/images/research-center.jpg",
+      image: "/images/research-evidence.svg",
       accent: "bg-brand-navy",
     },
     {
@@ -25,7 +25,7 @@ export function EcosystemSection() {
       title: "Human Capital and Workforce Consulting",
       description: "Workforce decisions made with a real view of the talent market.",
       badge: "Workforce",
-      image: "/images/services-advisory.jpg",
+      image: "/images/workforce-network.svg",
       accent: "bg-brand-cyan",
     },
     {
@@ -33,7 +33,7 @@ export function EcosystemSection() {
       title: "Employability Programmes",
       description: "Structured routes from application to offer.",
       badge: "Employability",
-      image: "/images/services-lab.jpg",
+      image: "/images/insights-graduates.jpg",
       accent: "bg-emerald-500",
     },
     {
@@ -49,7 +49,7 @@ export function EcosystemSection() {
       title: "Investment Facilitation",
       description: "Connecting investors to screened, investable African projects.",
       badge: "Investment",
-      image: "/images/insights-graduates.jpg",
+      image: "/images/investment-bridge.svg",
       accent: "bg-amber-500",
     },
   ];
