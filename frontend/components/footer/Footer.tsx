@@ -96,7 +96,7 @@ export function Footer() {
                   <InstagramIcon className="h-5 w-5" />
                 </a>
                 <a
-                  href="https://www.facebook.com/gmacgroup"
+                  href="https://www.facebook.com/profile.php?id=61589840175874"
                   target="_blank"
                   rel="noreferrer"
                   aria-label="GMACGROUP on Facebook"
