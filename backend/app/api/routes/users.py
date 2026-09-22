@@ -20,7 +20,7 @@ async def get_my_profile(current_user: dict = Depends(get_current_user)):
 
 
 @router.put("/me", response_model=UserOut)
-async def update_my_profile(
+def update_my_profile(
     payload: UserUpdate,
     current_user: dict = Depends(get_current_user),
     db: Session = Depends(get_db),

@@ -78,7 +78,7 @@ async def register(payload: UserCreate, db: Session = Depends(get_db)):
 
 
 @router.post("/login", response_model=AuthResponse)
-async def login(payload: UserLogin, db: Session = Depends(get_db)):
+def login(payload: UserLogin, db: Session = Depends(get_db)):
     """Authenticate user with email and password and return JWT access token."""
     email_lower = payload.email.lower().strip()
     user = db.scalar(select(User).where(User.email == email_lower))
@@ -125,7 +125,7 @@ async def forgot_password(payload: PasswordResetRequest, db: Session = Depends(g
 
 
 @router.post("/reset-password", response_model=PasswordResetResponse)
-async def reset_password(payload: PasswordResetConfirm, db: Session = Depends(get_db)):
+def reset_password(payload: PasswordResetConfirm, db: Session = Depends(get_db)):
     """Reset user password using a valid reset token."""
     email = verify_password_reset_token(payload.token)
     if not email:

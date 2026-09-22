@@ -83,7 +83,21 @@ interface Payment {
   created_at: string;
 }
 
+interface AdminPage<T> {
+  total: number;
+  page: number;
+  page_size: number;
+  items: T[];
+}
+
 type Queue = "applications" | "enrolments" | "members" | "contacts" | "payments" | "catalogue";
+type AdminQueue = Exclude<Queue, "catalogue">;
+
+interface PaginationState {
+  page: number;
+  pageSize: number;
+  total: number;
+}
 
 // ─── Catalogue types ─────────────────────────────────────────────────────────
 interface CatalogueOffer {
@@ -165,6 +179,43 @@ function StatusPill({ value }: { value: string }) {
   );
 }
 
+function PaginationControls({
+  page,
+  pageSize,
+  total,
+  disabled,
+  onChange,
+}: PaginationState & { disabled?: boolean; onChange: (page: number) => void }) {
+  const pageCount = Math.ceil(total / pageSize);
+  if (pageCount <= 1) return null;
+
+  return (
+    <div className="flex items-center justify-between gap-3 pt-2 text-xs text-slate-500">
+      <span>
+        Page {page} of {pageCount} · {total} total
+      </span>
+      <div className="flex items-center gap-2">
+        <button
+          type="button"
+          disabled={disabled || page === 1}
+          onClick={() => onChange(page - 1)}
+          className="rounded-lg border border-slate-300 bg-white px-3 py-1.5 font-bold text-slate-700 disabled:cursor-not-allowed disabled:opacity-40"
+        >
+          Previous
+        </button>
+        <button
+          type="button"
+          disabled={disabled || page === pageCount}
+          onClick={() => onChange(page + 1)}
+          className="rounded-lg border border-slate-300 bg-white px-3 py-1.5 font-bold text-slate-700 disabled:cursor-not-allowed disabled:opacity-40"
+        >
+          Next
+        </button>
+      </div>
+    </div>
+  );
+}
+
 export default function AdminPage() {
   const { user, loading, refreshUser } = useAuth();
   const [queue, setQueue] = useState<Queue>("applications");
@@ -175,6 +226,14 @@ export default function AdminPage() {
   const [contacts, setContacts] = useState<ContactRequest[]>([]);
   const [payments, setPayments] = useState<Payment[]>([]);
   const [loadingData, setLoadingData] = useState(true);
+  const [queueLoading, setQueueLoading] = useState(false);
+  const [pagination, setPagination] = useState<Record<AdminQueue, PaginationState>>({
+    applications: { page: 1, pageSize: 20, total: 0 },
+    enrolments: { page: 1, pageSize: 20, total: 0 },
+    members: { page: 1, pageSize: 20, total: 0 },
+    contacts: { page: 1, pageSize: 20, total: 0 },
+    payments: { page: 1, pageSize: 20, total: 0 },
+  });
   const [error, setError] = useState<string | null>(null);
 
   // Catalogue state
@@ -238,26 +297,68 @@ export default function AdminPage() {
     }
   }
 
+  async function loadQueuePage(queueName: AdminQueue, page: number) {
+    setQueueLoading(true);
+    setError(null);
+    try {
+      const result = await apiClient.get<AdminPage<Application | Enrolment | Member | ContactRequest | Payment>>(
+        `/admin/${queueName}?page=${page}&page_size=20`,
+      );
+      setPagination((previous) => ({
+        ...previous,
+        [queueName]: { page: result.page, pageSize: result.page_size, total: result.total },
+      }));
+      switch (queueName) {
+        case "applications":
+          setApplications(result.items as Application[]);
+          break;
+        case "enrolments":
+          setEnrolments(result.items as Enrolment[]);
+          break;
+        case "members":
+          setMembers(result.items as Member[]);
+          break;
+        case "contacts":
+          setContacts(result.items as ContactRequest[]);
+          break;
+        case "payments":
+          setPayments(result.items as Payment[]);
+          break;
+      }
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Could not load operations data");
+    } finally {
+      setQueueLoading(false);
+    }
+  }
+
   async function loadData() {
     setLoadingData(true);
     setError(null);
     try {
-      const [summary, applicationRows, enrolmentRows, memberRows, contactRows, paymentRows] =
+      const [summary, applicationPage, enrolmentPage, memberPage, contactPage, paymentPage] =
         await Promise.all([
           apiClient.get<Overview>("/admin/overview"),
-          apiClient.get<Application[]>("/admin/applications"),
-          apiClient.get<Enrolment[]>("/admin/enrolments"),
-          apiClient.get<Member[]>("/admin/members"),
-          apiClient.get<ContactRequest[]>("/admin/contacts"),
-          apiClient.get<Payment[]>("/admin/payments"),
+          apiClient.get<AdminPage<Application>>("/admin/applications?page=1&page_size=20"),
+          apiClient.get<AdminPage<Enrolment>>("/admin/enrolments?page=1&page_size=20"),
+          apiClient.get<AdminPage<Member>>("/admin/members?page=1&page_size=20"),
+          apiClient.get<AdminPage<ContactRequest>>("/admin/contacts?page=1&page_size=20"),
+          apiClient.get<AdminPage<Payment>>("/admin/payments?page=1&page_size=20"),
         ]);
       await loadCatalogue();
       setOverview(summary);
-      setApplications(applicationRows);
-      setEnrolments(enrolmentRows);
-      setMembers(memberRows);
-      setContacts(contactRows);
-      setPayments(paymentRows);
+      setApplications(applicationPage.items);
+      setEnrolments(enrolmentPage.items);
+      setMembers(memberPage.items);
+      setContacts(contactPage.items);
+      setPayments(paymentPage.items);
+      setPagination({
+        applications: { page: applicationPage.page, pageSize: applicationPage.page_size, total: applicationPage.total },
+        enrolments: { page: enrolmentPage.page, pageSize: enrolmentPage.page_size, total: enrolmentPage.total },
+        members: { page: memberPage.page, pageSize: memberPage.page_size, total: memberPage.total },
+        contacts: { page: contactPage.page, pageSize: contactPage.page_size, total: contactPage.total },
+        payments: { page: paymentPage.page, pageSize: paymentPage.page_size, total: paymentPage.total },
+      });
     } catch (err) {
       setError(err instanceof Error ? err.message : "Could not load operations data");
     } finally {
@@ -585,6 +686,11 @@ export default function AdminPage() {
               );
             })}
             {applications.length === 0 && <Empty label="No applications have been submitted yet." />}
+            <PaginationControls
+              {...pagination.applications}
+              disabled={queueLoading}
+              onChange={(page) => loadQueuePage("applications", page)}
+            />
           </section>
         )}
 
@@ -621,6 +727,11 @@ export default function AdminPage() {
               </div>
             ))}
             {enrolments.length === 0 && <Empty label="No programme enrolments have been submitted yet." />}
+            <PaginationControls
+              {...pagination.enrolments}
+              disabled={queueLoading}
+              onChange={(page) => loadQueuePage("enrolments", page)}
+            />
           </section>
         )}
 
@@ -653,6 +764,13 @@ export default function AdminPage() {
               </tbody>
             </table>
             {members.length === 0 && <Empty label="No members have registered yet." />}
+            <div className="px-5 pb-5">
+              <PaginationControls
+                {...pagination.members}
+                disabled={queueLoading}
+                onChange={(page) => loadQueuePage("members", page)}
+              />
+            </div>
           </section>
         )}
 
@@ -674,6 +792,11 @@ export default function AdminPage() {
               </article>
             ))}
             {contacts.length === 0 && <Empty label="No contact requests have been received." />}
+            <PaginationControls
+              {...pagination.contacts}
+              disabled={queueLoading}
+              onChange={(page) => loadQueuePage("contacts", page)}
+            />
           </section>
         )}
 
@@ -700,6 +823,11 @@ export default function AdminPage() {
               </div>
             ))}
             {payments.length === 0 && <Empty label="No payment records yet." />}
+            <PaginationControls
+              {...pagination.payments}
+              disabled={queueLoading}
+              onChange={(page) => loadQueuePage("payments", page)}
+            />
           </section>
         )}
 

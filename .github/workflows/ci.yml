@@ -19,7 +19,7 @@ jobs:
           node-version: "20"
       - run: npm install
       - run: npm run lint
-      # TODO: add npm run build and test steps once tests exist
+      - run: npm run build
 
   backend:
     runs-on: ubuntu-latest
@@ -63,9 +63,11 @@ jobs:
       - name: Create database tables
         run: |
           python -c "
-          from app.core.database import Base, engine
+          from app.core.database import engine
+          from app.models.base import Base
           Base.metadata.create_all(bind=engine)
           print('Tables created successfully')
           "
       - run: python -m pytest
+          - run: python -m compileall -q app
 

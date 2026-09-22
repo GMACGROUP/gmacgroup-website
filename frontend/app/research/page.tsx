@@ -7,7 +7,7 @@ import { apiClient } from "@/lib/api/client";
 import { ResearchProject, Publication, Expert } from "@/types";
 import { PageHeader } from "@/components/common/PageHeader";
 import { PaperRequestModal } from "@/components/modals/PaperRequestModal";
-import { MicroscopeIcon, BookOpenIcon, AcademicCapIcon, FileTextIcon, ShieldCheckIcon } from "@/components/common/Icons";
+import { MicroscopeIcon, BookOpenIcon, AcademicCapIcon, FileTextIcon } from "@/components/common/Icons";
 
 const TABS = [
   { key: "projects", label: "Research Projects", icon: MicroscopeIcon },
@@ -63,54 +63,6 @@ export default function ResearchPage() {
 
       {/* Main Container */}
       <section className="container mx-auto max-w-6xl space-y-8 px-5 py-8 sm:space-y-10 sm:px-6 sm:py-14 lg:px-8">
-
-        {/* ── Featured Study Banner ── */}
-        <div className="relative bg-brand-navyDeep text-white rounded-3xl overflow-hidden shadow-card border border-brand-navy">
-          <div className="absolute inset-0 z-0">
-            <Image
-              src="/images/research-center.jpg"
-              alt="GMAC Applied Research Center"
-              fill
-              className="object-cover opacity-20"
-              priority
-            />
-            <div className="absolute inset-0 bg-gradient-to-r from-brand-navyDeep via-brand-navyDeep/95 to-brand-navy/80" />
-          </div>
-
-          <div className="relative z-10 max-w-3xl space-y-3 p-5 sm:space-y-4 sm:p-10 lg:p-12">
-            <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-white/10 text-brand-cyan border border-white/20 uppercase tracking-wider">
-              <ShieldCheckIcon className="w-3.5 h-3.5 text-brand-cyan" />
-              Flagship Empirical Study
-            </span>
-            <h2 className="font-serif text-xl font-extrabold leading-tight text-white sm:text-3xl lg:text-4xl">
-              The Future of Work & Graduate Labor Transitions
-            </h2>
-            <p className="text-xs leading-relaxed text-slate-200 sm:text-base">
-              Evaluating skill polarization, institutional agility, and emerging technology disruptions across sub-Saharan African higher education and regional labor markets.
-            </p>
-            <div className="flex flex-col gap-2 pt-2 sm:flex-row sm:flex-wrap sm:items-center sm:gap-3">
-              <button
-                onClick={() => {
-                  const feat = publications[0] || {
-                    id: "pub-graduate-transition-gap",
-                    title: "The Future of Work & Graduate Labor Transitions in Sub-Saharan Africa",
-                    authors: ["Dr. Kwesi Mensah", "Ama Serwaa"],
-                  };
-                  setSelectedPublication(feat);
-                }}
-                className="w-full cursor-pointer rounded-xl bg-brand-red px-5 py-2.5 text-xs font-bold text-white shadow-elevate-red transition-all hover:bg-brand-redDark sm:w-auto sm:px-6 sm:text-sm"
-              >
-                Request Working Paper →
-              </button>
-              <button
-                onClick={() => setActiveTab("publications")}
-                className="w-full cursor-pointer rounded-xl border border-white/20 bg-white/10 px-5 py-2.5 text-xs font-semibold text-white transition-all hover:bg-white/20 sm:w-auto sm:text-sm"
-              >
-                Browse All Publications ↓
-              </button>
-            </div>
-          </div>
-        </div>
 
         {/* ── Prominent Interactive Navigation Bar ── */}
         <div className="rounded-2xl border border-slate-200 bg-white p-2 shadow-sm">

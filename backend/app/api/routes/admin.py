@@ -15,6 +15,7 @@ from app.models.payment import Payment
 from app.models.programme import ProgrammeEnrolment
 from app.models.user import User
 from app.schemas.admin import (
+    AdminPage,
     AdminApplicationOut,
     AdminContactOut,
     AdminEnrolmentOut,
@@ -22,6 +23,7 @@ from app.schemas.admin import (
     AdminPaymentOut,
     StatusUpdate,
 )
+from app.utils.pagination import paginate_query
 from app.services.notifications import notification_service
 
 router = APIRouter()
@@ -32,7 +34,7 @@ PAYMENT_STATUSES = {"not_required", "pending", "successful", "failed"}
 
 
 @router.get("/overview", response_model=AdminOverview)
-async def overview(_: dict = Depends(admin_only), db: Session = Depends(get_db)):
+def overview(_: dict = Depends(admin_only), db: Session = Depends(get_db)):
     return AdminOverview(
         members=db.scalar(select(func.count()).select_from(User)) or 0,
         applications=db.scalar(select(func.count()).select_from(Application)) or 0,
@@ -44,10 +46,16 @@ async def overview(_: dict = Depends(admin_only), db: Session = Depends(get_db))
     )
 
 
-@router.get("/members", response_model=list[dict])
-async def members(_: dict = Depends(admin_only), db: Session = Depends(get_db)):
-    users = db.scalars(select(User).order_by(User.created_at.desc())).all()
-    return [
+@router.get("/members", response_model=AdminPage[dict])
+def members(
+    page: int = Query(default=1, ge=1),
+    page_size: int = Query(default=20, ge=1, le=100),
+    _: dict = Depends(admin_only),
+    db: Session = Depends(get_db),
+):
+    query = select(User).order_by(User.created_at.desc())
+    page_data = paginate_query(db, query, page, page_size)
+    page_data["items"] = [
         {
             "id": user.id,
             "email": user.email,
@@ -57,20 +65,23 @@ async def members(_: dict = Depends(admin_only), db: Session = Depends(get_db)):
             "phone": user.phone,
             "created_at": user.created_at,
         }
-        for user in users
+        for user in page_data["items"]
     ]
+    return page_data
 
 
-@router.get("/applications", response_model=list[AdminApplicationOut])
-async def applications(
+@router.get("/applications", response_model=AdminPage[AdminApplicationOut])
+def applications(
     status_filter: str | None = Query(default=None, alias="status"),
+    page: int = Query(default=1, ge=1),
+    page_size: int = Query(default=20, ge=1, le=100),
     _: dict = Depends(admin_only),
     db: Session = Depends(get_db),
 ):
     query = select(Application).order_by(Application.created_at.desc())
     if status_filter:
         query = query.where(Application.status == status_filter)
-    return db.scalars(query).all()
+    return paginate_query(db, query, page, page_size)
 
 
 @router.patch("/applications/{application_id}", response_model=AdminApplicationOut)
@@ -109,20 +120,22 @@ async def update_application(
     return application
 
 
-@router.get("/enrolments", response_model=list[AdminEnrolmentOut])
-async def enrolments(
+@router.get("/enrolments", response_model=AdminPage[AdminEnrolmentOut])
+def enrolments(
     status_filter: str | None = Query(default=None, alias="status"),
+    page: int = Query(default=1, ge=1),
+    page_size: int = Query(default=20, ge=1, le=100),
     _: dict = Depends(admin_only),
     db: Session = Depends(get_db),
 ):
     query = select(ProgrammeEnrolment).order_by(ProgrammeEnrolment.created_at.desc())
     if status_filter:
         query = query.where(ProgrammeEnrolment.status == status_filter)
-    return db.scalars(query).all()
+    return paginate_query(db, query, page, page_size)
 
 
 @router.patch("/enrolments/{enrolment_id}", response_model=AdminEnrolmentOut)
-async def update_enrolment(
+def update_enrolment(
     enrolment_id: UUID,
     payload: StatusUpdate,
     _: dict = Depends(admin_only),
@@ -144,14 +157,26 @@ async def update_enrolment(
     return enrolment
 
 
-@router.get("/contacts", response_model=list[AdminContactOut])
-async def contacts(_: dict = Depends(admin_only), db: Session = Depends(get_db)):
-    return db.scalars(select(ContactRequest).order_by(ContactRequest.created_at.desc())).all()
+@router.get("/contacts", response_model=AdminPage[AdminContactOut])
+def contacts(
+    page: int = Query(default=1, ge=1),
+    page_size: int = Query(default=20, ge=1, le=100),
+    _: dict = Depends(admin_only),
+    db: Session = Depends(get_db),
+):
+    query = select(ContactRequest).order_by(ContactRequest.created_at.desc())
+    return paginate_query(db, query, page, page_size)
 
 
-@router.get("/payments", response_model=list[AdminPaymentOut])
-async def payments(_: dict = Depends(admin_only), db: Session = Depends(get_db)):
-    return db.scalars(select(Payment).order_by(Payment.created_at.desc())).all()
+@router.get("/payments", response_model=AdminPage[AdminPaymentOut])
+def payments(
+    page: int = Query(default=1, ge=1),
+    page_size: int = Query(default=20, ge=1, le=100),
+    _: dict = Depends(admin_only),
+    db: Session = Depends(get_db),
+):
+    query = select(Payment).order_by(Payment.created_at.desc())
+    return paginate_query(db, query, page, page_size)
 
 
 # ---------------------------------------------------------------------------

@@ -54,7 +54,7 @@ async def get_uploaded_file(file_id: str, filename: str, folder: str = "resumes"
 
 
 @router.get("/admin/applications/{application_id}/document")
-async def view_application_document(
+def view_application_document(
     application_id: UUID,
     _: dict = Depends(admin_only),
     db: Session = Depends(get_db),

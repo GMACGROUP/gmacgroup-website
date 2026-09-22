@@ -26,7 +26,7 @@ async def list_programmes(category: str | None = Query(default=None)):
 
 
 @router.get("/my-enrolments", response_model=List[EnrolmentOut])
-async def list_my_enrolments(
+def list_my_enrolments(
     current_user: dict = Depends(get_current_user),
     db: Session = Depends(get_db),
 ):

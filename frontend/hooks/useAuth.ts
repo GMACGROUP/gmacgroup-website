@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, useCallback } from "react";
+import { createContext, createElement, ReactNode, useCallback, useContext, useEffect, useState } from "react";
 import { apiClient } from "@/lib/api/client";
 
 export interface UserProfile {
@@ -24,7 +24,7 @@ const TOKEN_KEY = "gmac_auth_token";
 const USER_KEY = "gmac_auth_user";
 const AUTH_CHANGED_EVENT = "gmac-auth-changed";
 
-export function useAuth() {
+function useAuthState() {
   // Keep the initial render identical on the server and in the browser.
   // Browser storage is restored after hydration in the effect below.
   const [user, setUser] = useState<UserProfile | null>(null);
@@ -162,4 +162,21 @@ export function useAuth() {
     refreshUser,
     isAuthenticated: Boolean(user),
   };
+}
+
+type AuthContextValue = ReturnType<typeof useAuthState>;
+
+const AuthContext = createContext<AuthContextValue | null>(null);
+
+export function AuthProvider({ children }: { children: ReactNode }) {
+  const auth = useAuthState();
+  return createElement(AuthContext.Provider, { value: auth }, children);
+}
+
+export function useAuth() {
+  const auth = useContext(AuthContext);
+  if (!auth) {
+    throw new Error("useAuth must be used inside AuthProvider");
+  }
+  return auth;
 }
