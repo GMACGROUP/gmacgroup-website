@@ -62,6 +62,11 @@ async def register(payload: UserCreate, db: Session = Depends(get_db)):
         user.full_name or "Member",
         role=user.role,
     )
+    await notification_service.notify_member_registration(
+        user.email,
+        user.full_name or "Member",
+        user.role,
+    )
 
     token = create_access_token({
         "sub": str(user.id),

@@ -41,7 +41,7 @@ class Settings(BaseSettings):
     EMAIL_PROVIDER: str = "none"
     RESEND_API_KEY: str = ""
     EMAIL_FROM: str = "GMACGROUP <notifications@gmacgroup.org>"
-    OPERATIONS_EMAIL: str = ""
+    OPERATIONS_EMAIL: str = "info@gmac-group.com"
 
     # SMTP configuration (for sending from Gmail / standard SMTP without custom domain)
     SMTP_HOST: str = "smtp.gmail.com"

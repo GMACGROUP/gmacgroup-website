@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { apiClient } from "@/lib/api/client";
@@ -20,6 +20,13 @@ export function Footer() {
   const [submitting, setSubmitting] = useState(false);
   const [subscribed, setSubscribed] = useState(false);
   const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (!subscribed) return;
+
+    const timeout = window.setTimeout(() => setSubscribed(false), 4000);
+    return () => window.clearTimeout(timeout);
+  }, [subscribed]);
 
   if (
     safePathname.startsWith("/dashboard") ||
@@ -69,7 +76,7 @@ export function Footer() {
               </p>
               <div className="flex items-center gap-2.5">
                 <a
-                  href="https://www.linkedin.com/company/gmacgroup"
+                  href="https://www.linkedin.com/company/gmac-group/?viewAsMember=true"
                   target="_blank"
                   rel="noreferrer"
                   aria-label="GMACGROUP on LinkedIn"
@@ -96,7 +103,7 @@ export function Footer() {
                   <InstagramIcon className="h-5 w-5" />
                 </a>
                 <a
-                  href="https://www.facebook.com/gmacgroup"
+                  href="https://www.facebook.com/profile.php?id=61589840175874"
                   target="_blank"
                   rel="noreferrer"
                   aria-label="GMACGROUP on Facebook"
