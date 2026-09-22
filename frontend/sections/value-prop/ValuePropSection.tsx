@@ -1,134 +1,159 @@
 import Link from "next/link";
-import { AcademicCapIcon, MicroscopeIcon, BriefcaseIcon } from "@/components/common/Icons";
+import {
+  AcademicCapIcon,
+  MicroscopeIcon,
+  BriefcaseIcon,
+  TrendingUpIcon,
+} from "@/components/common/Icons";
 
 export function ValuePropSection() {
+  const audienceCards = [
+    {
+      title: "Funders",
+      subtitle: "Development agencies & funders",
+      body: "Baseline studies, evaluations, and labour market evidence you can defend.",
+      href: "/services",
+      cta: "Commission research",
+      icon: MicroscopeIcon,
+      badgeColor: "bg-blue-50 text-brand-navy border-blue-200/90",
+      accentGradient: "from-blue-600 to-cyan-500",
+      iconBg: "bg-blue-50 text-brand-navy group-hover:bg-brand-navy group-hover:text-white",
+      tags: ["Baseline Diagnostics", "Impact Evaluation", "Labour Evidence"],
+    },
+    {
+      title: "Employers",
+      subtitle: "Employers building a workforce",
+      body: "Graduate intake, talent assessment, and workforce strategy built on a real view of the market.",
+      href: "/services",
+      cta: "Build your workforce",
+      icon: BriefcaseIcon,
+      badgeColor: "bg-red-50 text-brand-red border-red-200/90",
+      accentGradient: "from-brand-red to-amber-500",
+      iconBg: "bg-red-50 text-brand-red group-hover:bg-brand-red group-hover:text-white",
+      tags: ["Graduate Intake", "Skills Diagnostics", "Workforce Strategy"],
+    },
+    {
+      title: "Investors",
+      subtitle: "Investors seeking projects",
+      body: "Screened deal flow, sector studies, and investment-ready projects across ten focus markets.",
+      href: "/services",
+      cta: "Find investable projects",
+      icon: TrendingUpIcon,
+      badgeColor: "bg-emerald-50 text-emerald-700 border-emerald-200/90",
+      accentGradient: "from-emerald-500 to-teal-400",
+      iconBg: "bg-emerald-50 text-emerald-700 group-hover:bg-emerald-600 group-hover:text-white",
+      tags: ["Deal Origination", "Sector Deep-Dives", "Market Analysis"],
+    },
+    {
+      title: "Professionals",
+      subtitle: "Professionals & graduates",
+      body: "Employability programmes, research methods training, and positioning for your next step.",
+      href: "/programmes",
+      cta: "Grow your career",
+      icon: AcademicCapIcon,
+      badgeColor: "bg-purple-50 text-purple-700 border-purple-200/90",
+      accentGradient: "from-purple-600 to-indigo-500",
+      iconBg: "bg-purple-50 text-purple-700 group-hover:bg-purple-600 group-hover:text-white",
+      tags: ["Career Readiness", "Applied Research", "Executive Cohorts"],
+    },
+  ];
+
+
   return (
-    <section className="py-14 sm:py-16 lg:py-20 bg-white border-b border-slate-200/80 overflow-hidden">
-      <div className="container mx-auto px-4 sm:px-6 lg:px-8 max-w-6xl">
-        
-        {/* Top Badge */}
-        <div className="mb-4">
-          <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-cyan-50 border border-cyan-200/80 text-cyan-600 text-[11px] font-bold tracking-wider uppercase shadow-xs">
-            <svg className="w-3.5 h-3.5 text-cyan-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-              <path strokeLinecap="round" strokeLinejoin="round" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
-            </svg>
-            WHAT WE DO
+    <section className="relative py-16 sm:py-20 lg:py-24 bg-gradient-to-b from-slate-50/90 via-white to-slate-50/80 border-b border-slate-200/80 overflow-hidden">
+      {/* Decorative ambient background glows */}
+      <div className="absolute top-10 left-1/2 -translate-x-1/2 w-[800px] h-[350px] bg-gradient-to-r from-blue-100/30 via-cyan-100/20 to-red-100/20 blur-3xl pointer-events-none rounded-full" />
+
+      <div className="container relative z-10 mx-auto px-4 sm:px-6 lg:px-8 max-w-7xl">
+        {/* Section Header */}
+        <div className="max-w-3xl mb-12 lg:mb-14">
+          <span className="section-label bg-cyan-50 border border-cyan-200/90 text-cyan-800 shadow-xs mb-3">
+            <span className="h-1.5 w-1.5 rounded-full bg-cyan-500 animate-pulse" />
+            How can we help?
           </span>
+          <h2 className="mt-2 text-3xl sm:text-4xl lg:text-[2.75rem] font-extrabold font-serif text-slate-900 tracking-tight leading-[1.12]">
+            Find the door that is yours.
+          </h2>
+          <p className="mt-4 text-base sm:text-lg text-slate-600 leading-relaxed">
+            Institutions and investors first, professionals second. Tell us the decision you are trying to make.
+          </p>
         </div>
 
-        {/* Two-Column Balanced Header */}
-        <div className="grid lg:grid-cols-12 gap-6 lg:gap-10 items-center mb-10 lg:mb-12">
-          <div className="lg:col-span-7">
-            <h2 className="text-2xl sm:text-3xl lg:text-4xl font-extrabold text-[#072448] tracking-tight leading-tight">
-              More than a talent platform. <br className="hidden sm:inline" />
-              <span className="text-brand-navy font-serif font-normal italic">Empowering human capital & research.</span>
-            </h2>
-          </div>
-          <div className="lg:col-span-5">
-            <p className="text-sm sm:text-base text-slate-500 leading-relaxed">
-              We bridge the systemic gap between capability and career achievement through cohort-based talent development, empirical research, and institutional advisory.
-            </p>
-          </div>
+        {/* 4 Audience Cards */}
+        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6">
+          {audienceCards.map((card) => {
+            const IconComponent = card.icon;
+            return (
+              <div
+                key={card.title}
+                className="group relative flex flex-col bg-white rounded-2xl border border-slate-200/90 shadow-card hover:shadow-card-hover hover:border-slate-300 hover:-translate-y-1.5 transition-all duration-300 overflow-hidden"
+              >
+                {/* Gradient Top Accent Bar */}
+                <div className={`h-1.5 w-full bg-gradient-to-r ${card.accentGradient} transition-all duration-300 group-hover:h-2`} />
+
+                <div className="p-6 sm:p-7 flex flex-col flex-1">
+                  {/* Top Badge & Icon Row */}
+                  <div className="flex items-center justify-between gap-2 mb-4">
+                    <span className={`badge ${card.badgeColor}`}>
+                      {card.title}
+                    </span>
+                    <div className={`w-9 h-9 rounded-xl ${card.iconBg} flex items-center justify-center transition-all duration-300 shadow-xs`}>
+                      <IconComponent className="w-4 h-4 transition-transform duration-300 group-hover:scale-110" />
+                    </div>
+                  </div>
+
+                  {/* Card Title */}
+                  <h3 className="text-lg sm:text-[19px] font-bold text-slate-900 group-hover:text-brand-navy transition-colors font-serif leading-snug">
+                    {card.subtitle}
+                  </h3>
+
+                  {/* Card Body */}
+                  <p className="mt-3 text-sm text-slate-600 leading-relaxed">
+                    {card.body}
+                  </p>
+
+                  {/* Feature Tags for scannability */}
+                  <div className="mt-4 flex flex-wrap gap-1.5 flex-1 items-end">
+                    {card.tags.map((tag) => (
+                      <span
+                        key={tag}
+                        className="px-2 py-0.5 rounded-md bg-slate-100/90 text-slate-600 text-[11px] font-medium"
+                      >
+                        {tag}
+                      </span>
+                    ))}
+                  </div>
+
+                  {/* Sleek CTA Link Button */}
+                  <div className="mt-6 pt-4 border-t border-slate-100">
+                    <Link
+                      href={card.href}
+                      className="inline-flex items-center justify-between w-full px-3.5 py-2 rounded-xl bg-slate-50 hover:bg-brand-navy text-slate-800 hover:text-white font-bold text-xs sm:text-sm border border-slate-200/70 hover:border-brand-navy shadow-xs transition-all duration-200 group/btn"
+                    >
+                      <span>{card.cta}</span>
+                      <span className="transition-transform duration-200 group-hover/btn:translate-x-1">→</span>
+                    </Link>
+                  </div>
+                </div>
+              </div>
+            );
+          })}
         </div>
 
-        {/* 3 Domain Pillar Cards (matching reference layout) */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-          
-          {/* Card 1: Education & Employability */}
-          <div className="group relative bg-white rounded-3xl p-6 sm:p-8 border border-slate-200/90 shadow-sm hover:shadow-card hover:border-brand-navy/30 hover:-translate-y-1 transition-all duration-300 flex flex-col justify-between">
-            <div>
-              {/* Header: Icon on left, 01 on right */}
-              <div className="flex items-center justify-between">
-                <div className="w-11 h-11 rounded-xl bg-cyan-50 border border-cyan-100 flex items-center justify-center text-cyan-600 group-hover:scale-105 transition-transform">
-                  <AcademicCapIcon className="w-5 h-5 text-cyan-600" />
-                </div>
-                <span className="text-2xl sm:text-3xl font-extrabold text-slate-300 font-sans tracking-tight">
-                  01
-                </span>
-              </div>
-
-              {/* Title & Body */}
-              <h3 className="text-xl font-bold text-slate-900 mt-6 mb-2.5">
-                Education & Employability
-              </h3>
-              <p className="text-slate-500 text-xs sm:text-sm leading-relaxed">
-                Cohort-based Career Readiness Labs, experiential skills workshops, and direct employer pipelines that prepare graduates for immediate workplace relevance.
-              </p>
-            </div>
-
-            <div className="mt-6 pt-4 border-t border-slate-100">
-              <Link href="/programmes" className="text-xs font-bold text-brand-navy hover:text-brand-red transition-colors inline-flex items-center gap-1 group/link">
-                <span>Explore Programmes</span>
-                <span className="ml-1 group-hover/link:translate-x-1 transition-transform">→</span>
-              </Link>
-            </div>
-          </div>
-
-          {/* Card 2: Applied Research & Fellowships (Featured Navy Card) */}
-          <div className="group relative bg-[#072448] text-white rounded-3xl p-6 sm:p-8 shadow-card hover:shadow-elevate hover:-translate-y-1 transition-all duration-300 flex flex-col justify-between overflow-hidden border border-brand-navy">
-            {/* Ambient Background Glow */}
-            <div className="absolute -top-12 -right-12 w-32 h-32 bg-brand-cyan/20 rounded-full blur-2xl pointer-events-none" />
-
-            <div className="relative z-10">
-              {/* Header: Icon on left, 02 on right */}
-              <div className="flex items-center justify-between">
-                <div className="w-11 h-11 rounded-xl bg-white/10 border border-white/20 backdrop-blur-md flex items-center justify-center text-brand-cyan group-hover:scale-105 transition-transform">
-                  <MicroscopeIcon className="w-5 h-5 text-brand-cyan" />
-                </div>
-                <span className="text-2xl sm:text-3xl font-extrabold text-white/25 font-sans tracking-tight">
-                  02
-                </span>
-              </div>
-
-              {/* Title & Body */}
-              <h3 className="text-xl font-bold text-white mt-6 mb-2.5">
-                Applied Research & Policy
-              </h3>
-              <p className="text-slate-200 text-xs sm:text-sm leading-relaxed">
-                Econometric baseline studies, labor market diagnostics, and fellowship programs pairing emerging scholars with experienced policy researchers.
-              </p>
-            </div>
-
-            <div className="relative z-10 mt-6 pt-4 border-t border-white/15">
-              <Link href="/research" className="text-xs font-bold text-brand-cyan hover:text-white transition-colors inline-flex items-center gap-1 group/link">
-                <span>Discover Research Center</span>
-                <span className="ml-1 group-hover/link:translate-x-1 transition-transform">→</span>
-              </Link>
-            </div>
-          </div>
-
-          {/* Card 3: Strategic Consulting & Advisory */}
-          <div className="group relative bg-white rounded-3xl p-6 sm:p-8 border border-slate-200/90 shadow-sm hover:shadow-card hover:border-brand-navy/30 hover:-translate-y-1 transition-all duration-300 flex flex-col justify-between">
-            <div>
-              {/* Header: Icon on left, 03 on right */}
-              <div className="flex items-center justify-between">
-                <div className="w-11 h-11 rounded-xl bg-cyan-50 border border-cyan-100 flex items-center justify-center text-cyan-600 group-hover:scale-105 transition-transform">
-                  <BriefcaseIcon className="w-5 h-5 text-cyan-600" />
-                </div>
-                <span className="text-2xl sm:text-3xl font-extrabold text-slate-300 font-sans tracking-tight">
-                  03
-                </span>
-              </div>
-
-              {/* Title & Body */}
-              <h3 className="text-xl font-bold text-slate-900 mt-6 mb-2.5">
-                Consulting & Advisory
-              </h3>
-              <p className="text-slate-500 text-xs sm:text-sm leading-relaxed">
-                Partnering with universities, enterprises, and governments on workforce diagnostics, talent architecture, and institutional capacity building.
-              </p>
-            </div>
-
-            <div className="mt-6 pt-4 border-t border-slate-100">
-              <Link href="/services" className="text-xs font-bold text-brand-navy hover:text-brand-red transition-colors inline-flex items-center gap-1 group/link">
-                <span>View Advisory Services</span>
-                <span className="ml-1 group-hover/link:translate-x-1 transition-transform">→</span>
-              </Link>
-            </div>
-          </div>
-
-        </div>
       </div>
     </section>
   );
 }
+
+function UsersIconComponent({ className }: { className?: string }) {
+  return (
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" className={className}>
+      <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" />
+      <circle cx="9" cy="7" r="4" />
+      <path d="M22 21v-2a4 4 0 0 0-3-3.87" />
+      <path d="M16 3.13a4 4 0 0 1 0 7.75" />
+    </svg>
+  );
+}
+
+

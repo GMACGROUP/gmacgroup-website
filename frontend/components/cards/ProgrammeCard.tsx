@@ -123,12 +123,12 @@ export function ProgrammeCard({
       <div className={`h-1 w-full ${cfg.accent}`} />
 
       <div className="flex flex-col flex-1 p-6">
-        <h3 className="text-lg font-extrabold text-slate-900 group-hover:text-brand-navy transition-colors font-serif leading-snug mb-2.5">
+        <h3 className="mb-2 text-base font-extrabold leading-snug text-slate-900 transition-colors group-hover:text-brand-navy sm:text-lg">
           {displayTitle}
         </h3>
 
         {displayDescription && (
-          <p className="text-slate-600 text-sm leading-relaxed flex-1 line-clamp-3">
+          <p className="line-clamp-3 flex-1 text-xs leading-relaxed text-slate-600 sm:text-sm">
             {displayDescription}
           </p>
         )}

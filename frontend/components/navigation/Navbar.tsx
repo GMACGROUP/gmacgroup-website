@@ -66,8 +66,8 @@ export function Navbar() {
         <nav className="flex min-h-10 items-center justify-between gap-2 overflow-hidden sm:gap-4">
 
           {/* Far Left: Brand Logo */}
-          <div className="min-w-0 flex-1 overflow-hidden flex items-center">
-            <Logo size="sm" showTagline={!isScrolled && false} />
+          <div className="flex-shrink-0 flex items-center pr-2">
+            <Logo size="md" className="h-11 sm:h-12 w-auto" />
           </div>
 
           {/* Center: All Navigation Tabs */}

@@ -10,24 +10,28 @@ const config: Config = {
     extend: {
       colors: {
         brand: {
-          DEFAULT: "#0E4D82", // GMAC Corporate Blue / Navy
-          navy: "#0E4D82",
-          navyDark: "#082F52",
-          navyDeep: "#061C30",
-          navyLight: "#1B6CA8",
-          red: "#E51924", // GMAC Vibrant Scarlet Red
-          redDark: "#B8141D",
-          redLight: "#FEE2E2",
-          cyan: "#00C4FF", // Globe Cyan accent
-          sky: "#0284C7",
-          ice: "#F0F7FF",
-          sand: "#FAF9F6",
+          DEFAULT: "#16294B",
+          navy: "#16294B",
+          navyDark: "#132542",
+          navyDeep: "#132542",
+          navyLight: "#294368",
+          red: "#9A3722",
+          redDark: "#762817",
+          redLight: "#F4E2DC",
+          cyan: "#2A8C8C",
+          sky: "#2A8C8C",
+          ice: "#F5F3EE",
+          sand: "#EFEDE6",
+          ivory: "#F5F3EE",
+          warm: "#EFEDE6",
+          gold: "#E7C67C",
+          teal: "#2A8C8C",
         },
       },
       fontFamily: {
         sans: [
-          "var(--font-inter)",
-          "Inter",
+          "var(--font-libre-franklin)",
+          "'Libre Franklin'",
           "-apple-system",
           "BlinkMacSystemFont",
           "'Segoe UI'",
@@ -35,8 +39,8 @@ const config: Config = {
           "sans-serif",
         ],
         serif: [
-          "var(--font-playfair)",
-          "'Playfair Display'",
+          "var(--font-cormorant)",
+          "'Cormorant Garamond'",
           "Georgia",
           "'Times New Roman'",
           "serif",

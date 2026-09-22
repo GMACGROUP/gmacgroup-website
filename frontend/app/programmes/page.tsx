@@ -49,15 +49,15 @@ export default function ProgrammesPage() {
       <section className="container mx-auto px-4 sm:px-6 py-10 max-w-7xl">
 
         {/* Category Filter Tabs */}
-        <div className="flex justify-center mb-10">
-          <div className="flex flex-wrap items-center justify-center gap-2">
+        <div className="-mx-4 mb-10 overflow-x-auto px-4 pb-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden sm:mx-0 sm:overflow-visible sm:px-0">
+          <div className="flex min-w-max flex-nowrap items-center gap-2 sm:min-w-0 sm:flex-wrap sm:justify-center">
             {filterTabs.map((tab) => {
               const Icon = tab.icon;
               return (
                 <button
                   key={tab.key}
                   onClick={() => setCategory(tab.key)}
-                  className={`flex items-center gap-2 px-4 py-2 rounded-full text-sm font-semibold border transition-all duration-200 ${
+                    className={`flex shrink-0 items-center gap-2 whitespace-nowrap rounded-full border px-4 py-2 text-sm font-semibold transition-all duration-200 ${
                     category === tab.key
                       ? "bg-brand-navy text-white border-brand-navy shadow-elevate"
                       : "bg-white text-slate-600 border-slate-200 hover:border-brand-navy/40 hover:text-brand-navy"

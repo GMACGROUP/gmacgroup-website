@@ -7,7 +7,7 @@ import { apiClient } from "@/lib/api/client";
 import { ResearchProject, Publication, Expert } from "@/types";
 import { PageHeader } from "@/components/common/PageHeader";
 import { PaperRequestModal } from "@/components/modals/PaperRequestModal";
-import { MicroscopeIcon, BookOpenIcon, AcademicCapIcon, FileTextIcon, ShieldCheckIcon, SearchIcon, AwardIcon } from "@/components/common/Icons";
+import { MicroscopeIcon, BookOpenIcon, AcademicCapIcon, FileTextIcon, ShieldCheckIcon } from "@/components/common/Icons";
 
 const TABS = [
   { key: "projects", label: "Research Projects", icon: MicroscopeIcon },
@@ -23,7 +23,6 @@ export default function ResearchPage() {
   const [publications, setPublications] = useState<Publication[]>([]);
   const [experts, setExperts] = useState<Expert[]>([]);
   const [loading, setLoading] = useState(true);
-  const [searchQuery, setSearchQuery] = useState("");
   const [selectedPublication, setSelectedPublication] = useState<Publication | null>(null);
 
   useEffect(() => {
@@ -63,7 +62,7 @@ export default function ResearchPage() {
       />
 
       {/* Main Container */}
-      <section className="container mx-auto px-4 sm:px-6 lg:px-8 py-10 sm:py-14 max-w-6xl space-y-10">
+      <section className="container mx-auto max-w-6xl space-y-8 px-5 py-8 sm:space-y-10 sm:px-6 sm:py-14 lg:px-8">
 
         {/* ── Featured Study Banner ── */}
         <div className="relative bg-brand-navyDeep text-white rounded-3xl overflow-hidden shadow-card border border-brand-navy">
@@ -78,18 +77,18 @@ export default function ResearchPage() {
             <div className="absolute inset-0 bg-gradient-to-r from-brand-navyDeep via-brand-navyDeep/95 to-brand-navy/80" />
           </div>
 
-          <div className="relative z-10 p-8 sm:p-10 lg:p-12 max-w-3xl space-y-4">
+          <div className="relative z-10 max-w-3xl space-y-3 p-5 sm:space-y-4 sm:p-10 lg:p-12">
             <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-white/10 text-brand-cyan border border-white/20 uppercase tracking-wider">
               <ShieldCheckIcon className="w-3.5 h-3.5 text-brand-cyan" />
               Flagship Empirical Study
             </span>
-            <h2 className="text-2xl sm:text-3xl lg:text-4xl font-extrabold text-white font-serif leading-tight">
+            <h2 className="font-serif text-xl font-extrabold leading-tight text-white sm:text-3xl lg:text-4xl">
               The Future of Work & Graduate Labor Transitions
             </h2>
-            <p className="text-slate-200 text-sm sm:text-base leading-relaxed">
+            <p className="text-xs leading-relaxed text-slate-200 sm:text-base">
               Evaluating skill polarization, institutional agility, and emerging technology disruptions across sub-Saharan African higher education and regional labor markets.
             </p>
-            <div className="pt-2 flex flex-wrap items-center gap-3">
+            <div className="flex flex-col gap-2 pt-2 sm:flex-row sm:flex-wrap sm:items-center sm:gap-3">
               <button
                 onClick={() => {
                   const feat = publications[0] || {
@@ -99,13 +98,13 @@ export default function ResearchPage() {
                   };
                   setSelectedPublication(feat);
                 }}
-                className="px-6 py-2.5 rounded-xl font-bold text-xs sm:text-sm text-white bg-brand-red hover:bg-brand-redDark shadow-elevate-red transition-all cursor-pointer"
+                className="w-full cursor-pointer rounded-xl bg-brand-red px-5 py-2.5 text-xs font-bold text-white shadow-elevate-red transition-all hover:bg-brand-redDark sm:w-auto sm:px-6 sm:text-sm"
               >
                 Request Working Paper →
               </button>
               <button
                 onClick={() => setActiveTab("publications")}
-                className="px-5 py-2.5 rounded-xl font-semibold text-xs sm:text-sm text-white bg-white/10 hover:bg-white/20 border border-white/20 transition-all cursor-pointer"
+                className="w-full cursor-pointer rounded-xl border border-white/20 bg-white/10 px-5 py-2.5 text-xs font-semibold text-white transition-all hover:bg-white/20 sm:w-auto sm:text-sm"
               >
                 Browse All Publications ↓
               </button>
@@ -114,8 +113,8 @@ export default function ResearchPage() {
         </div>
 
         {/* ── Prominent Interactive Navigation Bar ── */}
-        <div className="bg-white rounded-2xl p-2 border border-slate-200 shadow-sm flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-          <div className="flex flex-wrap items-center gap-1.5 w-full sm:w-auto">
+        <div className="rounded-2xl border border-slate-200 bg-white p-2 shadow-sm">
+          <div className="-mx-1 flex gap-1.5 overflow-x-auto px-1 pb-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden sm:mx-0 sm:flex-wrap sm:overflow-visible sm:px-0 sm:pb-0">
             {TABS.map((tab) => {
               const Icon = tab.icon;
               const isActive = activeTab === tab.key;
@@ -123,7 +122,9 @@ export default function ResearchPage() {
                 <button
                   key={tab.key}
                   onClick={() => setActiveTab(tab.key)}
-                  className={`flex items-center gap-2 px-3 py-2 sm:px-4 sm:py-2.5 rounded-xl text-[11px] sm:text-sm font-bold transition-all duration-200 ${
+                  role="tab"
+                  aria-selected={isActive}
+                  className={`flex shrink-0 items-center gap-2 whitespace-nowrap rounded-xl px-3 py-2 text-[11px] font-bold transition-all duration-200 sm:px-4 sm:py-2.5 sm:text-sm ${
                     isActive
                       ? "bg-brand-navy text-white shadow-sm"
                       : "text-slate-600 hover:text-brand-navy hover:bg-slate-100"
@@ -147,17 +148,6 @@ export default function ResearchPage() {
             })}
           </div>
 
-          {/* Search Filter Input */}
-          <div className="relative w-full sm:w-64">
-            <SearchIcon className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
-            <input
-              type="text"
-              placeholder="Filter topics, authors..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full pl-9 pr-3 py-2 text-xs rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-brand-navy/20 focus:border-brand-navy bg-slate-50 focus:bg-white transition-all placeholder:text-slate-400"
-            />
-          </div>
         </div>
 
         {/* ── Loading Skeletons ── */}
@@ -178,14 +168,8 @@ export default function ResearchPage() {
         {/* ── Tab 1: Research Projects ── */}
         {!loading && activeTab === "projects" && (
           <div className="space-y-6">
-            <div className="grid gap-5 sm:gap-6 grid-cols-1 md:grid-cols-2">
-              {projects
-                .filter(
-                  (p) =>
-                    p.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                    (p.summary && p.summary.toLowerCase().includes(searchQuery.toLowerCase()))
-                )
-                .map((project) => (
+            <div className="grid grid-cols-1 gap-5 sm:gap-6 md:grid-cols-2">
+              {projects.map((project) => (
                   <article
                     key={project.id}
                     className="group relative flex flex-col bg-white rounded-2xl border border-slate-200 shadow-card hover:shadow-card-hover hover:border-brand-navy/30 hover:-translate-y-1 transition-all duration-300 overflow-hidden"
@@ -203,7 +187,7 @@ export default function ResearchPage() {
                         )}
                       </div>
 
-                      <h3 className="text-xl font-extrabold text-slate-900 font-serif leading-snug mb-3 group-hover:text-brand-navy transition-colors">
+                      <h3 className="mb-3 font-serif text-lg font-extrabold leading-snug text-slate-900 transition-colors group-hover:text-brand-navy sm:text-xl">
                         {project.title}
                       </h3>
 
@@ -233,8 +217,12 @@ export default function ResearchPage() {
                 <div className="w-12 h-12 rounded-2xl bg-blue-50 text-brand-navy flex items-center justify-center mb-4 border border-blue-100">
                   <MicroscopeIcon className="w-6 h-6 text-brand-navy" />
                 </div>
-                <h4 className="text-base font-bold text-slate-900 font-serif">Active Research In Progress</h4>
-                <p className="text-xs text-slate-500 mt-1 max-w-xs">New study working papers are published periodically.</p>
+                <h4 className="font-serif text-base font-bold text-slate-900">
+                  Active Research In Progress
+                </h4>
+                <p className="mt-1 max-w-xs text-xs text-slate-500">
+                  New study working papers are published periodically.
+                </p>
               </div>
             )}
           </div>
@@ -243,26 +231,20 @@ export default function ResearchPage() {
         {/* ── Tab 2: Publications & Working Papers ── */}
         {!loading && activeTab === "publications" && (
           <div className="space-y-4">
-            {publications
-              .filter(
-                (pub) =>
-                  pub.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                  pub.authors.some((a) => a.toLowerCase().includes(searchQuery.toLowerCase()))
-              )
-              .map((pub) => (
+            {publications.map((pub) => (
                 <div
                   key={pub.id}
                   className="group flex flex-col gap-4 p-5 sm:p-6 bg-white rounded-2xl border border-slate-200 shadow-card hover:shadow-card-hover hover:border-brand-navy/30 transition-all duration-200 sm:flex-row sm:items-center sm:justify-between"
                 >
-                  <div className="flex items-start gap-4">
+                  <div className="flex min-w-0 items-start gap-3 sm:gap-4">
                     <div className="w-11 h-11 rounded-xl bg-purple-50 text-purple-700 border border-purple-100 flex items-center justify-center flex-shrink-0 shadow-xs">
                       <FileTextIcon className="w-5 h-5 text-purple-700" />
                     </div>
-                    <div>
+                    <div className="min-w-0">
                       <span className="text-[10px] font-bold text-purple-700 uppercase tracking-wider bg-purple-50 px-2 py-0.5 rounded border border-purple-100">
                         Peer-Reviewed Working Paper
                       </span>
-                      <h3 className="font-extrabold text-slate-900 text-base sm:text-lg mt-1 group-hover:text-brand-navy transition-colors">
+                      <h3 className="mt-1 break-words text-base font-extrabold text-slate-900 transition-colors group-hover:text-brand-navy sm:text-lg">
                         {pub.title}
                       </h3>
                       <p className="text-xs text-slate-500 mt-1 font-medium">
@@ -285,8 +267,12 @@ export default function ResearchPage() {
                 <div className="w-12 h-12 rounded-2xl bg-purple-50 text-purple-700 flex items-center justify-center mb-4 border border-purple-100">
                   <FileTextIcon className="w-6 h-6 text-purple-700" />
                 </div>
-                <h4 className="text-base font-bold text-slate-900 font-serif">Working Papers Under Review</h4>
-                <p className="text-xs text-slate-500 mt-1 max-w-xs">New publications are currently in peer review.</p>
+                <h4 className="font-serif text-base font-bold text-slate-900">
+                  Working Papers Under Review
+                </h4>
+                <p className="mt-1 max-w-xs text-xs text-slate-500">
+                  New publications are currently in peer review.
+                </p>
               </div>
             )}
           </div>
@@ -296,13 +282,7 @@ export default function ResearchPage() {
         {!loading && activeTab === "experts" && (
           <div className="space-y-6">
             <div className="grid gap-5 sm:gap-6 grid-cols-1 sm:grid-cols-2 xl:grid-cols-3">
-              {experts
-                .filter(
-                  (exp) =>
-                    exp.full_name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                    exp.expertise_areas.some((area) => area.toLowerCase().includes(searchQuery.toLowerCase()))
-                )
-                .map((expert) => {
+              {experts.map((expert) => {
                   const photoSrc = expertPhotos[expert.full_name] || "/images/testimonial-mensah.jpg";
                   return (
                     <div
@@ -346,8 +326,12 @@ export default function ResearchPage() {
                 <div className="w-12 h-12 rounded-2xl bg-red-50 text-brand-red flex items-center justify-center mb-4 border border-red-100">
                   <AcademicCapIcon className="w-6 h-6 text-brand-red" />
                 </div>
-                <h4 className="text-base font-bold text-slate-900 font-serif">Global Researcher Network</h4>
-                <p className="text-xs text-slate-500 mt-1 max-w-xs">Join our fellowship of affiliated economists and policy scholars.</p>
+                <h4 className="font-serif text-base font-bold text-slate-900">
+                  Global Researcher Network
+                </h4>
+                <p className="mt-1 max-w-xs text-xs text-slate-500">
+                  Join our fellowship of affiliated economists and policy scholars.
+                </p>
                 <Link href="/register" className="btn-primary mt-4 text-xs">
                   Apply as Fellow →
                 </Link>
@@ -357,7 +341,7 @@ export default function ResearchPage() {
         )}
 
         {/* ── Research Collaboration Callout ── */}
-        <div className="bg-white rounded-3xl border border-slate-200 shadow-card p-8 sm:p-10 flex flex-col md:flex-row items-center justify-between gap-6">
+        <div className="flex flex-col items-center justify-between gap-5 rounded-3xl border border-slate-200 bg-white p-5 shadow-card sm:p-8 md:flex-row lg:p-10">
           <div className="space-y-2 text-center md:text-left">
             <span className="section-label text-brand-red block">ACADEMIC & INSTITUTIONAL PARTNERSHIP</span>
             <h3 className="text-xl sm:text-2xl font-extrabold text-slate-900 font-serif">
@@ -367,8 +351,8 @@ export default function ResearchPage() {
               We partner with university faculties, international think tanks, and foundations on empirical labor assessments and policy briefs.
             </p>
           </div>
-          <div className="flex flex-wrap gap-3 shrink-0">
-            <Link href="/contact?subject=Research Partnership Proposal" className="btn-primary text-xs sm:text-sm px-6 py-3">
+          <div className="w-full shrink-0 md:w-auto">
+            <Link href="/contact?subject=Research Partnership Proposal" className="btn-primary w-full px-6 py-3 text-xs sm:text-sm md:w-auto">
               Submit Research Proposal →
             </Link>
           </div>

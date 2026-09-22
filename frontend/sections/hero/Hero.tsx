@@ -2,172 +2,261 @@
 
 import Link from "next/link";
 import Image from "next/image";
-import { useEffect, useState } from "react";
-import { AcademicCapIcon, MicroscopeIcon, BriefcaseIcon, GlobeIcon } from "@/components/common/Icons";
+import { useEffect, useRef, useState } from "react";
+
+// Inline icon components for the hero pillars
+type HeroIconProps = { className?: string; style?: React.CSSProperties };
+
+function ResearchIcon({ className, style }: HeroIconProps) {
+  return (
+    <svg className={className} style={style} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.75}>
+      <circle cx="11" cy="11" r="7" />
+      <path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-4.35-4.35" />
+      <path strokeLinecap="round" strokeLinejoin="round" d="M11 8v6M8 11h6" />
+    </svg>
+  );
+}
+
+function CapitalIcon({ className, style }: HeroIconProps) {
+  return (
+    <svg className={className} style={style} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.75}>
+      <path strokeLinecap="round" strokeLinejoin="round" d="M12 2l9 5-9 5-9-5 9-5z" />
+      <path strokeLinecap="round" strokeLinejoin="round" d="M3 12l9 5 9-5" />
+      <path strokeLinecap="round" strokeLinejoin="round" d="M3 17l9 5 9-5" />
+    </svg>
+  );
+}
+
+function ConsultingIcon({ className, style }: HeroIconProps) {
+  return (
+    <svg className={className} style={style} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.75}>
+      <rect x="2" y="7" width="20" height="14" rx="2" />
+      <path strokeLinecap="round" strokeLinejoin="round" d="M16 21V5a2 2 0 00-2-2h-4a2 2 0 00-2 2v16" />
+    </svg>
+  );
+}
+
+function InvestmentIcon({ className, style }: HeroIconProps) {
+  return (
+    <svg className={className} style={style} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.75}>
+      <path strokeLinecap="round" strokeLinejoin="round" d="M3 17l4-8 4 4 4-6 4 4" />
+      <circle cx="20" cy="11" r="1.5" fill="currentColor" stroke="none" />
+    </svg>
+  );
+}
+
+function ArrowRightIcon({ className }: { className?: string }) {
+  return (
+    <svg className={className} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+      <path strokeLinecap="round" strokeLinejoin="round" d="M5 12h14M12 5l7 7-7 7" />
+    </svg>
+  );
+}
+
+const pillars = [
+  {
+    Icon: ResearchIcon,
+    label: "Research",
+    title: "Applied Research & Evidence",
+    body: "Baseline studies, impact evaluations, and labour market intelligence produced inside the markets they describe.",
+    href: "/research",
+    accent: "#00C4FF",
+    accentBg: "rgba(0,196,255,0.12)",
+  },
+  {
+    Icon: CapitalIcon,
+    label: "Human Capital",
+    title: "Graduate & Workforce Development",
+    body: "Structured pathways from application to offer — employability programmes, career readiness labs, and cohort delivery.",
+    href: "/programmes",
+    accent: "#D7B56D",
+    accentBg: "rgba(215,181,109,0.12)",
+  },
+  {
+    Icon: ConsultingIcon,
+    label: "Consulting",
+    title: "Institutional & Policy Advisory",
+    body: "Strategic workforce consulting for institutions, governments, and development agencies across Africa.",
+    href: "/services",
+    accent: "#E51924",
+    accentBg: "rgba(229,25,36,0.12)",
+  },
+  {
+    Icon: InvestmentIcon,
+    label: "Investment",
+    title: "Investment Facilitation",
+    body: "Screened deal flow, sector studies, and investment-ready project pipelines across ten focus markets.",
+    href: "/services",
+    accent: "#4ADE80",
+    accentBg: "rgba(74,222,128,0.12)",
+  },
+];
+
+const stats = [
+  { value: "2,000+", label: "Participants Trained" },
+  { value: "30+", label: "Countries Reached" },
+  { value: "10", label: "Research Hubs" },
+  { value: "22", label: "Specialist Colleagues" },
+];
 
 export function Hero() {
-  const pillars = [
-    {
-      icon: AcademicCapIcon,
-      title: "Cohort Pathways",
-      subtitle: "Experiential Learning & Careers",
-      color: "text-brand-cyan",
-    },
-    {
-      icon: MicroscopeIcon,
-      title: "Applied Research",
-      subtitle: "Econometric & Policy Studies",
-      color: "text-white",
-    },
-    {
-      icon: BriefcaseIcon,
-      title: "Executive Advisory",
-      subtitle: "Human Capital Strategy",
-      color: "text-brand-red",
-    },
-    {
-      icon: GlobeIcon,
-      title: "Pan-African Reach",
-      subtitle: "Accra Hub & Global Network",
-      color: "text-brand-cyan",
-    },
-    {
-      icon: AcademicCapIcon,
-      title: "Future Skills",
-      subtitle: "Digital Fluency & Leadership",
-      color: "text-brand-cyan",
-    },
-    {
-      icon: BriefcaseIcon,
-      title: "Career Launchpad",
-      subtitle: "Internships & Fellowships",
-      color: "text-brand-red",
-    },
-    {
-      icon: MicroscopeIcon,
-      title: "Evidence Lab",
-      subtitle: "Data, Insights & Impact",
-      color: "text-white",
-    },
-    {
-      icon: GlobeIcon,
-      title: "Institutional Growth",
-      subtitle: "Partnerships That Perform",
-      color: "text-brand-cyan",
-    },
-    {
-      icon: BriefcaseIcon,
-      title: "Talent Strategy",
-      subtitle: "People, Systems & Results",
-      color: "text-brand-red",
-    },
-    {
-      icon: AcademicCapIcon,
-      title: "Research Fellows",
-      subtitle: "Mentorship & Publication",
-      color: "text-brand-cyan",
-    },
-  ];
-  const [activePillar, setActivePillar] = useState(0);
-  const [isPillarsPaused, setIsPillarsPaused] = useState(false);
+  const [activeCard, setActiveCard] = useState(0);
+  const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
+
+  const startRotation = () => {
+    intervalRef.current = setInterval(() => {
+      setActiveCard((prev) => (prev + 1) % pillars.length);
+    }, 3800);
+  };
 
   useEffect(() => {
-    if (isPillarsPaused) return;
+    startRotation();
+    return () => {
+      if (intervalRef.current) clearInterval(intervalRef.current);
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
-    const rotation = window.setInterval(() => {
-      setActivePillar((current) => (current + 4) % pillars.length);
-    }, 4200);
-
-    return () => window.clearInterval(rotation);
-  }, [isPillarsPaused, pillars.length]);
-
-  const visiblePillars = Array.from({ length: 4 }, (_, offset) => pillars[(activePillar + offset) % pillars.length]);
+  const handleCardClick = (idx: number) => {
+    setActiveCard(idx);
+    if (intervalRef.current) clearInterval(intervalRef.current);
+    startRotation();
+  };
 
   return (
-    <section className="relative min-h-[540px] sm:min-h-[620px] lg:min-h-[700px] flex items-center justify-center overflow-hidden bg-brand-navyDeep">
-      {/* Background Image with Layered Gradient Overlays */}
+    <section className="relative overflow-hidden bg-[#061C30] min-h-[760px] sm:min-h-[700px] lg:min-h-[680px]">
+      {/* Colour bar */}
+      <div className="absolute inset-x-0 top-0 z-20 h-1 bg-[linear-gradient(90deg,#D7B56D_0%,#E56F42_25%,#F4C95D_50%,#2C6EAD_75%,#D7B56D_100%)]" />
+
+      {/* Background image */}
       <div className="absolute inset-0 z-0">
         <Image
           src="/images/hero-banner.jpg"
-          alt="GMAC GROUP - Connecting Talent to Opportunity"
+          alt="GMAC GROUP — Connecting talent to opportunity"
           fill
           priority
-          className="object-cover object-center scale-105 transform motion-safe:transition-transform duration-1000"
+          className="object-cover object-center"
         />
-        {/* Navy & Cyan Ambient Gradient Overlay */}
-        <div className="absolute inset-0 bg-gradient-to-r from-brand-navyDeep/95 via-brand-navy/85 to-brand-navyDeep/90 mix-blend-multiply" />
-        <div className="absolute inset-0 bg-gradient-to-t from-brand-navyDeep via-transparent to-black/30" />
+        {/* Heavy overlay so text is very readable */}
+        <div className="absolute inset-0 bg-gradient-to-r from-[#061C30]/90 via-[#061C30]/70 to-[#061C30]/55" />
+        <div className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-[#061C30]/80" />
       </div>
 
-      {/* Hero Content */}
-      <div className="container relative z-10 mx-auto px-4 sm:px-6 pt-24 pb-16 sm:pt-28 sm:pb-20 lg:pt-36 lg:pb-28 text-center text-white">
-        {/* Brand Tagline Badge */}
-        <div className="inline-flex items-center gap-2 px-3 sm:px-4 py-1.5 rounded-full bg-white/10 backdrop-blur-md border border-white/20 text-brand-cyan text-[10px] sm:text-xs md:text-sm font-semibold tracking-wider uppercase mb-5 sm:mb-6 shadow-glow">
-          <span className="w-2 h-2 rounded-full bg-brand-red animate-ping" />
-          <span className="w-2 h-2 rounded-full bg-brand-red -ml-4" />
-          Human Capital • Applied Research • Advisory
-        </div>
+      {/* Main grid */}
+      <div className="container relative z-10 mx-auto max-w-7xl px-5 pt-12 pb-12 sm:px-6 sm:pt-16 sm:pb-14 lg:px-10 lg:pt-20 lg:pb-16">
+        <div className="grid items-center gap-9 sm:gap-12 lg:grid-cols-2 lg:gap-16">
 
-        {/* Main Heading & Slogan */}
-        <h1 className="text-[2.5rem] leading-[1.08] sm:text-5xl md:text-6xl lg:text-7xl font-extrabold tracking-tight max-w-5xl mx-auto">
-          <span className="italic font-serif font-normal block text-white drop-shadow-md">
-            Connecting Talent to Opportunity
-          </span>
-          <span className="mt-2 text-lg sm:text-3xl lg:text-4xl font-sans font-bold text-slate-100 block opacity-95">
-            Empowering the Next Generation of Global Impact
-          </span>
-        </h1>
+          {/* ── LEFT: headline + stats + CTAs ── */}
+          <div className="flex flex-col items-start">
+            {/* Eyebrow pill */}
+            <div className="mb-5 inline-flex items-center gap-2 rounded-full border border-white/20 bg-white/8 px-4 py-1.5 text-[11px] font-bold uppercase tracking-[0.18em] text-[#C8D8E4] backdrop-blur-md">
+              <span className="h-1.5 w-1.5 rounded-full bg-[#D7B56D] animate-pulse flex-shrink-0" />
+              Accra, Ghana · Pan-African Reach
+            </div>
 
-        {/* Narrative Description */}
-        <p className="mt-5 sm:mt-6 text-sm sm:text-base md:text-xl text-slate-200 max-w-xl mx-auto font-normal leading-relaxed drop-shadow-sm">
-          GMAC GROUP bridges learners, researchers, and forward-thinking institutions with actionable pathways from capability to career achievement.
-        </p>
+            {/* Headline */}
+            <h1 className="font-serif text-3xl font-extrabold leading-[1.08] tracking-tight text-white sm:text-5xl lg:text-[3.25rem]">
+              Building People.{" "}
+              <span className="text-[#D7B56D]">Building Evidence.</span>
+            </h1>
 
-        {/* Call to Actions */}
-        <div className="mt-8 sm:mt-10 flex flex-col sm:flex-row items-stretch justify-center gap-3 sm:gap-4 max-w-xl mx-auto">
-          <Link
-            href="/programmes"
-            className="w-full sm:w-auto px-6 sm:px-8 py-3.5 rounded-xl font-bold text-white bg-brand-red hover:bg-brand-redDark shadow-elevate-red hover:scale-[1.02] active:scale-95 transition-all duration-200"
-          >
-            Explore Programmes
-          </Link>
-          <Link
-            href="/services"
-            className="w-full sm:w-auto px-6 sm:px-8 py-3.5 rounded-xl font-semibold text-white bg-white/15 hover:bg-white/25 backdrop-blur-md border border-white/20 hover:scale-[1.02] active:scale-95 transition-all duration-200"
-          >
-            Our Services
-          </Link>
-          <Link
-            href="/opportunities"
-            className="w-full sm:w-auto px-6 sm:px-8 py-3.5 rounded-xl font-semibold text-brand-cyan hover:text-white bg-brand-navyDeep/60 hover:bg-brand-navy/60 backdrop-blur-md border border-brand-cyan/30 hover:border-brand-cyan/60 transition-all duration-200"
-          >
-            Browse Opportunities →
-          </Link>
-        </div>
+            {/* Sub-headline */}
+            <p className="mt-4 max-w-xl text-sm leading-relaxed text-[#B0C4D4] sm:mt-5 sm:text-lg">
+              GMAC Group connects talent to opportunity through applied research, graduate employability programmes,
+              institutional advisory, and investment facilitation across Africa.
+            </p>
 
-        {/* Institutional Pillars Bar */}
-        <div
-          className="mt-10 sm:mt-16 pt-6 sm:pt-10 border-t border-white/10 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-3 sm:gap-6 max-w-4xl mx-auto"
-          onMouseEnter={() => setIsPillarsPaused(true)}
-          onMouseLeave={() => setIsPillarsPaused(false)}
-          aria-label="GMACGROUP focus areas"
-        >
-          {visiblePillars.map((pillar, offset) => {
-            const Icon = pillar.icon;
-            return (
-              <div
-                key={`${pillar.title}-${activePillar}`}
-                className="hero-pillar-card p-3 sm:p-4 rounded-2xl bg-white/5 backdrop-blur-sm border border-white/10 text-left hover:bg-white/10 transition-colors"
-                style={{ animationDelay: `${offset * 90}ms` }}
-              >
-                <div className="flex items-center gap-2 mb-2">
-                  <Icon className={`w-4 h-4 sm:w-5 sm:h-5 ${pillar.color}`} />
-                  <span className={`text-xs sm:text-sm md:text-base font-extrabold ${pillar.color}`}>{pillar.title}</span>
+            {/* Divider */}
+            <div className="mt-6 h-px w-20 bg-[#D7B56D]/70" />
+
+            {/* Stats row */}
+            <div className="mt-6 grid w-full grid-cols-2 gap-x-6 gap-y-5 sm:grid-cols-4 sm:gap-4">
+              {stats.map((s) => (
+                <div key={s.label} className="flex flex-col items-center text-center sm:items-start sm:text-left">
+                  <span className="text-2xl font-extrabold font-sans leading-none tracking-tight text-white sm:text-3xl">
+                    {s.value}
+                  </span>
+                  <span className="mt-1 text-[11px] text-[#8AADC0] font-medium leading-snug">
+                    {s.label}
+                  </span>
                 </div>
-                <p className="text-[10px] sm:text-[11px] md:text-xs text-slate-300 font-medium leading-relaxed">{pillar.subtitle}</p>
-              </div>
-            );
-          })}
+              ))}
+            </div>
+
+            {/* CTAs */}
+            <div className="mt-8 flex w-full flex-col gap-3 sm:mt-9 sm:w-auto sm:flex-row sm:flex-wrap">
+              <Link
+                href="/contact"
+                className="inline-flex w-full items-center justify-center gap-2 rounded-full bg-[#D7B56D] px-6 py-3 text-sm font-bold text-[#061C30] shadow-lg transition-all duration-200 hover:-translate-y-0.5 hover:bg-[#E7C77D] hover:shadow-xl active:scale-95 sm:w-auto"
+              >
+                Start a conversation
+                <ArrowRightIcon className="w-4 h-4" />
+              </Link>
+              <Link
+                href="/programmes"
+                className="inline-flex w-full items-center justify-center gap-2 rounded-full border border-white/25 bg-white/10 px-6 py-3 text-sm font-bold text-white backdrop-blur-md transition-all duration-200 hover:-translate-y-0.5 hover:bg-white/20 active:scale-95 sm:w-auto"
+              >
+                View programmes
+              </Link>
+              <Link
+                href="/opportunities"
+                className="inline-flex w-full items-center justify-center gap-2 rounded-full border border-white/20 bg-transparent px-5 py-3 text-sm font-semibold text-[#B0C4D4] transition-all duration-200 hover:bg-white/10 hover:text-white sm:w-auto"
+              >
+                Open opportunities →
+              </Link>
+            </div>
+          </div>
+
+          {/* ── RIGHT: service pillar cards ── */}
+          <div className="flex flex-col gap-3">
+            {/* Active pillar card */}
+            {pillars.map((p, i) => {
+              const { Icon } = p;
+              return (
+                <div
+                  key={p.label}
+                    className={`rounded-2xl border border-white/12 p-5 sm:p-7 transition-all duration-500 ${
+                    activeCard === i
+                      ? "opacity-100 translate-y-0 pointer-events-auto"
+                      : "opacity-0 absolute pointer-events-none"
+                  }`}
+                  style={{
+                    background: activeCard === i
+                      ? "rgba(255,255,255,0.07)"
+                      : "transparent",
+                    backdropFilter: "blur(12px)",
+                    position: activeCard === i ? "relative" : "absolute",
+                  }}
+                  aria-hidden={activeCard !== i}
+                >
+                  <div className="flex items-start gap-4">
+                    <div
+                      className="w-12 h-12 rounded-xl flex-shrink-0 flex items-center justify-center"
+                      style={{ background: p.accentBg, border: `1px solid ${p.accent}40` }}
+                    >
+                      <Icon className="w-6 h-6" style={{ color: p.accent } as React.CSSProperties} />
+                    </div>
+                    <div className="flex flex-col">
+                      <span
+                        className="text-[11px] font-bold uppercase tracking-widest mb-1"
+                        style={{ color: p.accent }}
+                      >
+                        {p.label}
+                      </span>
+                      <h2 className="text-lg sm:text-xl font-bold font-serif text-white leading-snug">
+                        {p.title}
+                      </h2>
+                    </div>
+                  </div>
+
+                  <p className="mt-4 text-sm leading-relaxed text-[#9DB8CC]">
+                    {p.body}
+                  </p>
+
+                </div>
+              );
+            })}
+          </div>
         </div>
       </div>
     </section>

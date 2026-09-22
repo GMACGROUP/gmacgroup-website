@@ -21,7 +21,11 @@ export function Footer() {
   const [subscribed, setSubscribed] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  if (safePathname.startsWith("/dashboard")) return null;
+  if (
+    safePathname.startsWith("/dashboard") ||
+    safePathname === "/login" ||
+    safePathname === "/register"
+  ) return null;
 
   const handleSubscribe = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -49,7 +53,7 @@ export function Footer() {
           <div className="space-y-4">
             <Logo variant="dark" size="md" showTagline={true} />
             <p className="text-sm text-slate-400 leading-relaxed mt-4">
-              GMAC GROUP is a leading Human Capital, Applied Research, and Professional Development organization committed to unlocking potential and driving sustainable institutional growth.
+              Gmac Group builds people and the evidence institutions need to deploy them well. We connect talent to opportunity through research, skills, advisory, and investment facilitation across Africa.
             </p>
             <div className="flex items-center gap-3 pt-2 text-slate-400">
               <span className="text-xs font-semibold px-2.5 py-1 rounded bg-white/10 text-brand-cyan border border-white/10">

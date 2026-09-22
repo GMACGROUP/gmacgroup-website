@@ -25,13 +25,13 @@ export function CtaBanner() {
         <div className="mt-8 flex flex-wrap items-center justify-center gap-4">
           <Link
             href="/contact"
-            className="px-7 py-3 rounded-xl font-bold text-sm text-white bg-brand-red hover:bg-brand-redDark shadow-elevate-red hover:scale-105 active:scale-95 transition-all"
+            className="px-8 py-3.5 rounded-full font-bold text-sm text-white bg-brand-red hover:bg-brand-redDark shadow-elevate-red hover:shadow-xl hover:-translate-y-0.5 active:scale-95 transition-all duration-200"
           >
             Contact Advisory Team →
           </Link>
           <Link
             href="/programmes"
-            className="px-7 py-3 rounded-xl font-semibold text-sm text-white bg-white/10 hover:bg-white/20 backdrop-blur-md border border-white/20 hover:scale-105 active:scale-95 transition-all"
+            className="px-8 py-3.5 rounded-full font-bold text-sm text-white bg-white/10 hover:bg-white/20 backdrop-blur-md border border-white/25 hover:-translate-y-0.5 active:scale-95 transition-all duration-200"
           >
             Explore Cohort Programmes
           </Link>
