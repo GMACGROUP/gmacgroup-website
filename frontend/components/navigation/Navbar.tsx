@@ -184,6 +184,25 @@ export function Navbar() {
                   </Link>
                 </li>
               ))}
+              {user && (
+                <li>
+                  <Link
+                    href="/dashboard"
+                    prefetch={true}
+                    onClick={() => setMobileMenuOpen(false)}
+                    className={`flex min-h-11 items-center gap-2 rounded-xl px-3 py-2.5 text-sm font-bold transition-colors ${
+                      isDashboardPage
+                        ? "bg-brand-ice text-brand-navy"
+                        : "text-brand-navy hover:bg-brand-ice/70"
+                    }`}
+                  >
+                    {isDashboardPage && (
+                      <span className="h-1.5 w-1.5 flex-shrink-0 rounded-full bg-brand-red" />
+                    )}
+                    Dashboard
+                  </Link>
+                </li>
+              )}
             </ul>
             <div className="mt-3 pt-3 border-t border-slate-100 flex flex-col gap-2">
               {user ? (
