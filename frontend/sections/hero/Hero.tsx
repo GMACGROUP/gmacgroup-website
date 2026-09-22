@@ -135,7 +135,7 @@ export function Hero() {
           alt="GMAC GROUP — Connecting talent to opportunity"
           fill
           priority
-          className="object-cover object-center"
+          className="object-cover object-[44%_center] sm:object-center"
         />
         {/* Heavy overlay so text is very readable */}
         <div className="absolute inset-0 bg-gradient-to-r from-[#061C30]/90 via-[#061C30]/70 to-[#061C30]/55" />
