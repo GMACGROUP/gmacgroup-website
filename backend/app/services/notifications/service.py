@@ -263,6 +263,19 @@ class NotificationService:
             f"Subscriber email: {email}",
         )
 
+        await self.send_email(
+            email,
+            "You are subscribed to GMAC Insights",
+            (
+                "Hello,\n\n"
+                "Thank you for subscribing to GMAC Insights. You will receive our "
+                "periodic briefings on workforce trends, research, and fellowship cohorts.\n\n"
+                "Best,\n"
+                "The GMAC GROUP Team\n"
+                "Accra, Ghana"
+            ),
+        )
+
     async def notify_status_changed(self, email: str, name: str, title: str, status: str):
         first_name = name.split()[0] if name else name
         status_label = status.replace("_", " ").title()
