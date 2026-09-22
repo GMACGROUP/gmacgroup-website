@@ -6,6 +6,7 @@ import { Navbar } from "@/components/navigation/Navbar";
 import { Footer } from "@/components/footer/Footer";
 import { ScrollProgress } from "@/components/common/ScrollProgress";
 import { NavigationProgressBar } from "@/components/common/NavigationProgressBar";
+import { AuthProvider } from "@/hooks/useAuth";
 
 const libreFranklin = Libre_Franklin({
   subsets: ["latin"],
@@ -36,13 +37,15 @@ export default function RootLayout({
   return (
     <html lang="en" className={`${libreFranklin.variable} ${cormorant.variable}`}>
       <body className="min-h-screen flex flex-col font-sans">
-        <Suspense fallback={null}>
-          <NavigationProgressBar />
-        </Suspense>
-        <Navbar />
-        <main className="flex-1 pt-16">{children}</main>
-        <Footer />
-        <ScrollProgress />
+        <AuthProvider>
+          <Suspense fallback={null}>
+            <NavigationProgressBar />
+          </Suspense>
+          <Navbar />
+          <main className="flex-1 pt-16">{children}</main>
+          <Footer />
+          <ScrollProgress />
+        </AuthProvider>
       </body>
     </html>
   );

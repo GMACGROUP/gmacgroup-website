@@ -29,7 +29,7 @@ async def list_opportunities(type: str | None = Query(default=None)):
 
 
 @router.get("/my-applications", response_model=List[ApplicationOut])
-async def list_my_applications(
+def list_my_applications(
     current_user: dict = Depends(get_current_user),
     db: Session = Depends(get_db),
 ):

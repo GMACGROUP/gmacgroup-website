@@ -2,9 +2,20 @@
 
 from datetime import datetime
 from decimal import Decimal
+from typing import Generic, TypeVar
 from uuid import UUID
 
 from pydantic import BaseModel, ConfigDict
+
+
+ItemT = TypeVar("ItemT")
+
+
+class AdminPage(BaseModel, Generic[ItemT]):
+    total: int
+    page: int
+    page_size: int
+    items: list[ItemT]
 
 
 class StatusUpdate(BaseModel):

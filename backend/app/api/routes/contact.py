@@ -46,7 +46,7 @@ async def submit_contact_request(
 
 
 @router.post("/newsletter", response_model=NewsletterResponse)
-async def subscribe_newsletter(payload: NewsletterSubscribe, db: Session = Depends(get_db)):
+def subscribe_newsletter(payload: NewsletterSubscribe, db: Session = Depends(get_db)):
     """Subscribe an email to the GMAC Insights newsletter."""
     email_lower = payload.email.lower().strip()
     subscriber = db.query(NewsletterSubscriber).filter(NewsletterSubscriber.email == email_lower).first()

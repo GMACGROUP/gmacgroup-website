@@ -1,7 +1,7 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   reactStrictMode: true,
-  // TODO: configure image domains (Supabase storage, CMS, etc.)
+  output: "standalone",
   images: {
     remotePatterns: [],
   },

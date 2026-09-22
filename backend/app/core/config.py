@@ -8,6 +8,7 @@ TODO:
 
 from functools import lru_cache
 from pydantic_settings import BaseSettings, SettingsConfigDict
+from pydantic import model_validator
 
 
 class Settings(BaseSettings):
@@ -57,6 +58,17 @@ class Settings(BaseSettings):
     MAX_UPLOAD_SIZE_MB: int = 10
 
     model_config = SettingsConfigDict(env_file=".env", extra="ignore")
+
+    @model_validator(mode="after")
+    def validate_production_settings(self):
+        if self.ENVIRONMENT.lower() in {"production", "staging"}:
+            if self.JWT_SECRET in {"change-me", "generate-a-strong-secret-key"} or len(self.JWT_SECRET) < 32:
+                raise ValueError("JWT_SECRET must be a strong value with at least 32 characters in production")
+            if not self.ALLOWED_ORIGINS:
+                raise ValueError("ALLOWED_ORIGINS must contain the deployed frontend origin")
+            if self.STORAGE_PROVIDER.lower() == "local":
+                raise ValueError("STORAGE_PROVIDER must use durable object storage in production")
+        return self
 
 
 @lru_cache

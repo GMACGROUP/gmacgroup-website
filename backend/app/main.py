@@ -1,5 +1,5 @@
 import logging
-from fastapi import FastAPI
+from fastapi import FastAPI, Response, status
 from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy import text
 
@@ -64,5 +64,18 @@ async def root():
 
 @app.get("/health")
 async def health_check():
-    """Liveness/readiness probe."""
+    """Liveness probe that does not require a database connection."""
     return {"status": "healthy"}
+
+
+@app.get("/ready")
+def readiness_check(response: Response):
+    """Readiness probe that confirms the API can reach its database."""
+    try:
+        with engine.connect() as connection:
+            connection.execute(text("SELECT 1"))
+    except Exception:
+        logger.exception("Readiness check failed")
+        response.status_code = status.HTTP_503_SERVICE_UNAVAILABLE
+        return {"status": "not_ready"}
+    return {"status": "ready"}
