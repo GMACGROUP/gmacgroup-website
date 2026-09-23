@@ -208,24 +208,23 @@ export function Hero() {
           </div>
 
           {/* ── RIGHT: service pillar cards ── */}
-          <div className="flex flex-col gap-3">
+          <div className="relative min-h-[250px] sm:min-h-[230px]">
             {/* Active pillar card */}
             {pillars.map((p, i) => {
               const { Icon } = p;
               return (
                 <div
                   key={p.label}
-                    className={`rounded-2xl border border-white/12 p-5 sm:p-7 transition-all duration-500 ${
+                    className={`absolute inset-0 rounded-2xl border border-white/12 p-5 sm:p-7 transition-all duration-500 ${
                     activeCard === i
                       ? "opacity-100 translate-y-0 pointer-events-auto"
-                      : "opacity-0 absolute pointer-events-none"
+                      : "opacity-0 translate-y-2 pointer-events-none"
                   }`}
                   style={{
                     background: activeCard === i
                       ? "rgba(255,255,255,0.07)"
                       : "transparent",
                     backdropFilter: "blur(12px)",
-                    position: activeCard === i ? "relative" : "absolute",
                   }}
                   aria-hidden={activeCard !== i}
                 >
