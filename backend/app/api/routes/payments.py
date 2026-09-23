@@ -4,7 +4,7 @@ from datetime import datetime, timezone
 from uuid import uuid4
 
 import httpx
-from fastapi import APIRouter, Depends, Header, HTTPException, Request, status
+from fastapi import APIRouter, BackgroundTasks, Depends, Header, HTTPException, Request, status
 from sqlalchemy import select
 from sqlalchemy.orm import Session
 
@@ -39,6 +39,7 @@ def _find_target(payload: PaymentInitialize) -> tuple[dict, dict]:
 async def _complete_payment(
     db: Session,
     payment: Payment,
+    background_tasks: BackgroundTasks,
     transaction_status: str,
     transaction_id: str | None = None,
 ) -> Payment:
@@ -86,7 +87,8 @@ async def _complete_payment(
         db.add(application)
     db.commit()
     if payment.target_type == "programme":
-        await notification_service.notify_enrolment_submitted(
+        background_tasks.add_task(
+            notification_service.notify_enrolment_submitted,
             enrolment.email,
             enrolment.full_name or "Applicant",
             enrolment.programme_title or "Programme",
@@ -103,7 +105,8 @@ async def _complete_payment(
             ),
         )
     else:
-        await notification_service.notify_application_submitted(
+        background_tasks.add_task(
+            notification_service.notify_application_submitted,
             application.applicant_email,
             application.applicant_name or "Applicant",
             application.opportunity_title or "Opportunity",
@@ -179,7 +182,12 @@ async def initialize_payment(
     return PaymentInitializeOut(status="pending", reference=reference, checkout_url=checkout_url, amount=offer["amount"], currency=offer["currency"])
 
 
-async def _verify(reference: str, transaction_id: str | None, db: Session) -> PaymentVerifyOut:
+async def _verify(
+    reference: str,
+    transaction_id: str | None,
+    db: Session,
+    background_tasks: BackgroundTasks,
+) -> PaymentVerifyOut:
     payment = db.scalar(select(Payment).where(Payment.provider_reference == reference))
     if payment is None:
         raise HTTPException(status_code=404, detail="Payment reference not found")
@@ -199,18 +207,24 @@ async def _verify(reference: str, transaction_id: str | None, db: Session) -> Pa
         and float(data.get("amount", 0)) >= float(payment.amount)
         and data.get("currency") == payment.currency
     )
-    await _complete_payment(db, payment, "successful" if valid else "failed", transaction_id)
+    await _complete_payment(db, payment, background_tasks, "successful" if valid else "failed", transaction_id)
     return PaymentVerifyOut(status=payment.status, reference=reference, target_type=payment.target_type, target_id=payment.programme_id or payment.opportunity_id or "")
 
 
 @router.get("/{reference}/verify", response_model=PaymentVerifyOut)
-async def verify_payment(reference: str, transaction_id: str, db: Session = Depends(get_db)):
-    return await _verify(reference, transaction_id, db)
+async def verify_payment(
+    reference: str,
+    transaction_id: str,
+    background_tasks: BackgroundTasks,
+    db: Session = Depends(get_db),
+):
+    return await _verify(reference, transaction_id, db, background_tasks)
 
 
 @router.post("/webhook", status_code=status.HTTP_200_OK)
 async def payment_webhook(
     request: Request,
+    background_tasks: BackgroundTasks,
     verif_hash: str | None = Header(default=None, alias="verif-hash"),
     db: Session = Depends(get_db),
 ):
@@ -220,5 +234,5 @@ async def payment_webhook(
     data = body.get("data", {})
     reference = data.get("tx_ref")
     if reference and data.get("id"):
-        await _verify(reference, str(data["id"]), db)
+        await _verify(reference, str(data["id"]), db, background_tasks)
     return {"received": True}
