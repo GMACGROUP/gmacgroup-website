@@ -29,11 +29,11 @@ export function PageHeader({
             {badge}
           </span>
         )}
-        <h1 className="font-serif text-2xl font-extrabold leading-snug tracking-tight text-[#F3E7C9] drop-shadow-sm sm:text-3xl lg:text-4xl">
+        <h1 className="font-serif text-3xl font-extrabold leading-tight tracking-tight text-[#F3E7C9] drop-shadow-sm sm:text-3xl lg:text-4xl">
           {title}
         </h1>
         {subtitle && (
-          <p className="mx-auto mt-2.5 max-w-2xl text-xs font-normal leading-relaxed text-slate-200 sm:text-sm md:text-base">
+          <p className="mx-auto mt-3 max-w-2xl text-sm font-normal leading-relaxed text-slate-200 sm:text-sm md:text-base">
             {subtitle}
           </p>
         )}
