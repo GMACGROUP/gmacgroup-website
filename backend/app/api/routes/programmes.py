@@ -5,7 +5,7 @@ training programmes, institutional programmes, and enrolment.
 
 from datetime import datetime, timezone
 from typing import List, Optional
-from fastapi import APIRouter, Depends, HTTPException, Query, status
+from fastapi import APIRouter, BackgroundTasks, Depends, HTTPException, Query, status
 from sqlalchemy import or_, select
 from sqlalchemy.orm import Session
 from app.api.dependencies import get_current_user, get_optional_user
@@ -53,6 +53,7 @@ async def get_programme(programme_id: str):
 async def enrol_in_programme(
     programme_id: str,
     payload: EnrolmentCreate,
+    background_tasks: BackgroundTasks,
     current_user: Optional[dict] = Depends(get_optional_user),
     db: Session = Depends(get_db),
 ):
@@ -88,7 +89,8 @@ async def enrol_in_programme(
     db.add(enrolment)
     db.commit()
     db.refresh(enrolment)
-    await notification_service.notify_enrolment_submitted(
+    background_tasks.add_task(
+        notification_service.notify_enrolment_submitted,
         enrolment.email or email,
         enrolment.full_name or name,
         enrolment.programme_title or "Programme",
