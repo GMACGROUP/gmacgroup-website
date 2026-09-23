@@ -119,7 +119,7 @@ export function EnrolmentModal({
           <XMarkIcon className="w-5 h-5" />
         </button>
 
-        <div className="p-6 sm:p-8">
+        <div className="p-4 sm:p-8">
           {!submitted ? (
             <>
               <div className="flex items-center gap-2 mb-2 text-brand-red text-xs font-bold uppercase tracking-wider">
@@ -237,18 +237,18 @@ export function EnrolmentModal({
                   </p>
                 )}
 
-                <div className="pt-2 flex items-center justify-end gap-3">
+                <div className="pt-2 flex flex-col-reverse items-stretch gap-2 sm:flex-row sm:items-center sm:justify-end sm:gap-3">
                   <button
                     type="button"
                     onClick={onClose}
-                    className="px-4 py-2.5 rounded-xl text-xs font-bold text-slate-600 hover:bg-slate-100 transition-colors"
+                    className="w-full px-4 py-2.5 rounded-xl text-sm font-bold text-slate-600 hover:bg-slate-100 transition-colors sm:w-auto sm:text-xs"
                   >
                     Cancel
                   </button>
                   <button
                     type="submit"
                     disabled={submitting}
-                    className="px-6 py-2.5 rounded-xl text-xs sm:text-sm font-bold text-white bg-brand-red hover:bg-brand-redDark shadow-md hover:shadow-lg active:scale-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-cyan transition-all disabled:opacity-50"
+                    className="w-full px-4 py-3 rounded-xl text-sm font-bold leading-snug text-white text-center bg-brand-red hover:bg-brand-redDark shadow-md hover:shadow-lg active:scale-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-cyan transition-all disabled:opacity-50 sm:w-auto sm:px-6 sm:py-2.5 sm:text-sm"
                   >
                     {submitting ? "Processing Enrolment..." : "Confirm Cohort Enrolment →"}
                   </button>

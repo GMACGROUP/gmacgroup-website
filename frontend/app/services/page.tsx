@@ -184,7 +184,7 @@ export default function ServicesPage() {
                     <div className="mt-6 pt-5 border-t border-slate-100 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
                       <Link
                         href={`/contact?subject=Service Inquiry: ${encodeURIComponent(service.title)}`}
-                        className="btn-primary text-xs px-4 py-2 w-full sm:w-auto text-center"
+                        className="btn-primary inline-flex w-fit max-w-full px-3 py-2 text-[11px] leading-tight text-center sm:w-auto sm:px-4 sm:py-2 sm:text-xs"
                       >
                         Request Advisory →
                       </Link>
@@ -212,7 +212,7 @@ export default function ServicesPage() {
             <p className="text-sm text-slate-500 mt-2">
               No services found in this category at the moment.
             </p>
-            <Link href="/contact" className="btn-primary mt-5">
+            <Link href="/contact" className="btn-primary mt-5 px-4 py-2.5 text-xs sm:px-6 sm:py-3 sm:text-sm">
               Request Custom Advisory
             </Link>
           </div>
