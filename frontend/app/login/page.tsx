@@ -50,14 +50,14 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="min-h-[85vh] flex items-center justify-center bg-slate-50 py-16 px-4">
+    <div className="min-h-[calc(100dvh-4rem)] flex items-center justify-center bg-slate-50 px-4 py-8 sm:py-16">
       {/* Subtle background decoration */}
       <div className="absolute inset-0 pointer-events-none overflow-hidden">
         <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[700px] h-[300px] rounded-full bg-blue-50/60 blur-3xl" />
         <div className="absolute bottom-0 right-1/4 w-[400px] h-[250px] rounded-full bg-red-50/40 blur-3xl" />
       </div>
 
-      <div className="relative w-full max-w-md overflow-hidden rounded-[28px] border border-slate-200/80 bg-white p-8 shadow-[0_8px_40px_rgba(14,77,130,0.10)] sm:p-10">
+      <div className="relative w-full max-w-md overflow-hidden rounded-[28px] border border-slate-200/80 bg-white p-6 shadow-[0_8px_40px_rgba(14,77,130,0.10)] sm:p-10">
         {/* Top gradient accent bar */}
         <div className="absolute inset-x-0 top-0 h-1.5 bg-[linear-gradient(90deg,#D7B56D_0%,#E56F42_22%,#F4C95D_52%,#2C6EAD_78%,#D7B56D_100%)]" />
 

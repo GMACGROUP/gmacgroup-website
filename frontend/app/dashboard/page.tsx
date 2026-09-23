@@ -140,11 +140,11 @@ function DashboardContent() {
         )}
 
         {/* ── Welcome Banner ── */}
-        <div className="relative rounded-3xl bg-brand-navy text-white p-8 sm:p-10 shadow-elevate overflow-hidden border border-brand-navyLight/20">
+        <div className="relative rounded-3xl bg-brand-navy text-white p-5 sm:p-10 shadow-elevate overflow-hidden border border-brand-navyLight/20">
           <div className="absolute top-0 right-0 w-96 h-96 bg-brand-cyan/10 rounded-full blur-3xl pointer-events-none" />
           <div className="absolute bottom-0 right-48 w-80 h-80 bg-brand-red/10 rounded-full blur-3xl pointer-events-none" />
 
-          <div className="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-6">
+          <div className="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-5 sm:gap-6">
             <div className="space-y-2">
               <div className="flex items-center gap-2">
                 <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-white/10 text-brand-cyan text-xs font-bold uppercase tracking-wider border border-white/15">
@@ -156,7 +156,7 @@ function DashboardContent() {
                 </span>
               </div>
 
-              <h1 className="text-2xl sm:text-3xl lg:text-4xl font-extrabold font-serif">
+              <h1 className="text-2xl sm:text-3xl lg:text-4xl font-extrabold font-serif text-white leading-tight break-words">
                 Welcome back, {userDisplayName}
               </h1>
               <p className="text-xs sm:text-sm text-slate-200 max-w-2xl leading-relaxed">
@@ -164,10 +164,10 @@ function DashboardContent() {
               </p>
             </div>
 
-            <div className="flex flex-wrap items-center gap-2 sm:gap-3 shrink-0">
+            <div className="flex w-full flex-col items-stretch gap-2 sm:w-auto sm:flex-row sm:flex-wrap sm:items-center sm:gap-3 shrink-0">
               <button
                 onClick={() => setIsEditingProfile(!isEditingProfile)}
-                className="px-4 py-2.5 rounded-xl font-bold text-xs bg-white/10 hover:bg-white/20 border border-white/20 text-white transition-all"
+                className="px-4 py-2.5 rounded-xl font-bold text-xs bg-white/10 hover:bg-white/20 border border-white/20 text-white transition-all sm:w-auto"
               >
                 {isEditingProfile ? "Close Profile" : "Edit Profile"}
               </button>
@@ -175,14 +175,14 @@ function DashboardContent() {
                 <Link
                   href="/admin"
                   prefetch={true}
-                  className="px-4 py-2.5 rounded-xl font-bold text-xs bg-brand-cyan text-brand-navy hover:bg-white transition-all"
+                  className="px-4 py-2.5 rounded-xl font-bold text-xs bg-brand-cyan text-brand-navy hover:bg-white transition-all sm:w-auto"
                 >
                   Operations Console
                 </Link>
               )}
               <button
                 onClick={handleLogout}
-                className="px-4 py-2.5 rounded-xl font-bold text-xs bg-red-500/20 hover:bg-red-500/30 text-red-200 border border-red-400/30 transition-all"
+                className="px-4 py-2.5 rounded-xl font-bold text-xs bg-red-500/20 hover:bg-red-500/30 text-red-200 border border-red-400/30 transition-all sm:w-auto"
               >
                 Sign Out
               </button>
