@@ -85,6 +85,9 @@ class NotificationService:
 
         if provider == "smtp":
             if not settings.SMTP_USER or not settings.SMTP_PASSWORD:
+                logger.error(
+                    "SMTP delivery skipped: SMTP_USER or SMTP_PASSWORD is not configured"
+                )
                 self._print_dev_fallback(
                     "SMTP UNCONFIGURED - add SMTP_USER and SMTP_PASSWORD to .env",
                     to, subject, body,
@@ -102,10 +105,21 @@ class NotificationService:
                     subject,
                     body,
                 )
-                logger.info("Email dispatched via SMTP (plain-text) to %s", to)
+                logger.info(
+                    "SMTP delivery succeeded: provider=smtp host=%s port=%s recipient=%s",
+                    settings.SMTP_HOST,
+                    settings.SMTP_PORT,
+                    to,
+                )
                 return True
             except Exception as exc:
-                logger.exception("SMTP delivery failed for %s: %s", to, exc)
+                logger.exception(
+                    "SMTP delivery failed: provider=smtp host=%s port=%s recipient=%s error=%s",
+                    settings.SMTP_HOST,
+                    settings.SMTP_PORT,
+                    to,
+                    exc,
+                )
                 self._print_dev_fallback(f"SMTP ERROR: {exc}", to, subject, body)
                 return False
 
