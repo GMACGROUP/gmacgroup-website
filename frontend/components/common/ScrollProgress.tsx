@@ -1,11 +1,13 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { usePathname } from "next/navigation";
 
 const CIRCLE_RADIUS = 20;
 const CIRCLE_CIRCUMFERENCE = 2 * Math.PI * CIRCLE_RADIUS;
 
 export function ScrollProgress() {
+  const pathname = usePathname();
   const [progress, setProgress] = useState(0);
   const [isVisible, setIsVisible] = useState(false);
 
@@ -43,6 +45,10 @@ export function ScrollProgress() {
   }
 
   const dashOffset = CIRCLE_CIRCUMFERENCE * (1 - progress);
+
+  if (pathname === "/login" || pathname === "/register" || pathname === "/forgot-password" || pathname === "/reset-password") {
+    return null;
+  }
 
   return (
     <button

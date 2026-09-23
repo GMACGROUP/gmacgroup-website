@@ -42,14 +42,14 @@ export default function RegisterPage() {
   }
 
   return (
-    <div className="relative flex min-h-[85vh] items-center justify-center bg-slate-50 px-4 py-16">
+    <div className="relative flex min-h-[calc(100dvh-4rem)] items-center justify-center bg-slate-50 px-4 py-8 sm:py-16">
       {/* Subtle background decoration */}
       <div className="absolute inset-0 pointer-events-none overflow-hidden">
         <div className="absolute left-1/2 top-0 h-[300px] w-[700px] -translate-x-1/2 rounded-full bg-blue-50/60 blur-3xl" />
         <div className="absolute bottom-0 right-1/4 h-[250px] w-[400px] rounded-full bg-red-50/40 blur-3xl" />
       </div>
 
-      <div className="relative w-full max-w-md overflow-hidden rounded-[28px] border border-slate-200/80 bg-white p-8 shadow-[0_8px_40px_rgba(14,77,130,0.10)] sm:p-10">
+      <div className="relative w-full max-w-md overflow-hidden rounded-[28px] border border-slate-200/80 bg-white p-6 shadow-[0_8px_40px_rgba(14,77,130,0.10)] sm:p-10">
         <div className="absolute inset-x-0 top-0 h-1.5 bg-[linear-gradient(90deg,#D7B56D_0%,#E56F42_22%,#F4C95D_52%,#2C6EAD_78%,#D7B56D_100%)]" />
 
         <div className="mb-8 pt-2 text-center">
