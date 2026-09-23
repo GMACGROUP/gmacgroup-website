@@ -56,7 +56,7 @@ export default function ProgrammesClient({ programmes: allProgrammes }: { progra
           <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
             {programmes.map((programme) => (
               <ProgrammeCard key={programme.id} programme={programme} onEnrol={setSelectedProgramme} />
-            ))}1            ``````````
+            ))}
           </div>
         ) : (
           <div className="empty-state mt-4">
