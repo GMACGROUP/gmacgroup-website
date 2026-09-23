@@ -2,7 +2,7 @@
 Contact & communication routes: contact forms, newsletter subscriptions.
 """
 
-from fastapi import APIRouter, Depends, status
+from fastapi import APIRouter, BackgroundTasks, Depends, status
 from sqlalchemy.orm import Session
 
 from app.core.database import get_db
@@ -23,6 +23,7 @@ router = APIRouter()
 @router.post("/", response_model=ContactRequestOut, status_code=status.HTTP_201_CREATED)
 async def submit_contact_request(
     payload: ContactRequestCreate,
+    background_tasks: BackgroundTasks,
     db: Session = Depends(get_db),
 ):
     """Store a contact request and return its tracking record."""
@@ -36,7 +37,8 @@ async def submit_contact_request(
     db.add(request)
     db.commit()
     db.refresh(request)
-    await notification_service.notify_contact_request(
+    background_tasks.add_task(
+        notification_service.notify_contact_request,
         request.name,
         request.email,
         request.subject,
