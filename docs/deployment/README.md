@@ -64,6 +64,49 @@ frontend uses Next.js standalone output and runs as the non-root `nextjs` user.
 
 The frontend build argument must be supplied by CI or the hosting platform.
 
+## Render Backend
+
+The repository includes `render.yaml` for the backend service. In Render,
+choose **New > Blueprint**, connect the GitHub repository, and apply the
+Blueprint. Set the `sync: false` values in the Render dashboard before the
+first deploy. Use the final Vercel URL for `FRONTEND_URL` and in
+`ALLOWED_ORIGINS`, for example:
+
+```env
+FRONTEND_URL=https://your-frontend.vercel.app
+ALLOWED_ORIGINS=["https://your-frontend.vercel.app"]
+```
+
+Render uses the repository root as the Docker context and
+`backend/Dockerfile` as the Dockerfile. The service health check is
+`/health`; use `/ready` after setting the production database URL to verify
+database connectivity.
+
+## Vercel Frontend
+
+Create a Vercel project from the same GitHub repository with:
+
+- Root Directory: `frontend`
+- Framework Preset: `Next.js`
+- Build Command: `npm run build`
+- Install Command: `npm ci`
+
+Set these build-time variables in Vercel:
+
+```env
+NEXT_PUBLIC_API_URL=https://your-backend.onrender.com/api/v1
+NEXT_PUBLIC_SUPABASE_URL=https://your-project.supabase.co
+NEXT_PUBLIC_SUPABASE_ANON_KEY=<public-anon-key>
+```
+
+After the first Vercel deployment, copy its public URL into Render's
+`FRONTEND_URL` and `ALLOWED_ORIGINS`, then redeploy the backend. Finally set
+the Flutterwave webhook to:
+
+```text
+https://your-backend.onrender.com/api/v1/payments/webhook
+```
+
 ## Service Probes
 
 - Backend liveness: `GET /health` expects HTTP `200`.
