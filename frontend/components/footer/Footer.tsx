@@ -94,7 +94,7 @@ export function Footer() {
                   <XSocialIcon className="h-4 w-4" />
                 </a>
                 <a
-                  href="https://www.instagram.com/gmacgroup"
+                  href="https://www.instagram.com/gmac_group?stkn=NWdhdTYzdXFneW1n"
                   target="_blank"
                   rel="noreferrer"
                   aria-label="GMACGROUP on Instagram"

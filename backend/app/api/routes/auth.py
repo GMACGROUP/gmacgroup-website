@@ -2,7 +2,7 @@
 Authentication routes: register, login, current user verification.
 """
 
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, BackgroundTasks, Depends, HTTPException, status
 from sqlalchemy import select
 from sqlalchemy.orm import Session
 from app.api.dependencies import (
@@ -109,14 +109,19 @@ def login(payload: UserLogin, db: Session = Depends(get_db)):
 
 
 @router.post("/forgot-password", response_model=PasswordResetResponse)
-async def forgot_password(payload: PasswordResetRequest, db: Session = Depends(get_db)):
+async def forgot_password(
+    payload: PasswordResetRequest,
+    background_tasks: BackgroundTasks,
+    db: Session = Depends(get_db),
+):
     """Initiate self-service password recovery."""
     email_lower = payload.email.lower().strip()
     user = db.scalar(select(User).where(User.email == email_lower))
 
     if user:
         reset_token = create_password_reset_token(user.email)
-        await notification_service.notify_password_reset(
+        background_tasks.add_task(
+            notification_service.notify_password_reset,
             user.email,
             user.full_name or "Member",
             reset_token,
