@@ -119,6 +119,38 @@ export default function AboutPage() {
           </div>
         </div>
 
+        {/* Core Team */}
+        <div className="grid lg:grid-cols-12 gap-6 lg:gap-8 items-stretch">
+          <div className="lg:col-span-4 rounded-3xl bg-[#072448] p-7 sm:p-9 text-white shadow-card overflow-hidden relative">
+            <div className="absolute -right-16 -top-16 h-40 w-40 rounded-full border border-brand-cyan/20" />
+            <div className="absolute -right-8 -top-8 h-24 w-24 rounded-full border border-brand-cyan/20" />
+            <div className="relative z-10 flex h-full flex-col justify-between gap-12">
+              <div>
+                <span className="inline-flex rounded-full border border-brand-cyan/30 bg-brand-cyan/10 px-3 py-1 text-[10px] font-bold uppercase tracking-[0.18em] text-brand-cyan">
+                  Core Team
+                </span>
+                <p className="mt-6 text-6xl font-extrabold tracking-tight text-white/90 font-serif">RSA</p>
+              </div>
+              <div>
+                <p className="text-sm font-semibold uppercase tracking-[0.16em] text-brand-cyan">Founder</p>
+                <h2 className="mt-2 text-2xl sm:text-3xl font-bold font-serif text-white">Raphael S. Ajana</h2>
+              </div>
+            </div>
+          </div>
+
+          <div className="lg:col-span-8 rounded-3xl border border-slate-200/90 bg-white p-7 sm:p-9 shadow-card">
+            <span className="inline-flex items-center gap-1.5 rounded-full border border-red-200 bg-red-50 px-3 py-1 text-[10px] font-bold uppercase tracking-[0.16em] text-brand-red">
+              A word from the founder
+            </span>
+            <p className="mt-5 max-w-3xl text-base sm:text-lg leading-relaxed text-slate-700">
+              Raphael is an economist trained at the University of Ghana, with research and advisory experience across labour markets, development policy, and capital mobilisation for African markets. He leads Gmac Group&apos;s executive advisory work and chairs its flagship convenings.
+            </p>
+            <blockquote className="mt-7 border-l-4 border-brand-warm pl-5 font-serif text-xl sm:text-2xl font-bold leading-snug text-brand-navy">
+              Build the people and build the evidence at the same time, from inside the continent they concern.
+            </blockquote>
+          </div>
+        </div>
+
         {/* Dynamic 3-Pillar Section */}
         <div>
           <div className="max-w-2xl mb-8">
