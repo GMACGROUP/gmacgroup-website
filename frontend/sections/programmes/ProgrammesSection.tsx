@@ -1,7 +1,14 @@
+"use client";
+
+import { useState } from "react";
 import Link from "next/link";
 import { ProgrammeCard } from "@/components/cards/ProgrammeCard";
+import { EnrolmentModal } from "@/components/modals/EnrolmentModal";
+import { Programme } from "@/types";
 
 export function ProgrammesSection() {
+  const [selectedProgramme, setSelectedProgramme] = useState<Programme | null>(null);
+
   const sampleProgrammes = [
     {
       id: "programme-career-readiness",
@@ -58,10 +65,20 @@ export function ProgrammesSection() {
 
         <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-6 sm:gap-8">
           {sampleProgrammes.map((programme) => (
-            <ProgrammeCard key={programme.id} programme={programme} />
+            <ProgrammeCard
+              key={programme.id}
+              programme={programme}
+              onEnrol={setSelectedProgramme}
+            />
           ))}
         </div>
       </div>
+
+      <EnrolmentModal
+        programme={selectedProgramme}
+        isOpen={Boolean(selectedProgramme)}
+        onClose={() => setSelectedProgramme(null)}
+      />
     </section>
   );
 }
