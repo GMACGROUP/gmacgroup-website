@@ -136,14 +136,18 @@ const applicationStatuses = [
   "under_review",
   "interview",
   "shortlisted",
+  "approved",
   "accepted",
+  "completed",
   "rejected",
+  "cancelled",
   "withdrawn",
 ];
 
 const enrolmentStatuses = [
   "pending",
   "confirmed",
+  "approved",
   "completed",
   "cancelled",
   "withdrawn",
@@ -158,7 +162,7 @@ function formatDate(value: string) {
 }
 
 function StatusPill({ value }: { value: string }) {
-  const isPositive = ["accepted", "confirmed", "successful"].includes(value);
+  const isPositive = ["accepted", "approved", "completed", "confirmed", "successful"].includes(value);
   const isPending = ["submitted", "under_review", "pending"].includes(value);
   const isNegative = ["rejected", "cancelled", "withdrawn", "failed"].includes(value);
 
