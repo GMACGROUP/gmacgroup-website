@@ -110,23 +110,23 @@ function DashboardContent() {
   const userDisplayName = user.full_name || user.email.split("@")[0];
 
   return (
-    <div className="bg-slate-50 min-h-screen py-10 sm:py-14">
-      <div className="container mx-auto px-4 sm:px-6 max-w-6xl space-y-8">
+    <div className="w-full min-w-0 overflow-x-clip bg-slate-50 min-h-screen py-10 sm:py-14">
+      <div className="container mx-auto w-full min-w-0 px-4 sm:px-6 max-w-6xl space-y-8">
 
         {/* ── New Member Welcome Alert ── */}
         {showWelcomeAlert && (
-          <div className="relative p-5 sm:p-6 rounded-3xl bg-gradient-to-r from-emerald-600 via-teal-700 to-brand-navy text-white shadow-elevate flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 animate-fadeIn border border-emerald-400/30">
-            <div className="flex items-start gap-4">
+          <div className="relative min-w-0 p-5 sm:p-6 rounded-3xl bg-gradient-to-r from-emerald-600 via-teal-700 to-brand-navy text-white shadow-elevate flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 animate-fadeIn border border-emerald-400/30">
+            <div className="flex min-w-0 items-start gap-4">
               <div className="w-12 h-12 rounded-2xl bg-white/15 border border-white/20 flex items-center justify-center shrink-0">
                 <span className="text-2xl">🎉</span>
               </div>
-              <div className="space-y-1">
+              <div className="min-w-0 space-y-1">
                 <h3 className="text-base sm:text-lg font-bold font-serif">
                   Welcome to GMACGROUP, {userDisplayName}!
                 </h3>
                 <p className="text-xs sm:text-sm text-emerald-100 leading-relaxed max-w-2xl">
                   Your member account is active and a welcome orientation email has been dispatched to{" "}
-                  <strong className="text-white font-semibold">{user.email}</strong>. Explore programmes, submit fellowship applications, or complete your profile below.
+                  <strong className="break-all text-white font-semibold">{user.email}</strong>. Explore programmes, submit fellowship applications, or complete your profile below.
                 </p>
               </div>
             </div>
@@ -140,12 +140,12 @@ function DashboardContent() {
         )}
 
         {/* ── Welcome Banner ── */}
-        <div className="relative rounded-3xl bg-brand-navy text-white p-5 sm:p-10 shadow-elevate overflow-hidden border border-brand-navyLight/20">
+        <div className="relative min-w-0 rounded-3xl bg-brand-navy text-white p-5 sm:p-10 shadow-elevate overflow-hidden border border-brand-navyLight/20">
           <div className="absolute top-0 right-0 w-96 h-96 bg-brand-cyan/10 rounded-full blur-3xl pointer-events-none" />
           <div className="absolute bottom-0 right-48 w-80 h-80 bg-brand-red/10 rounded-full blur-3xl pointer-events-none" />
 
           <div className="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-5 sm:gap-6">
-            <div className="space-y-2">
+            <div className="min-w-0 space-y-2">
               <div className="flex items-center gap-2">
                 <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-white/10 text-brand-cyan text-xs font-bold uppercase tracking-wider border border-white/15">
                   <ShieldCheckIcon className="w-3.5 h-3.5 text-brand-cyan" />
@@ -156,7 +156,7 @@ function DashboardContent() {
                 </span>
               </div>
 
-              <h1 className="text-2xl sm:text-3xl lg:text-4xl font-extrabold font-serif text-white leading-tight break-words">
+                <h1 className="break-words text-2xl sm:text-3xl lg:text-4xl font-extrabold font-serif text-white leading-tight">
                 Welcome back, {userDisplayName}
               </h1>
               <p className="text-xs sm:text-sm text-slate-200 max-w-2xl leading-relaxed">
@@ -272,11 +272,11 @@ function DashboardContent() {
 
         {/* ── Metric Snapshot Cards ── */}
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
-          <div className="p-6 rounded-3xl bg-white border border-slate-200 shadow-card flex items-center gap-4">
+          <div className="min-w-0 p-6 rounded-3xl bg-white border border-slate-200 shadow-card flex items-center gap-4">
             <div className="w-12 h-12 rounded-2xl bg-brand-ice flex items-center justify-center text-brand-navy shrink-0">
               <AcademicCapIcon className="w-6 h-6 text-brand-navy" />
             </div>
-            <div>
+            <div className="min-w-0">
               <p className="text-xs font-bold text-slate-500 uppercase tracking-wider">
                 Cohort Enrolments
               </p>
@@ -286,11 +286,11 @@ function DashboardContent() {
             </div>
           </div>
 
-          <div className="p-6 rounded-3xl bg-white border border-slate-200 shadow-card flex items-center gap-4">
+          <div className="min-w-0 p-6 rounded-3xl bg-white border border-slate-200 shadow-card flex items-center gap-4">
             <div className="w-12 h-12 rounded-2xl bg-amber-50 flex items-center justify-center text-amber-600 shrink-0">
               <BriefcaseIcon className="w-6 h-6 text-amber-600" />
             </div>
-            <div>
+            <div className="min-w-0">
               <p className="text-xs font-bold text-slate-500 uppercase tracking-wider">
                 Applications
               </p>
@@ -300,11 +300,11 @@ function DashboardContent() {
             </div>
           </div>
 
-          <div className="p-6 rounded-3xl bg-white border border-slate-200 shadow-card flex items-center gap-4">
+          <div className="min-w-0 p-6 rounded-3xl bg-white border border-slate-200 shadow-card flex items-center gap-4">
             <div className="w-12 h-12 rounded-2xl bg-emerald-50 flex items-center justify-center text-emerald-600 shrink-0">
               <CheckCircleIcon className="w-6 h-6 text-emerald-600" />
             </div>
-            <div>
+            <div className="min-w-0">
               <p className="text-xs font-bold text-slate-500 uppercase tracking-wider">
                 Account Status
               </p>
@@ -320,9 +320,9 @@ function DashboardContent() {
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
 
           {/* Enrolled Programmes */}
-          <div className="bg-white rounded-3xl p-6 sm:p-8 border border-slate-200 shadow-card space-y-5">
-            <div className="flex items-center justify-between border-b border-slate-100 pb-4">
-              <div>
+          <div className="min-w-0 bg-white rounded-3xl p-6 sm:p-8 border border-slate-200 shadow-card space-y-5">
+              <div className="flex min-w-0 items-start justify-between gap-3 border-b border-slate-100 pb-4">
+              <div className="min-w-0">
                 <h3 className="text-lg font-bold text-slate-900 font-serif">My Programmes</h3>
                 <p className="text-xs text-slate-500">Active and upcoming cohort tracks</p>
               </div>
@@ -345,10 +345,10 @@ function DashboardContent() {
                 enrolments.map((item) => (
                   <div
                     key={item.id}
-                    className="p-4 rounded-2xl bg-slate-50 border border-slate-200/80 flex items-center justify-between gap-4"
+                    className="min-w-0 p-4 rounded-2xl bg-slate-50 border border-slate-200/80 flex items-center justify-between gap-4"
                   >
-                    <div>
-                      <h4 className="text-sm font-bold text-slate-900">
+                    <div className="min-w-0">
+                      <h4 className="break-words text-sm font-bold text-slate-900">
                         {item.programme_title || item.programme_id}
                       </h4>
                       <p className="text-[11px] text-slate-500 flex items-center gap-1">
@@ -378,9 +378,9 @@ function DashboardContent() {
           </div>
 
           {/* Submitted Applications */}
-          <div className="bg-white rounded-3xl p-6 sm:p-8 border border-slate-200 shadow-card space-y-5">
-            <div className="flex items-center justify-between border-b border-slate-100 pb-4">
-              <div>
+          <div className="min-w-0 bg-white rounded-3xl p-6 sm:p-8 border border-slate-200 shadow-card space-y-5">
+              <div className="flex min-w-0 items-start justify-between gap-3 border-b border-slate-100 pb-4">
+              <div className="min-w-0">
                 <h3 className="text-lg font-bold text-slate-900 font-serif">My Applications</h3>
                 <p className="text-xs text-slate-500">Submitted fellowship & opening dossiers</p>
               </div>
@@ -403,10 +403,10 @@ function DashboardContent() {
                 applications.map((app) => (
                   <div
                     key={app.id}
-                    className="p-4 rounded-2xl bg-slate-50 border border-slate-200/80 flex items-center justify-between gap-4"
+                    className="min-w-0 p-4 rounded-2xl bg-slate-50 border border-slate-200/80 flex items-center justify-between gap-4"
                   >
-                    <div>
-                      <h4 className="text-sm font-bold text-slate-900">
+                    <div className="min-w-0">
+                      <h4 className="break-words text-sm font-bold text-slate-900">
                         {app.opportunity_title || app.opportunity_id}
                       </h4>
                       <p className="text-[11px] text-slate-500 flex items-center gap-1">
