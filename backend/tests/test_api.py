@@ -160,11 +160,22 @@ def test_upload_valid_pdf_document():
     assert data["filename"] == "kwame_mensah_resume.pdf"
     assert data["size_bytes"] == len(pdf_content)
 
-    # Test downloading / viewing the file
+    # Uploaded documents must not be publicly readable.
     get_res = client.get(data["file_url"])
+    assert get_res.status_code == 401
+
+    # Verify an authenticated admin can download the document.
+    from app.api.routes.uploads import admin_only
+
+    app.dependency_overrides[admin_only] = lambda: {"role": "admin"}
+    try:
+        get_res = client.get(data["file_url"])
+    finally:
+        app.dependency_overrides.pop(admin_only, None)
+
     assert get_res.status_code == 200
     assert get_res.content == pdf_content
-    assert "inline" in get_res.headers.get("content-disposition", "")
+    assert "attachment" in get_res.headers.get("content-disposition", "")
 
 
 def test_upload_invalid_file_type():
