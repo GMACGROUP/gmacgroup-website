@@ -21,9 +21,13 @@ function formatInlineText(text: string): ReactNode[] {
 }
 
 function formatAssistantMessage(content: string): ReactNode {
+  const normalizedContent = content
+    .replace(/\s+(#{1,3}\s+)/g, "\n\n$1")
+    .replace(/\s+(\*|-)\s+(?=\*\*)/g, "\n$1 ");
+
   return (
     <div className="space-y-3">
-      {content.split(/\r?\n/).map((line, index) => {
+      {normalizedContent.split(/\r?\n/).map((line, index) => {
         const trimmedLine = line.trim();
         if (!trimmedLine) return <div key={index} className="h-1" />;
 
@@ -173,19 +177,19 @@ export function AIChatWidget() {
         onClick={() => setIsOpen(true)}
         aria-label="Open AI assistant"
         title="AI assistant"
-        className="fixed bottom-5 right-20 z-50 flex h-14 items-center justify-center gap-2 rounded-full bg-brand-red px-4 text-white shadow-[0_8px_24px_rgba(229,25,36,0.35)] ring-2 ring-white transition hover:-translate-y-1 hover:bg-brand-redDark focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-cyan focus-visible:ring-offset-2 sm:bottom-8 sm:right-24"
+        className="fixed bottom-24 right-5 z-50 flex h-11 w-11 items-center justify-center gap-0 rounded-full bg-brand-red p-0 text-white shadow-[0_8px_24px_rgba(229,25,36,0.35)] ring-2 ring-white transition hover:-translate-y-1 hover:bg-brand-redDark focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-cyan focus-visible:ring-offset-2 sm:bottom-8 sm:right-24 sm:h-14 sm:w-auto sm:gap-2 sm:px-4"
       >
         {isOpen ? (
-          <svg aria-hidden="true" className="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+          <svg aria-hidden="true" className="h-4 w-4 sm:h-5 sm:w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
             <path d="M6 6l12 12M18 6L6 18" strokeLinecap="round" />
           </svg>
         ) : (
-          <svg aria-hidden="true" className="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8">
+          <svg aria-hidden="true" className="h-4 w-4 sm:h-5 sm:w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8">
             <path d="m12 3 1.35 5.65L19 10l-5.65 1.35L12 17l-1.35-5.65L5 10l5.65-1.35L12 3Z" strokeLinejoin="round" />
             <path d="m19 16 .55 2.45L22 19l-2.45.55L19 22l-.55-2.45L16 19l2.45-.55L19 16Z" strokeLinejoin="round" />
           </svg>
         )}
-        <span className="text-sm font-bold">{isOpen ? "Close" : "AI chat"}</span>
+        <span className="hidden text-sm font-bold sm:inline">{isOpen ? "Close" : "AI chat"}</span>
       </button>}
     </>
   );
