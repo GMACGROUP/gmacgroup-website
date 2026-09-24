@@ -93,20 +93,22 @@ async def apply_to_opportunity(
     db.add(application)
     db.commit()
     db.refresh(application)
-    await notification_service.notify_application_submitted(
-        application.applicant_email or email,
-        application.applicant_name or name,
-        application.opportunity_title or "Opportunity",
-        "\n".join(
-            detail
-            for detail in (
-                f"Phone: {application.phone}" if application.phone else "",
-                f"LinkedIn: {application.linkedin_url}" if application.linkedin_url else "",
-                f"Cover note: {application.cover_note}" if application.cover_note else "",
-                f"Resume: {application.resume_url}" if application.resume_url else "",
-                f"Offer: {application.offer_type}" if application.offer_type else "",
-            )
-            if detail
-        ),
+    notification_service.fire_and_forget(
+        notification_service.notify_application_submitted(
+            application.applicant_email or email,
+            application.applicant_name or name,
+            application.opportunity_title or "Opportunity",
+            "\n".join(
+                detail
+                for detail in (
+                    f"Phone: {application.phone}" if application.phone else "",
+                    f"LinkedIn: {application.linkedin_url}" if application.linkedin_url else "",
+                    f"Cover note: {application.cover_note}" if application.cover_note else "",
+                    f"Resume: {application.resume_url}" if application.resume_url else "",
+                    f"Offer: {application.offer_type}" if application.offer_type else "",
+                )
+                if detail
+            ),
+        )
     )
     return application

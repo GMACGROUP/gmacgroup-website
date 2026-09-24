@@ -38,6 +38,7 @@ class Settings(BaseSettings):
     FRONTEND_URL: str = "http://localhost:3000"
 
     # Email notifications (Resend or SMTP / Gmail)
+    EMAIL_NOTIFICATIONS_ENABLED: bool = True
     EMAIL_PROVIDER: str = "none"
     RESEND_API_KEY: str = ""
     EMAIL_FROM: str = "GMACGROUP <notifications@gmacgroup.org>"
