@@ -8,6 +8,7 @@ from sqlalchemy import func, select
 from sqlalchemy.orm import Session
 
 from app.api.dependencies import require_role
+from app.core.config import get_settings
 from app.core.database import get_db
 from app.models.contact import ContactRequest
 from app.models.opportunity import Application, ApplicationEvent
@@ -18,6 +19,7 @@ from app.schemas.admin import (
     AdminPage,
     AdminApplicationOut,
     AdminContactOut,
+    AdminEmailTestRequest,
     AdminEnrolmentOut,
     AdminOverview,
     AdminPaymentOut,
@@ -44,6 +46,25 @@ def overview(_: dict = Depends(admin_only), db: Session = Depends(get_db)):
             select(func.count()).select_from(Payment).where(Payment.status == "pending")
         ) or 0,
     )
+
+
+@router.post("/email/test")
+async def test_email_delivery(
+    payload: AdminEmailTestRequest,
+    _: dict = Depends(admin_only),
+):
+    """Send a provider test message and return safe delivery metadata."""
+    settings = get_settings()
+    recipient = str(payload.to or settings.OPERATIONS_EMAIL or "").strip()
+    if not recipient:
+        raise HTTPException(status_code=400, detail="No test recipient is configured")
+
+    result = await notification_service.send_brevo_email_with_metadata(
+        recipient,
+        payload.subject,
+        payload.message,
+    )
+    return result
 
 
 @router.get("/members", response_model=AdminPage[dict])

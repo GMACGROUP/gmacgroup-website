@@ -78,12 +78,95 @@ class NotificationService:
         logger.warning(dev_box)
         print(dev_box, flush=True)
 
+    async def send_brevo_email_with_metadata(
+        self,
+        to: str,
+        subject: str,
+        body: str,
+        html_body: Optional[str] = None,
+        reply_to: Optional[str] = None,
+    ) -> dict:
+        """Send through Brevo and return safe delivery metadata for diagnostics."""
+        settings = get_settings()
+        if not settings.BREVO_API_KEY:
+            return {
+                "success": False,
+                "provider": "brevo",
+                "error": "BREVO_API_KEY is not configured",
+            }
+
+        sender_email = settings.EMAIL_FROM
+        sender_name = settings.EMAIL_FROM_NAME
+        if "<" in sender_email and ">" in sender_email:
+            sender_name, sender_email = sender_email.split("<", 1)
+            sender_name = sender_name.strip().strip('"\'')
+            sender_email = sender_email.split(">", 1)[0].strip()
+        elif not sender_email or "@" not in sender_email:
+            sender_email = settings.OPERATIONS_EMAIL or "noreply@gmacgroup.org"
+
+        payload = {
+            "sender": {"name": sender_name or "GMACGROUP", "email": sender_email},
+            "to": [{"email": to}],
+            "subject": subject,
+            "textContent": body,
+        }
+        if html_body:
+            payload["htmlContent"] = html_body
+        if reply_to:
+            payload["replyTo"] = {"email": reply_to}
+
+        try:
+            async with httpx.AsyncClient(timeout=20) as client:
+                response = await client.post(
+                    "https://api.brevo.com/v3/smtp/email",
+                    headers={
+                        "api-key": settings.BREVO_API_KEY,
+                        "Content-Type": "application/json",
+                        "Accept": "application/json",
+                    },
+                    json=payload,
+                )
+            response.raise_for_status()
+            provider_data = response.json()
+            message_id = provider_data.get("messageId")
+            logger.info("Brevo email accepted: message_id=%s recipient=%s", message_id, to)
+            return {
+                "success": True,
+                "provider": "brevo",
+                "message_id": message_id,
+                "recipient": to,
+                "status_code": response.status_code,
+            }
+        except httpx.HTTPStatusError as exc:
+            logger.error(
+                "Brevo API error for %s (HTTP %s): %s",
+                to,
+                exc.response.status_code,
+                exc.response.text,
+            )
+            return {
+                "success": False,
+                "provider": "brevo",
+                "recipient": to,
+                "status_code": exc.response.status_code,
+                "error": "Brevo rejected the email request",
+            }
+        except httpx.HTTPError as exc:
+            logger.exception("Brevo network error for %s: %s", to, exc)
+            return {
+                "success": False,
+                "provider": "brevo",
+                "recipient": to,
+                "error": "Unable to reach Brevo",
+            }
+
     async def send_email(
         self,
         to: str,
         subject: str,
         body: str,
         html_body: Optional[str] = None,
+        reply_to: Optional[str] = None,
     ) -> bool:
         settings = get_settings()
         if not settings.EMAIL_NOTIFICATIONS_ENABLED:
@@ -91,6 +174,14 @@ class NotificationService:
             return True
 
         provider = (settings.EMAIL_PROVIDER or "none").lower()
+
+        if provider == "brevo" and settings.BREVO_API_KEY:
+            result = await self.send_brevo_email_with_metadata(
+                to, subject, body, html_body, reply_to
+            )
+            if not result["success"]:
+                self._print_dev_fallback(f"BREVO ERROR: {result.get('error')}", to, subject, body)
+            return result["success"]
 
         if provider == "smtp":
             if not settings.SMTP_USER or not settings.SMTP_PASSWORD:
@@ -170,12 +261,34 @@ class NotificationService:
 
     async def notify_contact_request(self, name: str, email: str, subject: str, message: str):
         settings = get_settings()
+        deliveries = []
         if settings.OPERATIONS_EMAIL:
-            await self.send_email(
-                settings.OPERATIONS_EMAIL,
-                f"New contact message: {subject}",
-                f"From: {name} <{email}>\n\n{message}",
+            deliveries.append(
+                self.send_email(
+                    settings.OPERATIONS_EMAIL,
+                    f"[GMAC GROUP FEEDBACK] {subject}",
+                    f"GMAC GROUP FEEDBACK SUBMISSION\n\n"
+                    f"From: {name} <{email}>\n"
+                    f"Subject: {subject}\n\n"
+                    f"Message:\n{message}",
+                    reply_to=email,
+                )
             )
+
+        deliveries.append(
+            self.send_email(
+                email,
+                f"[GMAC GROUP] Feedback received",
+                f"GMAC GROUP FEEDBACK CONFIRMATION\n\n"
+                f"Hi {name},\n\n"
+                "Thank you for contacting GMAC GROUP. We have received your message "
+                "and a member of our team will get back to you.\n\n"
+                f"Feedback subject: {subject}\n"
+                f"Your message:\n{message}\n\n"
+                "Best,\nThe GMAC GROUP Team",
+            )
+        )
+        await asyncio.gather(*deliveries)
 
     async def notify_operations(self, subject: str, body: str):
         """Send an incoming business event to the operations inbox."""

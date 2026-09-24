@@ -5,6 +5,7 @@ from decimal import Decimal
 from typing import Generic, TypeVar
 from uuid import UUID
 
+from pydantic import EmailStr, Field
 from pydantic import BaseModel, ConfigDict
 
 
@@ -99,3 +100,13 @@ class AdminOverview(BaseModel):
     enrolments: int
     contacts: int
     pending_payments: int
+
+
+class AdminEmailTestRequest(BaseModel):
+    to: EmailStr | None = None
+    subject: str = Field(default="GMAC GROUP email delivery test", min_length=1, max_length=160)
+    message: str = Field(
+        default="This is a live email delivery test from the GMAC GROUP backend.",
+        min_length=1,
+        max_length=5000,
+    )
