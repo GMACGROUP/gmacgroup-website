@@ -5,7 +5,8 @@ Opportunity routes: internships, jobs, fellowships, and applications.
 from datetime import datetime, timezone
 from typing import List, Optional
 from fastapi import APIRouter, Depends, HTTPException, Query, status
-from sqlalchemy import or_, select
+from sqlalchemy import func, or_, select
+from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session
 from app.api.dependencies import get_current_user, get_optional_user
 from app.core.database import get_db
@@ -71,11 +72,29 @@ async def apply_to_opportunity(
         raise HTTPException(status_code=status.HTTP_402_PAYMENT_REQUIRED, detail="Complete payment before selecting this offer")
 
     user_id = current_user.get("id") if current_user else None
-    email = current_user.get("email") if current_user else (payload.applicant_email or "applicant@example.com")
+    email = current_user.get("email") if current_user else payload.applicant_email
+    if not email:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="An email address is required to submit an application.",
+        )
+    email = str(email).lower().strip()
     name = current_user.get("full_name") if current_user else (payload.applicant_name or "Applicant")
     if user_id is None:
-        matched_user = db.scalar(select(User).where(User.email == str(email).lower()))
+        matched_user = db.scalar(select(User).where(User.email == email))
         user_id = matched_user.id if matched_user else None
+
+    existing_application = db.scalar(
+        select(Application).where(
+            Application.opportunity_id == opportunity_id,
+            func.lower(Application.applicant_email) == email,
+        )
+    )
+    if existing_application:
+        raise HTTPException(
+            status_code=status.HTTP_409_CONFLICT,
+            detail="You have already applied for this opportunity.",
+        )
 
     application = Application(
         opportunity_id=opportunity_id,
@@ -91,7 +110,14 @@ async def apply_to_opportunity(
         status="submitted",
     )
     db.add(application)
-    db.commit()
+    try:
+        db.commit()
+    except IntegrityError as exc:
+        db.rollback()
+        raise HTTPException(
+            status_code=status.HTTP_409_CONFLICT,
+            detail="You have already applied for this opportunity.",
+        ) from exc
     db.refresh(application)
     notification_service.fire_and_forget(
         notification_service.notify_application_submitted(
