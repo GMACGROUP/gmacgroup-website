@@ -111,11 +111,13 @@ async def update_application(
     db.commit()
     db.refresh(application)
     if application.applicant_email:
-        await notification_service.notify_status_changed(
-            application.applicant_email,
-            application.applicant_name or "Applicant",
-            application.opportunity_title or "Opportunity",
-            application.status,
+        notification_service.fire_and_forget(
+            notification_service.notify_status_changed(
+                application.applicant_email,
+                application.applicant_name or "Applicant",
+                application.opportunity_title or "Opportunity",
+                application.status,
+            )
         )
     return application
 

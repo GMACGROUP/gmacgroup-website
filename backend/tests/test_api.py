@@ -239,6 +239,22 @@ def test_reset_password_invalid_token():
     assert res.status_code == 400
 
 
+def test_notifications_are_dispatched_without_blocking_the_request(monkeypatch):
+    import asyncio
+    import time
+
+    from app.services.notifications import notification_service
+
+    async def slow_email(*args, **kwargs):
+        await asyncio.sleep(0.35)
+
+    start = time.perf_counter()
+    notification_service.fire_and_forget(slow_email())
+    elapsed = time.perf_counter() - start
+
+    assert elapsed < 0.2, f"Notification dispatch blocked the request thread: {elapsed:.3f}s"
+
+
 # ---------------------------------------------------------------------------
 # Admin Dynamic Catalog Management (Option C)
 # ---------------------------------------------------------------------------

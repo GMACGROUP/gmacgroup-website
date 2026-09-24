@@ -1,4 +1,5 @@
 ﻿import asyncio
+from concurrent.futures import ThreadPoolExecutor
 from email.message import EmailMessage
 import email.utils
 import logging
@@ -10,6 +11,7 @@ import httpx
 from app.core.config import get_settings
 
 logger = logging.getLogger(__name__)
+_thread_pool = ThreadPoolExecutor(max_workers=8)
 
 
 def _send_smtp_plain(
@@ -60,6 +62,9 @@ def _send_smtp_plain(
 
 class NotificationService:
 
+    def fire_and_forget(self, coro):
+        _thread_pool.submit(asyncio.run, coro)
+
     def _print_dev_fallback(self, header: str, to: str, subject: str, body: str):
         dev_box = (
             "\n" + "=" * 70 + "\n"
@@ -81,6 +86,10 @@ class NotificationService:
         html_body: Optional[str] = None,
     ) -> bool:
         settings = get_settings()
+        if not settings.EMAIL_NOTIFICATIONS_ENABLED:
+            logger.info("Email delivery skipped: EMAIL_NOTIFICATIONS_ENABLED is false")
+            return True
+
         provider = (settings.EMAIL_PROVIDER or "none").lower()
 
         if provider == "smtp":

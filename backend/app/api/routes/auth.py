@@ -2,7 +2,7 @@
 Authentication routes: register, login, current user verification.
 """
 
-from fastapi import APIRouter, BackgroundTasks, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy import select
 from sqlalchemy.orm import Session
 from app.api.dependencies import (
@@ -29,10 +29,13 @@ router = APIRouter()
 
 
 @router.post("/register", response_model=AuthResponse, status_code=status.HTTP_201_CREATED)
-async def register(payload: UserCreate, db: Session = Depends(get_db)):
+async def register(
+    payload: UserCreate,
+    db: Session = Depends(get_db),
+):
     """Register a new user, store profile, and return JWT access token."""
     email_lower = payload.email.lower().strip()
-    
+
     # Check if user already exists
     if db.scalar(select(User).where(User.email == email_lower)):
         raise HTTPException(
@@ -57,15 +60,20 @@ async def register(payload: UserCreate, db: Session = Depends(get_db)):
     db.add(user)
     db.commit()
     db.refresh(user)
-    await notification_service.notify_member_registered(
-        user.email,
-        user.full_name or "Member",
-        role=user.role,
+
+    notification_service.fire_and_forget(
+        notification_service.notify_member_registered(
+            user.email,
+            user.full_name or "Member",
+            role=user.role,
+        )
     )
-    await notification_service.notify_member_registration(
-        user.email,
-        user.full_name or "Member",
-        user.role,
+    notification_service.fire_and_forget(
+        notification_service.notify_member_registration(
+            user.email,
+            user.full_name or "Member",
+            user.role,
+        )
     )
 
     token = create_access_token({
@@ -111,7 +119,6 @@ def login(payload: UserLogin, db: Session = Depends(get_db)):
 @router.post("/forgot-password", response_model=PasswordResetResponse)
 async def forgot_password(
     payload: PasswordResetRequest,
-    background_tasks: BackgroundTasks,
     db: Session = Depends(get_db),
 ):
     """Initiate self-service password recovery."""
@@ -120,11 +127,12 @@ async def forgot_password(
 
     if user:
         reset_token = create_password_reset_token(user.email)
-        background_tasks.add_task(
-            notification_service.notify_password_reset,
-            user.email,
-            user.full_name or "Member",
-            reset_token,
+        notification_service.fire_and_forget(
+            notification_service.notify_password_reset(
+                user.email,
+                user.full_name or "Member",
+                reset_token,
+            )
         )
 
     # Identical response regardless of whether email exists to prevent enumeration attacks
