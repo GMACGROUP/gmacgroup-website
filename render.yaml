@@ -18,6 +18,8 @@ services:
         generateValue: true
       - key: FRONTEND_URL
         value: https://gmacgroup.vercel.app
+      - key: AI_FLASK_URL
+        sync: false
       - key: SUPABASE_URL
         sync: false
       - key: SUPABASE_SERVICE_ROLE_KEY

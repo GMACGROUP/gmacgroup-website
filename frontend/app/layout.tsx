@@ -5,6 +5,7 @@ import "../styles/globals.css";
 import { Navbar } from "@/components/navigation/Navbar";
 import { Footer } from "@/components/footer/Footer";
 import { ScrollProgress } from "@/components/common/ScrollProgress";
+import { AIChatWidget } from "@/components/common/AIChatWidget";
 import { NavigationProgressBar } from "@/components/common/NavigationProgressBar";
 import { AuthProvider } from "@/hooks/useAuth";
 
@@ -45,6 +46,7 @@ export default function RootLayout({
           <main className="flex-1 pt-16">{children}</main>
           <Footer />
           <ScrollProgress />
+          <AIChatWidget />
         </AuthProvider>
       </body>
     </html>
