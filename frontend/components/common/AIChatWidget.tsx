@@ -1,6 +1,6 @@
 "use client";
 
-import { FormEvent, ReactNode, useState } from "react";
+import { FormEvent, ReactNode, useEffect, useState } from "react";
 
 type Message = { role: "user" | "assistant"; content: string };
 type ChatTurn = [string, string];
@@ -67,6 +67,22 @@ export function AIChatWidget() {
   const [isSending, setIsSending] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
+  useEffect(() => {
+    if (!isOpen) return;
+
+    const previousOverflow = document.body.style.overflow;
+    const previousPaddingRight = document.body.style.paddingRight;
+    const scrollbarWidth = window.innerWidth - document.documentElement.clientWidth;
+
+    document.body.style.overflow = "hidden";
+    if (scrollbarWidth > 0) document.body.style.paddingRight = `${scrollbarWidth}px`;
+
+    return () => {
+      document.body.style.overflow = previousOverflow;
+      document.body.style.paddingRight = previousPaddingRight;
+    };
+  }, [isOpen]);
+
   function resetConversation(showWelcome = true) {
     setMessages(
       showWelcome
@@ -121,7 +137,7 @@ export function AIChatWidget() {
           aria-label="GMACGROUP AI assistant"
           className="fixed top-20 right-4 z-50 flex h-[min(610px,calc(100dvh-7rem))] w-[min(420px,calc(100vw-2rem))] flex-col overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-[0_20px_70px_rgba(6,28,48,0.25)] sm:right-24"
         >
-          <header className="flex items-center justify-between bg-[#07111f] px-5 py-4 text-white">
+          <header className="flex flex-shrink-0 items-center justify-between bg-[#07111f] px-5 py-4 text-white">
             <div>
               <p className="font-semibold">Gmac Group <span className="ml-1 rounded border border-cyan-400/40 px-1 text-[10px] text-cyan-300">AI</span></p>
               <p className="mt-0.5 text-xs text-white/65">Research, Human Capital &amp; Investment <span className="text-emerald-400">• Active</span></p>
@@ -139,7 +155,7 @@ export function AIChatWidget() {
             </div>
           </header>
 
-          <div className="min-h-0 flex-1 space-y-4 overflow-y-auto bg-[#0b1422] p-4" aria-live="polite">
+          <div className="min-h-0 flex-1 space-y-4 overflow-y-auto overscroll-contain bg-[#0b1422] p-4" aria-live="polite">
             {messages.map((message, index) => (
               <div key={`${message.role}-${index}`} className={`flex ${message.role === "user" ? "justify-end" : "justify-start"}`}>
                 <div className={`max-w-[88%] rounded-2xl px-4 py-3 text-sm ${message.role === "user" ? "rounded-br-sm bg-brand-red text-white leading-relaxed" : "rounded-bl-sm border border-slate-600 bg-[#172235] text-slate-200"}`}>
@@ -159,10 +175,10 @@ export function AIChatWidget() {
             )}
           </div>
 
-          <form onSubmit={sendMessage} className="border-t border-slate-700 bg-[#07111f] p-3">
+          <form onSubmit={sendMessage} className="flex-shrink-0 border-t border-slate-700 bg-[#07111f] p-3">
             <div className="flex gap-2">
               <label htmlFor="ai-widget-prompt" className="sr-only">Ask the Gmac Group assistant</label>
-              <input id="ai-widget-prompt" value={prompt} onChange={(event) => setPrompt(event.target.value)} placeholder="Ask Gmac Group..." className="min-h-11 min-w-0 flex-1 rounded-xl border border-slate-600 bg-[#172235] px-3 text-sm text-white outline-none placeholder:text-slate-500 focus:border-cyan-300" disabled={isSending} />
+              <input id="ai-widget-prompt" value={prompt} onChange={(event) => setPrompt(event.target.value)} placeholder="Ask Gmac Group..." className="min-h-11 min-w-0 flex-1 rounded-xl border border-slate-600 bg-[#172235] px-3 text-base text-white outline-none placeholder:text-slate-500 focus:border-cyan-300 sm:text-sm" disabled={isSending} />
               <button type="submit" disabled={isSending || !prompt.trim()} aria-label="Send message" className="flex h-11 w-11 flex-shrink-0 items-center justify-center rounded-xl bg-brand-red text-white transition hover:bg-brand-redDark disabled:cursor-not-allowed disabled:opacity-50">
                 <svg aria-hidden="true" className="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="m4 4 16 8-16 8 3-8-3-8Zm3 8h13" strokeLinecap="round" strokeLinejoin="round" /></svg>
               </button>
@@ -177,7 +193,7 @@ export function AIChatWidget() {
         onClick={() => setIsOpen(true)}
         aria-label="Open AI assistant"
         title="AI assistant"
-        className="fixed bottom-24 right-5 z-50 flex h-11 w-11 items-center justify-center gap-0 rounded-full bg-brand-red p-0 text-white shadow-[0_8px_24px_rgba(229,25,36,0.35)] ring-2 ring-white transition hover:-translate-y-1 hover:bg-brand-redDark focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-cyan focus-visible:ring-offset-2 sm:bottom-8 sm:right-24 sm:h-14 sm:w-auto sm:gap-2 sm:px-4"
+        className="fixed bottom-5 right-5 z-50 flex h-[52px] w-[52px] items-center justify-center gap-0 rounded-full bg-brand-red p-0 text-white shadow-[0_8px_24px_rgba(229,25,36,0.35)] ring-2 ring-white transition hover:-translate-y-1 hover:bg-brand-redDark focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-cyan focus-visible:ring-offset-2 sm:bottom-8 sm:right-24 sm:h-14 sm:w-auto sm:gap-2 sm:px-4"
       >
         {isOpen ? (
           <svg aria-hidden="true" className="h-4 w-4 sm:h-5 sm:w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
