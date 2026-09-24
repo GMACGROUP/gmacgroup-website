@@ -27,7 +27,12 @@ async def upload_document(
 
 
 @router.get("/files/{file_id}/{filename}")
-async def get_uploaded_file(file_id: str, filename: str, folder: str = "resumes"):
+async def get_uploaded_file(
+    file_id: str,
+    filename: str,
+    folder: str = "resumes",
+    _: dict = Depends(admin_only),
+):
     """Retrieve and stream an uploaded file for browser inline viewing or download."""
     path = storage_service.get_local_file_path(file_id, filename, folder=folder)
     if not path:
@@ -42,8 +47,9 @@ async def get_uploaded_file(file_id: str, filename: str, folder: str = "resumes"
 
     # Inline disposition allows PDFs to open directly in the browser's PDF viewer / iframe
     headers = {
-        "Content-Disposition": f'inline; filename="{path.name}"',
-        "Cache-Control": "public, max-age=86400",
+        "Content-Disposition": f'attachment; filename="{path.name}"',
+        "Cache-Control": "private, no-store",
+        "X-Content-Type-Options": "nosniff",
     }
 
     return FileResponse(
