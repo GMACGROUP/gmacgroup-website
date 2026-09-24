@@ -271,13 +271,13 @@ function DashboardContent() {
         )}
 
         {/* ── Metric Snapshot Cards ── */}
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
-          <div className="min-w-0 p-6 rounded-3xl bg-white border border-slate-200 shadow-card flex items-center gap-4">
-            <div className="w-12 h-12 rounded-2xl bg-brand-ice flex items-center justify-center text-brand-navy shrink-0">
-              <AcademicCapIcon className="w-6 h-6 text-brand-navy" />
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-6">
+          <div className="min-w-0 p-4 sm:p-6 rounded-2xl sm:rounded-3xl bg-white border border-slate-300 shadow-sm flex items-center gap-3 sm:gap-4">
+            <div className="w-11 h-11 sm:w-12 sm:h-12 rounded-xl sm:rounded-2xl bg-brand-ice flex items-center justify-center text-brand-navy shrink-0">
+              <AcademicCapIcon className="w-5 h-5 sm:w-6 sm:h-6 text-brand-navy" />
             </div>
             <div className="min-w-0">
-              <p className="text-xs font-bold text-slate-500 uppercase tracking-wider">
+              <p className="text-[11px] sm:text-xs font-bold text-slate-500 uppercase tracking-[0.08em] sm:tracking-wider">
                 Cohort Enrolments
               </p>
               <h3 className="text-2xl font-extrabold text-slate-900 mt-0.5 font-serif">
@@ -286,12 +286,12 @@ function DashboardContent() {
             </div>
           </div>
 
-          <div className="min-w-0 p-6 rounded-3xl bg-white border border-slate-200 shadow-card flex items-center gap-4">
-            <div className="w-12 h-12 rounded-2xl bg-amber-50 flex items-center justify-center text-amber-600 shrink-0">
-              <BriefcaseIcon className="w-6 h-6 text-amber-600" />
+          <div className="min-w-0 p-4 sm:p-6 rounded-2xl sm:rounded-3xl bg-white border border-slate-300 shadow-sm flex items-center gap-3 sm:gap-4">
+            <div className="w-11 h-11 sm:w-12 sm:h-12 rounded-xl sm:rounded-2xl bg-amber-50 flex items-center justify-center text-amber-600 shrink-0">
+              <BriefcaseIcon className="w-5 h-5 sm:w-6 sm:h-6 text-amber-600" />
             </div>
             <div className="min-w-0">
-              <p className="text-xs font-bold text-slate-500 uppercase tracking-wider">
+              <p className="text-[11px] sm:text-xs font-bold text-slate-500 uppercase tracking-[0.08em] sm:tracking-wider">
                 Applications
               </p>
               <h3 className="text-2xl font-extrabold text-slate-900 mt-0.5 font-serif">
@@ -300,12 +300,12 @@ function DashboardContent() {
             </div>
           </div>
 
-          <div className="min-w-0 p-6 rounded-3xl bg-white border border-slate-200 shadow-card flex items-center gap-4">
-            <div className="w-12 h-12 rounded-2xl bg-emerald-50 flex items-center justify-center text-emerald-600 shrink-0">
-              <CheckCircleIcon className="w-6 h-6 text-emerald-600" />
+          <div className="min-w-0 p-4 sm:p-6 rounded-2xl sm:rounded-3xl bg-white border border-slate-300 shadow-sm flex items-center gap-3 sm:gap-4">
+            <div className="w-11 h-11 sm:w-12 sm:h-12 rounded-xl sm:rounded-2xl bg-emerald-50 flex items-center justify-center text-emerald-600 shrink-0">
+              <CheckCircleIcon className="w-5 h-5 sm:w-6 sm:h-6 text-emerald-600" />
             </div>
             <div className="min-w-0">
-              <p className="text-xs font-bold text-slate-500 uppercase tracking-wider">
+              <p className="text-[11px] sm:text-xs font-bold text-slate-500 uppercase tracking-[0.08em] sm:tracking-wider">
                 Account Status
               </p>
               <h3 className="text-sm font-bold text-emerald-600 mt-0.5 flex items-center gap-1.5">
@@ -317,11 +317,11 @@ function DashboardContent() {
         </div>
 
         {/* ── Two Column Activities ── */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-8">
 
           {/* Enrolled Programmes */}
-          <div className="min-w-0 bg-white rounded-3xl p-6 sm:p-8 border border-slate-200 shadow-card space-y-5">
-              <div className="flex min-w-0 items-start justify-between gap-3 border-b border-slate-100 pb-4">
+            <div className="min-w-0 bg-white rounded-2xl sm:rounded-3xl p-4 sm:p-8 border border-slate-300 shadow-sm space-y-4 sm:space-y-5">
+              <div className="flex min-w-0 items-start justify-between gap-3 border-b border-slate-200 pb-3 sm:pb-4">
               <div className="min-w-0">
                 <h3 className="text-lg font-bold text-slate-900 font-serif">My Programmes</h3>
                 <p className="text-xs text-slate-500">Active and upcoming cohort tracks</p>
@@ -378,8 +378,8 @@ function DashboardContent() {
           </div>
 
           {/* Submitted Applications */}
-          <div className="min-w-0 bg-white rounded-3xl p-6 sm:p-8 border border-slate-200 shadow-card space-y-5">
-              <div className="flex min-w-0 items-start justify-between gap-3 border-b border-slate-100 pb-4">
+            <div className="min-w-0 bg-white rounded-2xl sm:rounded-3xl p-4 sm:p-8 border border-slate-300 shadow-sm space-y-4 sm:space-y-5">
+              <div className="flex min-w-0 items-start justify-between gap-3 border-b border-slate-200 pb-3 sm:pb-4">
               <div className="min-w-0">
                 <h3 className="text-lg font-bold text-slate-900 font-serif">My Applications</h3>
                 <p className="text-xs text-slate-500">Submitted fellowship & opening dossiers</p>
