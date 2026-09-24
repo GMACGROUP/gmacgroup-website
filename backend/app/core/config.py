@@ -29,8 +29,9 @@ class Settings(BaseSettings):
     JWT_SECRET: str = "change-me"
     JWT_ALGORITHM: str = "HS256"
 
-    # AI provider (placeholder — TODO: define provider-specific settings)
+    # AI provider / separately deployed Flask assistant
     AI_PROVIDER_API_KEY: str = ""
+    AI_FLASK_URL: str = ""
 
     # Flutterwave payments
     FLW_SECRET_KEY: str = ""
