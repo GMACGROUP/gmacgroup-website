@@ -30,8 +30,11 @@ from app.services.notifications import notification_service
 
 router = APIRouter()
 admin_only = require_role("admin")
-APPLICATION_STATUSES = {"submitted", "under_review", "interview", "shortlisted", "accepted", "rejected", "withdrawn"}
-ENROLMENT_STATUSES = {"pending", "confirmed", "completed", "cancelled", "withdrawn"}
+APPLICATION_STATUSES = {
+    "submitted", "under_review", "interview", "shortlisted", "approved",
+    "accepted", "completed", "rejected", "cancelled", "withdrawn",
+}
+ENROLMENT_STATUSES = {"pending", "confirmed", "approved", "completed", "cancelled", "withdrawn"}
 PAYMENT_STATUSES = {"not_required", "pending", "successful", "failed"}
 
 
@@ -158,7 +161,7 @@ def enrolments(
 
 
 @router.patch("/enrolments/{enrolment_id}", response_model=AdminEnrolmentOut)
-def update_enrolment(
+async def update_enrolment(
     enrolment_id: UUID,
     payload: StatusUpdate,
     _: dict = Depends(admin_only),
@@ -177,6 +180,15 @@ def update_enrolment(
     enrolment.updated_at = datetime.now(timezone.utc)
     db.commit()
     db.refresh(enrolment)
+    if enrolment.email:
+        notification_service.fire_and_forget(
+            notification_service.notify_enrolment_status_changed(
+                enrolment.email,
+                enrolment.full_name or "Member",
+                enrolment.programme_title or "Programme",
+                enrolment.status,
+            )
+        )
     return enrolment
 
 

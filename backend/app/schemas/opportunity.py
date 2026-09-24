@@ -75,8 +75,11 @@ class ApplicationStatus(str, Enum):
     UNDER_REVIEW = "under_review"
     SHORTLISTED = "shortlisted"
     INTERVIEW = "interview"
+    APPROVED = "approved"
     ACCEPTED = "accepted"
+    COMPLETED = "completed"
     REJECTED = "rejected"
+    CANCELLED = "cancelled"
     WITHDRAWN = "withdrawn"
 
 

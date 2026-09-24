@@ -413,6 +413,7 @@ class NotificationService:
         )
 
     async def notify_status_changed(self, email: str, name: str, title: str, status: str):
+        settings = get_settings()
         first_name = name.split()[0] if name else name
         status_label = status.replace("_", " ").title()
         subject = f"Update on your application for {title}"
@@ -422,7 +423,46 @@ class NotificationService:
             f"Best,\n"
             f"The GMAC GROUP Team"
         )
-        await self.send_email(email, subject, plain_text)
+        deliveries = [self.send_email(email, subject, plain_text)]
+        if settings.OPERATIONS_EMAIL and settings.OPERATIONS_EMAIL.lower() != email.lower():
+            deliveries.append(
+                self.send_email(
+                    settings.OPERATIONS_EMAIL,
+                    f"[GMAC GROUP] Application status updated: {title}",
+                    f"APPLICATION STATUS UPDATE\n\n"
+                    f"Applicant: {name} <{email}>\n"
+                    f"Opportunity: {title}\n"
+                    f"New status: {status_label}",
+                )
+            )
+        await asyncio.gather(*deliveries)
+
+    async def notify_enrolment_status_changed(
+        self,
+        email: str,
+        name: str,
+        title: str,
+        status: str,
+    ):
+        settings = get_settings()
+        first_name = name.split()[0] if name else name
+        status_label = status.replace("_", " ").title()
+        await self.send_email(
+            email,
+            f"Update on your programme enrolment for {title}",
+            f"Hi {first_name},\n\n"
+            f"The status of your enrolment for '{title}' has been updated to: {status_label}.\n\n"
+            "Best,\nThe GMAC GROUP Team",
+        )
+        if settings.OPERATIONS_EMAIL and settings.OPERATIONS_EMAIL.lower() != email.lower():
+            await self.send_email(
+                settings.OPERATIONS_EMAIL,
+                f"[GMAC GROUP] Programme enrolment status updated: {title}",
+                f"PROGRAMME ENROLMENT STATUS UPDATE\n\n"
+                f"Member: {name} <{email}>\n"
+                f"Programme: {title}\n"
+                f"New status: {status_label}",
+            )
 
     async def notify_password_reset(self, email: str, name: str, reset_token: str):
         """Password reset email - plain text for Gmail SMTP inbox delivery."""
