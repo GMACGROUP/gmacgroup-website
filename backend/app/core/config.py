@@ -37,11 +37,13 @@ class Settings(BaseSettings):
     FLW_WEBHOOK_SECRET_HASH: str = ""
     FRONTEND_URL: str = "http://localhost:3000"
 
-    # Email notifications (Resend or SMTP / Gmail)
+    # Email notifications (Brevo, Resend or SMTP / Gmail)
     EMAIL_NOTIFICATIONS_ENABLED: bool = True
     EMAIL_PROVIDER: str = "none"
+    BREVO_API_KEY: str = ""
     RESEND_API_KEY: str = ""
-    EMAIL_FROM: str = "GMACGROUP <notifications@gmacgroup.org>"
+    EMAIL_FROM: str = "christian.gmacgroup@gmail.com"
+    EMAIL_FROM_NAME: str = "GMACGROUP"
     OPERATIONS_EMAIL: str = "workdisal480@gmail.com"
 
     # SMTP configuration (for sending from Gmail / standard SMTP without custom domain)
