@@ -6,7 +6,8 @@ training programmes, institutional programmes, and enrolment.
 from datetime import datetime, timezone
 from typing import List, Optional
 from fastapi import APIRouter, BackgroundTasks, Depends, HTTPException, Query, status
-from sqlalchemy import or_, select
+from sqlalchemy import func, or_, select
+from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session
 from app.api.dependencies import get_current_user, get_optional_user
 from app.core.database import get_db
@@ -68,11 +69,29 @@ async def enrol_in_programme(
         raise HTTPException(status_code=status.HTTP_402_PAYMENT_REQUIRED, detail="Complete payment before selecting this offer")
 
     user_id = current_user.get("id") if current_user else None
-    email = current_user.get("email") if current_user else (payload.email or "guest@example.com")
+    email = current_user.get("email") if current_user else payload.email
+    if not email:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="An email address is required to enrol in a programme.",
+        )
+    email = str(email).lower().strip()
     name = current_user.get("full_name") if current_user else (payload.full_name or "Applicant")
     if user_id is None:
-        matched_user = db.scalar(select(User).where(User.email == str(email).lower()))
+        matched_user = db.scalar(select(User).where(User.email == email))
         user_id = matched_user.id if matched_user else None
+
+    existing_enrolment = db.scalar(
+        select(ProgrammeEnrolment).where(
+            ProgrammeEnrolment.programme_id == programme_id,
+            func.lower(ProgrammeEnrolment.email) == email,
+        )
+    )
+    if existing_enrolment:
+        raise HTTPException(
+            status_code=status.HTTP_409_CONFLICT,
+            detail="You are already enrolled in this programme.",
+        )
 
     enrolment = ProgrammeEnrolment(
         programme_id=programme_id,
@@ -87,7 +106,14 @@ async def enrol_in_programme(
         status="confirmed",
     )
     db.add(enrolment)
-    db.commit()
+    try:
+        db.commit()
+    except IntegrityError as exc:
+        db.rollback()
+        raise HTTPException(
+            status_code=status.HTTP_409_CONFLICT,
+            detail="You are already enrolled in this programme.",
+        ) from exc
     db.refresh(enrolment)
     background_tasks.add_task(
         notification_service.notify_enrolment_submitted,

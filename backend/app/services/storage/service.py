@@ -26,6 +26,7 @@ MAGIC_BYTES = {
     b"PK\x03\x04": "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
     b"\xd0\xcf\x11\xe0": "application/msword",
 }
+ALLOWED_STORAGE_FOLDERS = {"resumes"}
 
 
 def sanitize_filename(filename: str) -> str:
@@ -58,6 +59,16 @@ class StorageService:
             base_dir = Path(os.getcwd()) / self.settings.UPLOAD_DIR
         base_dir.mkdir(parents=True, exist_ok=True)
         return base_dir
+
+    @staticmethod
+    def _validate_folder(folder: str) -> str:
+        clean_folder = folder.strip().lower()
+        if clean_folder not in ALLOWED_STORAGE_FOLDERS:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="Unsupported upload folder.",
+            )
+        return clean_folder
 
     async def validate_file(self, file: UploadFile) -> tuple[bytes, str, int]:
         """Read and validate file content type, size, and header signature."""
@@ -115,6 +126,7 @@ class StorageService:
 
     async def save_document(self, file: UploadFile, folder: str = "resumes") -> dict:
         """Store uploaded file and return unified metadata."""
+        folder = self._validate_folder(folder)
         content, content_type, size = await self.validate_file(file)
 
         raw_filename = file.filename or "document.pdf"
@@ -208,6 +220,10 @@ class StorageService:
 
     def get_local_file_path(self, file_id: str, filename: str, folder: str = "resumes") -> Path | None:
         """Retrieve local file path if it exists."""
+        try:
+            folder = self._validate_folder(folder)
+        except HTTPException:
+            return None
         base_dir = self._get_upload_base_dir()
         file_path = base_dir / folder / file_id / sanitize_filename(filename)
         if file_path.exists() and file_path.is_file():
