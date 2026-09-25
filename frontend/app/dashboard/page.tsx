@@ -5,6 +5,8 @@ import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useAuth } from "@/hooks/useAuth";
 import { apiClient } from "@/lib/api/client";
+import { Opportunity, Programme } from "@/types";
+import { ActivityDetailModal } from "@/components/modals/ActivityDetailModal";
 import {
   AcademicCapIcon,
   BriefcaseIcon,
@@ -40,6 +42,15 @@ function DashboardContent() {
   const [enrolments, setEnrolments] = useState<EnrolmentItem[]>([]);
   const [applications, setApplications] = useState<ApplicationItem[]>([]);
   const [loadingData, setLoadingData] = useState(true);
+  const [selectedActivity, setSelectedActivity] = useState<{
+    kind: "programme" | "opportunity";
+    title: string;
+    status: string;
+    createdAt: string;
+  } | null>(null);
+  const [activityDetails, setActivityDetails] = useState<Programme | Opportunity | null>(null);
+  const [loadingActivityDetails, setLoadingActivityDetails] = useState(false);
+  const [activityDetailError, setActivityDetailError] = useState<string | null>(null);
 
   // Profile Edit State
   const [isEditingProfile, setIsEditingProfile] = useState(false);
@@ -106,6 +117,34 @@ function DashboardContent() {
     logout();
     router.push("/");
   };
+
+  async function openProgrammeDetails(item: EnrolmentItem) {
+    setSelectedActivity({ kind: "programme", title: item.programme_title || item.programme_id, status: item.status, createdAt: item.created_at });
+    setActivityDetails(null);
+    setActivityDetailError(null);
+    setLoadingActivityDetails(true);
+    try {
+      setActivityDetails(await apiClient.get<Programme>(`/programmes/${item.programme_id}`));
+    } catch {
+      setActivityDetailError("We could not load the full programme details right now.");
+    } finally {
+      setLoadingActivityDetails(false);
+    }
+  }
+
+  async function openOpportunityDetails(item: ApplicationItem) {
+    setSelectedActivity({ kind: "opportunity", title: item.opportunity_title || item.opportunity_id, status: item.status, createdAt: item.created_at });
+    setActivityDetails(null);
+    setActivityDetailError(null);
+    setLoadingActivityDetails(true);
+    try {
+      setActivityDetails(await apiClient.get<Opportunity>(`/opportunities/${item.opportunity_id}`));
+    } catch {
+      setActivityDetailError("We could not load the full opportunity details right now.");
+    } finally {
+      setLoadingActivityDetails(false);
+    }
+  }
 
   const userDisplayName = user.full_name || user.email.split("@")[0];
 
@@ -343,23 +382,21 @@ function DashboardContent() {
                 </div>
               ) : enrolments.length > 0 ? (
                 enrolments.map((item) => (
-                  <div
+                  <button
+                    type="button"
+                    onClick={() => openProgrammeDetails(item)}
                     key={item.id}
-                    className="min-w-0 p-4 rounded-2xl bg-slate-50 border border-slate-200/80 flex items-center justify-between gap-4"
+                    className="group min-w-0 w-full rounded-2xl border border-slate-200/80 bg-slate-50 p-4 text-left transition hover:border-brand-navy/30 hover:bg-brand-ice/40 focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-cyan"
                   >
-                    <div className="min-w-0">
-                      <h4 className="break-words text-sm font-bold text-slate-900">
-                        {item.programme_title || item.programme_id}
-                      </h4>
-                      <p className="text-[11px] text-slate-500 flex items-center gap-1">
-                        <ClockIcon className="w-3.5 h-3.5 text-slate-400" />
-                        Enrolled {new Date(item.created_at).toLocaleDateString()}
-                      </p>
+                    <div className="flex items-center justify-between gap-4">
+                      <div className="min-w-0">
+                        <h4 className="break-words text-sm font-bold text-slate-900">{item.programme_title || item.programme_id}</h4>
+                        <p className="flex items-center gap-1 text-[11px] text-slate-500"><ClockIcon className="h-3.5 w-3.5 text-slate-400" />Enrolled {new Date(item.created_at).toLocaleDateString()}</p>
+                      </div>
+                      <span className="shrink-0 text-slate-400 transition group-hover:translate-x-0.5 group-hover:text-brand-navy">→</span>
                     </div>
-                    <span className="text-[10px] font-bold uppercase tracking-wider bg-emerald-50 text-emerald-700 border border-emerald-200 px-2.5 py-1 rounded-full whitespace-nowrap">
-                      {item.status || "Enrolled"}
-                    </span>
-                  </div>
+                    <span className="mt-2 inline-block rounded-full border border-emerald-200 bg-emerald-50 px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider text-emerald-700">{item.status || "Enrolled"}</span>
+                  </button>
                 ))
               ) : (
                 <div className="p-8 rounded-2xl bg-slate-50 border border-dashed border-slate-200 text-center space-y-2">
@@ -401,23 +438,21 @@ function DashboardContent() {
                 </div>
               ) : applications.length > 0 ? (
                 applications.map((app) => (
-                  <div
+                  <button
+                    type="button"
+                    onClick={() => openOpportunityDetails(app)}
                     key={app.id}
-                    className="min-w-0 p-4 rounded-2xl bg-slate-50 border border-slate-200/80 flex items-center justify-between gap-4"
+                    className="group min-w-0 w-full rounded-2xl border border-slate-200/80 bg-slate-50 p-4 text-left transition hover:border-brand-navy/30 hover:bg-brand-ice/40 focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-cyan"
                   >
-                    <div className="min-w-0">
-                      <h4 className="break-words text-sm font-bold text-slate-900">
-                        {app.opportunity_title || app.opportunity_id}
-                      </h4>
-                      <p className="text-[11px] text-slate-500 flex items-center gap-1">
-                        <ClockIcon className="w-3.5 h-3.5 text-slate-400" />
-                        Submitted {new Date(app.created_at).toLocaleDateString()}
-                      </p>
+                    <div className="flex items-center justify-between gap-4">
+                      <div className="min-w-0">
+                        <h4 className="break-words text-sm font-bold text-slate-900">{app.opportunity_title || app.opportunity_id}</h4>
+                        <p className="flex items-center gap-1 text-[11px] text-slate-500"><ClockIcon className="h-3.5 w-3.5 text-slate-400" />Submitted {new Date(app.created_at).toLocaleDateString()}</p>
+                      </div>
+                      <span className="shrink-0 text-slate-400 transition group-hover:translate-x-0.5 group-hover:text-brand-navy">→</span>
                     </div>
-                    <span className="text-[10px] font-bold uppercase tracking-wider bg-blue-50 text-brand-navy border border-blue-200 px-2.5 py-1 rounded-full whitespace-nowrap">
-                      {app.status || "Submitted"}
-                    </span>
-                  </div>
+                    <span className="mt-2 inline-block rounded-full border border-blue-200 bg-blue-50 px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider text-brand-navy">{app.status || "Submitted"}</span>
+                  </button>
                 ))
               ) : (
                 <div className="p-8 rounded-2xl bg-slate-50 border border-dashed border-slate-200 text-center space-y-2">
@@ -436,6 +471,17 @@ function DashboardContent() {
           </div>
 
         </div>
+
+        <ActivityDetailModal
+          preview={selectedActivity}
+          details={activityDetails}
+          loading={loadingActivityDetails}
+          error={activityDetailError}
+          onClose={() => {
+            setSelectedActivity(null);
+            setActivityDetails(null);
+          }}
+        />
 
       </div>
     </div>
