@@ -1,5 +1,4 @@
 import Link from "next/link";
-import Image from "next/image";
 import {
   AcademicCapIcon,
   MicroscopeIcon,
@@ -16,7 +15,7 @@ export function ValuePropSection() {
       href: "/services",
       cta: "Commission research",
       icon: MicroscopeIcon,
-      image: "/images/audience-funders.svg",
+      image: "/images/audience-funders.jpg",
       badgeColor: "bg-blue-50 text-brand-navy border-blue-200/90",
       accentGradient: "from-blue-600 to-cyan-500",
       iconBg: "bg-blue-50 text-brand-navy group-hover:bg-brand-navy group-hover:text-white",
@@ -29,7 +28,7 @@ export function ValuePropSection() {
       href: "/services",
       cta: "Build your workforce",
       icon: BriefcaseIcon,
-      image: "/images/audience-employers.svg",
+      image: "/images/audience-employers.jpg",
       badgeColor: "bg-red-50 text-brand-red border-red-200/90",
       accentGradient: "from-brand-red to-amber-500",
       iconBg: "bg-red-50 text-brand-red group-hover:bg-brand-red group-hover:text-white",
@@ -42,7 +41,7 @@ export function ValuePropSection() {
       href: "/services",
       cta: "Find investable projects",
       icon: TrendingUpIcon,
-      image: "/images/audience-investors.svg",
+      image: "/images/audience-investors.jpg",
       badgeColor: "bg-emerald-50 text-emerald-700 border-emerald-200/90",
       accentGradient: "from-emerald-500 to-teal-400",
       iconBg: "bg-emerald-50 text-emerald-700 group-hover:bg-emerald-600 group-hover:text-white",
@@ -55,7 +54,7 @@ export function ValuePropSection() {
       href: "/programmes",
       cta: "Grow your career",
       icon: AcademicCapIcon,
-      image: "/images/audience-professionals.svg",
+      image: "/images/audience-professionals.jpg",
       badgeColor: "bg-purple-50 text-purple-700 border-purple-200/90",
       accentGradient: "from-purple-600 to-indigo-500",
       iconBg: "bg-purple-50 text-purple-700 group-hover:bg-purple-600 group-hover:text-white",
@@ -93,14 +92,13 @@ export function ValuePropSection() {
                 key={card.title}
                 className="group relative flex min-h-[430px] flex-col overflow-hidden rounded-2xl border border-slate-200/90 bg-slate-900 shadow-card transition-all duration-300 hover:-translate-y-1.5 hover:shadow-card-hover sm:min-h-[450px]"
               >
-                <Image
-                  src={card.image}
-                  alt=""
-                  fill
-                  sizes="(min-width: 1280px) 25vw, (min-width: 768px) 50vw, 100vw"
-                  className="object-cover transition-transform duration-700 group-hover:scale-105"
+                <div
+                  role="img"
+                  aria-label={`${card.title} audience image`}
+                  className="absolute inset-0 bg-cover bg-center transition-transform duration-700 group-hover:scale-105"
+                  style={{ backgroundImage: `url("${card.image}")` }}
                 />
-                <div className="absolute inset-0 bg-gradient-to-b from-[#07111f]/30 via-[#07111f]/35 to-[#07111f]/95" />
+                <div className="absolute inset-0 bg-gradient-to-b from-[#07111f]/45 via-[#07111f]/45 to-[#07111f]/95" />
                 <div className="relative z-10 flex min-h-[430px] flex-1 flex-col p-6 sm:min-h-[450px] sm:p-7">
                   <div className="flex items-center justify-between gap-2">
                     <span className="badge border-white/30 bg-white/90 text-slate-800 shadow-sm">{card.title}</span>
