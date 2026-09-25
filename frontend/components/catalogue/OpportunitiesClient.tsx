@@ -31,10 +31,10 @@ const typeAccents: Record<string, string> = {
 };
 
 const typeImages: Record<string, string> = {
-  internship: "/images/services-lab.jpg",
-  fellowship: "/images/research-center.jpg",
-  employment: "/images/services-advisory.jpg",
-  other: "/images/about-team.jpg",
+  internship: "/images/service-employability.jpg",
+  fellowship: "/images/service-policy-research.jpg",
+  employment: "/images/service-workforce-consulting.jpg",
+  other: "/images/service-capacity-building.jpg",
 };
 
 export default function OpportunitiesClient({ opportunities: allOpportunities }: { opportunities: Opportunity[] }) {

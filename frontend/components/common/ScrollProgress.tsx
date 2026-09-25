@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { usePathname } from "next/navigation";
 
-const CIRCLE_RADIUS = 20;
+const CIRCLE_RADIUS = 18;
 const CIRCLE_CIRCUMFERENCE = 2 * Math.PI * CIRCLE_RADIUS;
 
 export function ScrollProgress() {
@@ -19,7 +19,7 @@ export function ScrollProgress() {
       const nextProgress = scrollableHeight > 0 ? Math.min(window.scrollY / scrollableHeight, 1) : 0;
 
       setProgress(nextProgress);
-      setIsVisible(window.scrollY > 160);
+      setIsVisible(window.scrollY > 220);
       frameId = 0;
     }
 
@@ -46,7 +46,12 @@ export function ScrollProgress() {
 
   const dashOffset = CIRCLE_CIRCUMFERENCE * (1 - progress);
 
-  if (pathname === "/login" || pathname === "/register" || pathname === "/forgot-password" || pathname === "/reset-password") {
+  if (
+    pathname === "/login" ||
+    pathname === "/register" ||
+    pathname === "/forgot-password" ||
+    pathname === "/reset-password"
+  ) {
     return null;
   }
 
@@ -54,30 +59,55 @@ export function ScrollProgress() {
     <button
       type="button"
       onClick={scrollToTop}
-      aria-label={`Back to top, ${Math.round(progress * 100)} percent of page read`}
+      aria-label={`Back to top (${Math.round(progress * 100)}% scrolled)`}
       title="Back to top"
-      className={`fixed bottom-20 right-5 z-40 hidden h-14 w-14 items-center justify-center rounded-full bg-brand-navy text-white shadow-[0_8px_24px_rgba(6,28,48,0.35)] ring-2 ring-white transition-all duration-300 hover:-translate-y-1 hover:bg-brand-navyDark focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-cyan focus-visible:ring-offset-2 sm:flex sm:bottom-8 sm:right-8 ${
-        isVisible ? "translate-y-0 opacity-100" : "pointer-events-none translate-y-4 opacity-0"
+      className={`fixed z-40 flex items-center justify-center rounded-full bg-[#07111F]/90 text-white backdrop-blur-md shadow-lg border border-white/20 transition-all duration-300 hover:scale-108 hover:bg-[#07111F] hover:border-cyan-400/50 focus:outline-none focus-visible:ring-2 focus-visible:ring-cyan-400 ${
+        /* Mobile: right-5, bottom-20 (above AI widget). Desktop: right-8, bottom-24 */
+        "bottom-[74px] right-5 sm:bottom-[82px] sm:right-8 h-11 w-11 sm:h-12 sm:w-12"
+      } ${
+        isVisible
+          ? "opacity-100 translate-y-0 pointer-events-auto"
+          : "opacity-0 translate-y-3 pointer-events-none"
       }`}
     >
-      <svg className="absolute inset-0 h-full w-full -rotate-90" viewBox="0 0 48 48" aria-hidden="true">
-        <circle cx="24" cy="24" r={CIRCLE_RADIUS} fill="none" stroke="#7DD3FC" strokeOpacity="0.3" strokeWidth="2.5" />
+      <svg
+        className="absolute inset-0 h-full w-full -rotate-90 p-0.5"
+        viewBox="0 0 44 44"
+        aria-hidden="true"
+      >
         <circle
-          cx="24"
-          cy="24"
+          cx="22"
+          cy="22"
           r={CIRCLE_RADIUS}
           fill="none"
-          stroke="#00C4FF"
+          stroke="#334155"
+          strokeOpacity="0.4"
+          strokeWidth="2.5"
+        />
+        <circle
+          cx="22"
+          cy="22"
+          r={CIRCLE_RADIUS}
+          fill="none"
+          stroke="#2A8C8C"
           strokeLinecap="round"
-          strokeWidth="3"
+          strokeWidth="2.5"
           strokeDasharray={CIRCLE_CIRCUMFERENCE}
           strokeDashoffset={dashOffset}
+          className="transition-[stroke-dashoffset] duration-100 ease-linear"
         />
       </svg>
-      <span className="absolute inset-2 rounded-full border border-white/10" aria-hidden="true" />
-      <svg className="relative h-6 w-6 drop-shadow-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" aria-hidden="true">
-        <path d="m6 14 6-6 6 6" strokeLinecap="round" strokeLinejoin="round" />
+      <svg
+        className="relative h-4 w-4 sm:h-5 sm:w-5 text-white drop-shadow-sm transition-transform duration-200 group-hover:-translate-y-0.5"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="2.5"
+        aria-hidden="true"
+      >
+        <path d="m18 15-6-6-6 6" strokeLinecap="round" strokeLinejoin="round" />
       </svg>
     </button>
   );
 }
+

@@ -34,28 +34,28 @@ export function ProgrammeCard({
       badge: "bg-sky-50 text-sky-700 border-sky-200",
       accent: "bg-sky-500",
       icon: AcademicCapIcon,
-      image: "/images/services-lab.jpg",
+      image: "/images/service-employability.jpg",
     },
     professional_development: {
       label: "Professional Dev",
       badge: "bg-blue-50 text-brand-navy border-blue-200",
       accent: "bg-brand-navy",
       icon: BriefcaseIcon,
-      image: "/images/services-advisory.jpg",
+      image: "/images/service-workforce-consulting.jpg",
     },
     training: {
       label: "Specialized Training",
       badge: "bg-red-50 text-brand-red border-red-200",
       accent: "bg-brand-red",
       icon: WrenchIcon,
-      image: "/images/insights-graduates.jpg",
+      image: "/images/service-capacity-building.jpg",
     },
     institutional: {
       label: "Institutional Capacity",
       badge: "bg-emerald-50 text-emerald-700 border-emerald-200",
       accent: "bg-emerald-500",
       icon: BuildingIcon,
-      image: "/images/about-team.jpg",
+      image: "/images/service-policy-research.jpg",
     },
   };
 
@@ -64,7 +64,7 @@ export function ProgrammeCard({
     badge: "bg-slate-100 text-slate-700 border-slate-200",
     accent: "bg-slate-400",
     icon: BookOpenIcon,
-    image: "/images/services-lab.jpg",
+    image: "/images/service-signature-events.jpg",
   };
 
   const IconComp = cfg.icon;

@@ -14,7 +14,7 @@ export function OpportunitiesSection() {
       description:
         "Join an elite cohort conducting baseline workforce transition studies and institutional capacity diagnostics.",
       badgeColor: "bg-purple-100 text-purple-800 border-purple-300 font-bold",
-      image: "/images/research-center.jpg",
+      image: "/images/service-policy-research.jpg",
     },
     {
       id: "opp-2",
@@ -26,7 +26,7 @@ export function OpportunitiesSection() {
       description:
         "Partner with cross-functional advisory teams supporting enterprise talent acquisition and executive development.",
       badgeColor: "bg-blue-100 text-brand-navy border-blue-300 font-bold",
-      image: "/images/services-advisory.jpg",
+      image: "/images/service-workforce-consulting.jpg",
     },
     {
       id: "opp-3",
@@ -38,7 +38,7 @@ export function OpportunitiesSection() {
       description:
         "High-velocity internship for emerging quantitative analysts and social science graduates.",
       badgeColor: "bg-red-100 text-brand-red border-red-300 font-bold",
-      image: "/images/services-lab.jpg",
+      image: "/images/service-employability.jpg",
     },
   ];
 
