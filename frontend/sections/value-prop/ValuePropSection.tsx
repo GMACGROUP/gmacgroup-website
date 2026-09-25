@@ -90,7 +90,7 @@ export function ValuePropSection() {
             return (
               <div
                 key={card.title}
-                className="group relative flex min-h-[430px] flex-col overflow-hidden rounded-2xl border border-slate-200/90 bg-slate-900 shadow-card transition-all duration-300 hover:-translate-y-1.5 hover:shadow-card-hover sm:min-h-[450px]"
+                className="group relative flex min-h-[430px] min-w-0 flex-col overflow-hidden rounded-2xl border border-slate-200/90 bg-slate-900 shadow-card transition-all duration-300 hover:-translate-y-1.5 hover:shadow-card-hover sm:min-h-[450px] xl:min-h-[470px]"
               >
                 <div
                   role="img"
@@ -98,8 +98,8 @@ export function ValuePropSection() {
                   className="absolute inset-0 bg-cover bg-center transition-transform duration-700 group-hover:scale-105"
                   style={{ backgroundImage: `url("${card.image}")` }}
                 />
-                <div className="absolute inset-0 bg-gradient-to-b from-[#07111f]/45 via-[#07111f]/45 to-[#07111f]/95" />
-                <div className="relative z-10 flex min-h-[430px] flex-1 flex-col p-6 sm:min-h-[450px] sm:p-7">
+                <div className="absolute inset-0 bg-gradient-to-b from-[#07111f]/55 via-[#07111f]/60 to-[#07111f]/95" />
+                <div className="relative z-10 flex min-h-[430px] min-w-0 flex-1 flex-col p-6 sm:min-h-[450px] sm:p-7 xl:min-h-[470px]">
                   <div className="flex items-center justify-between gap-2">
                     <span className="badge border-white/30 bg-white/90 text-slate-800 shadow-sm">{card.title}</span>
                     <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-white/30 bg-white/15 text-white shadow-sm backdrop-blur-md transition-transform duration-300 group-hover:scale-110">
@@ -107,25 +107,25 @@ export function ValuePropSection() {
                     </div>
                   </div>
 
-                  <div className="mt-auto">
-                    <h3 className="text-xl font-bold leading-snug text-white font-serif sm:text-2xl">
+                  <div className="mt-auto min-w-0">
+                    <h3 className="break-words text-xl font-bold leading-snug text-white font-serif sm:text-2xl">
                       {card.subtitle}
                     </h3>
-                    <p className="mt-3 text-sm leading-relaxed text-white/80 sm:text-base">
+                    <p className="mt-3 break-words text-sm leading-relaxed text-white/95 sm:text-base">
                       {card.body}
                     </p>
                     <div className="mt-5 flex flex-wrap gap-1.5">
                       {card.tags.map((tag) => (
-                        <span key={tag} className="rounded-md border border-white/15 bg-white/10 px-2 py-1 text-[11px] font-medium text-white/85 backdrop-blur-sm">
+                        <span key={tag} className="rounded-md border border-white/25 bg-white/15 px-2 py-1 text-[11px] font-medium text-white/95 backdrop-blur-sm">
                           {tag}
                         </span>
                       ))}
                     </div>
                     <Link
                       href={card.href}
-                      className="group/btn mt-6 inline-flex min-h-12 w-full items-center justify-between rounded-xl border border-white/30 bg-white/95 px-4 py-3 text-sm font-bold text-brand-navy shadow-sm transition-all duration-200 hover:bg-white"
+                      className="group/btn mt-6 inline-flex min-h-12 w-full min-w-0 items-center justify-between rounded-xl border border-white/30 bg-white/95 px-4 py-3 text-sm font-bold text-brand-navy shadow-sm transition-all duration-200 hover:bg-white"
                     >
-                      <span>{card.cta}</span>
+                      <span className="min-w-0 break-words pr-2">{card.cta}</span>
                       <span className="transition-transform duration-200 group-hover/btn:translate-x-1">→</span>
                     </Link>
                   </div>
