@@ -48,8 +48,8 @@ export default function ResearchPage() {
 
   const expertPhotos: Record<string, string> = {
     "Dr. Kwesi Mensah": "/images/testimonial-mensah.jpg",
-    "Ama Serwaa": "/images/about-team.jpg",
-    "Marcus Chen": "/images/services-advisory.jpg",
+    "Ama Serwaa": "/images/audience-professionals.jpg",
+    "Marcus Chen": "/images/audience-employers.jpg",
   };
 
   return (

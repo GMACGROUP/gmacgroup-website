@@ -15,7 +15,7 @@ const articles = [
     badgeColor: "bg-red-50 text-brand-red border-red-200",
     accent: "bg-brand-red",
     icon: TrendingUpIcon,
-    image: "/images/insights-graduates.jpg",
+    image: "/images/service-employability.jpg",
   },
   {
     id: "2",
@@ -28,7 +28,7 @@ const articles = [
     badgeColor: "bg-blue-50 text-brand-navy border-blue-200",
     accent: "bg-brand-navy",
     icon: BuildingIcon,
-    image: "/images/research-center.jpg",
+    image: "/images/service-policy-research.jpg",
   },
   {
     id: "3",
@@ -41,7 +41,7 @@ const articles = [
     badgeColor: "bg-purple-50 text-purple-700 border-purple-200",
     accent: "bg-purple-600",
     icon: SparklesIcon,
-    image: "/images/services-advisory.jpg",
+    image: "/images/service-workforce-consulting.jpg",
   },
 ];
 

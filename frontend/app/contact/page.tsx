@@ -57,7 +57,7 @@ export default function ContactPage() {
             {/* Advisory Hub Photo */}
             <div className="relative h-44 w-full rounded-2xl overflow-hidden border border-slate-200 shadow-md group">
               <Image
-                src="/images/services-advisory.jpg"
+                src="/images/service-workforce-consulting.jpg"
                 alt="GMAC Advisory Office in Accra"
                 fill
                 className="object-cover group-hover:scale-105 transition-transform duration-500"

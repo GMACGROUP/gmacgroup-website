@@ -13,7 +13,7 @@ export function ResearchSection() {
       lead: "GMAC Research Team",
       badge: "Flagship Initiative",
       icon: MicroscopeIcon,
-      image: "/images/research-center.jpg",
+      image: "/images/service-policy-research.jpg",
     },
     {
       title: "Institutional Capacity & Workforce Readiness Index",
@@ -24,7 +24,7 @@ export function ResearchSection() {
       lead: "Policy & Human Capital Unit",
       badge: "Policy Brief",
       icon: FileTextIcon,
-      image: "/images/insights-graduates.jpg",
+      image: "/images/service-capacity-building.jpg",
     },
   ];
 

@@ -39,9 +39,9 @@ export default function ServicesPage() {
       : services.filter((s) => s.category?.toLowerCase() === activeCategory);
 
   const categoryImages: Record<string, string> = {
-    education: "/images/services-lab.jpg",
-    research: "/images/research-center.jpg",
-    consulting: "/images/services-advisory.jpg",
+    education: "/images/service-employability.jpg",
+    research: "/images/service-policy-research.jpg",
+    consulting: "/images/service-workforce-consulting.jpg",
   };
 
   const categoryIcons: Record<string, typeof AcademicCapIcon> = {

@@ -14,7 +14,7 @@ export function ServicesSection() {
       badge: "Research",
       badgeColor: "bg-blue-50 text-brand-navy border-blue-200",
       accent: "bg-brand-navy",
-      image: "/images/research-center.jpg",
+      image: "/images/service-policy-research.jpg",
     },
     {
       id: "service-capacity",
@@ -26,7 +26,7 @@ export function ServicesSection() {
       badge: "Capacity",
       badgeColor: "bg-red-50 text-brand-red border-red-200",
       accent: "bg-brand-red",
-      image: "/images/services-lab.jpg",
+      image: "/images/service-capacity-building.jpg",
     },
     {
       id: "service-workforce",
@@ -38,7 +38,7 @@ export function ServicesSection() {
       badge: "Workforce",
       badgeColor: "bg-sky-50 text-brand-navy border-sky-200",
       accent: "bg-brand-cyan",
-      image: "/images/services-advisory.jpg",
+      image: "/images/service-workforce-consulting.jpg",
     },
     {
       id: "service-employability",
@@ -50,7 +50,7 @@ export function ServicesSection() {
       badge: "Employability",
       badgeColor: "bg-emerald-50 text-emerald-700 border-emerald-200",
       accent: "bg-emerald-500",
-      image: "/images/services-lab.jpg",
+      image: "/images/service-employability.jpg",
     },
     {
       id: "service-events",
@@ -62,7 +62,7 @@ export function ServicesSection() {
       badge: "Events",
       badgeColor: "bg-purple-50 text-purple-700 border-purple-200",
       accent: "bg-purple-500",
-      image: "/images/services-advisory.jpg",
+      image: "/images/service-signature-events.jpg",
     },
     {
       id: "service-investment",
@@ -74,7 +74,7 @@ export function ServicesSection() {
       badge: "Investment",
       badgeColor: "bg-amber-50 text-amber-700 border-amber-200",
       accent: "bg-amber-500",
-      image: "/images/research-center.jpg",
+      image: "/images/service-investment-capital.jpg",
     },
   ];
 
