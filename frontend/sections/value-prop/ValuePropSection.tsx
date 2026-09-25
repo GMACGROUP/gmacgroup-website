@@ -1,4 +1,5 @@
 import Link from "next/link";
+import Image from "next/image";
 import {
   AcademicCapIcon,
   MicroscopeIcon,
@@ -15,6 +16,7 @@ export function ValuePropSection() {
       href: "/services",
       cta: "Commission research",
       icon: MicroscopeIcon,
+      image: "/images/audience-funders.svg",
       badgeColor: "bg-blue-50 text-brand-navy border-blue-200/90",
       accentGradient: "from-blue-600 to-cyan-500",
       iconBg: "bg-blue-50 text-brand-navy group-hover:bg-brand-navy group-hover:text-white",
@@ -27,6 +29,7 @@ export function ValuePropSection() {
       href: "/services",
       cta: "Build your workforce",
       icon: BriefcaseIcon,
+      image: "/images/audience-employers.svg",
       badgeColor: "bg-red-50 text-brand-red border-red-200/90",
       accentGradient: "from-brand-red to-amber-500",
       iconBg: "bg-red-50 text-brand-red group-hover:bg-brand-red group-hover:text-white",
@@ -39,6 +42,7 @@ export function ValuePropSection() {
       href: "/services",
       cta: "Find investable projects",
       icon: TrendingUpIcon,
+      image: "/images/audience-investors.svg",
       badgeColor: "bg-emerald-50 text-emerald-700 border-emerald-200/90",
       accentGradient: "from-emerald-500 to-teal-400",
       iconBg: "bg-emerald-50 text-emerald-700 group-hover:bg-emerald-600 group-hover:text-white",
@@ -51,6 +55,7 @@ export function ValuePropSection() {
       href: "/programmes",
       cta: "Grow your career",
       icon: AcademicCapIcon,
+      image: "/images/audience-professionals.svg",
       badgeColor: "bg-purple-50 text-purple-700 border-purple-200/90",
       accentGradient: "from-purple-600 to-indigo-500",
       iconBg: "bg-purple-50 text-purple-700 group-hover:bg-purple-600 group-hover:text-white",
@@ -86,49 +91,41 @@ export function ValuePropSection() {
             return (
               <div
                 key={card.title}
-                className="group relative flex flex-col bg-white rounded-2xl border border-slate-200/90 shadow-card hover:shadow-card-hover hover:border-slate-300 hover:-translate-y-1.5 transition-all duration-300 overflow-hidden"
+                className="group relative flex min-h-[430px] flex-col overflow-hidden rounded-2xl border border-slate-200/90 bg-slate-900 shadow-card transition-all duration-300 hover:-translate-y-1.5 hover:shadow-card-hover sm:min-h-[450px]"
               >
-                {/* Gradient Top Accent Bar */}
-                <div className={`h-1.5 w-full bg-gradient-to-r ${card.accentGradient} transition-all duration-300 group-hover:h-2`} />
-
-                <div className="p-6 sm:p-7 flex flex-col flex-1">
-                  {/* Top Badge & Icon Row */}
-                  <div className="flex items-center justify-between gap-2 mb-4">
-                    <span className={`badge ${card.badgeColor}`}>
-                      {card.title}
-                    </span>
-                    <div className={`w-9 h-9 rounded-xl ${card.iconBg} flex items-center justify-center transition-all duration-300 shadow-xs`}>
-                      <IconComponent className="w-4 h-4 transition-transform duration-300 group-hover:scale-110" />
+                <Image
+                  src={card.image}
+                  alt=""
+                  fill
+                  sizes="(min-width: 1280px) 25vw, (min-width: 768px) 50vw, 100vw"
+                  className="object-cover transition-transform duration-700 group-hover:scale-105"
+                />
+                <div className="absolute inset-0 bg-gradient-to-b from-[#07111f]/30 via-[#07111f]/35 to-[#07111f]/95" />
+                <div className="relative z-10 flex min-h-[430px] flex-1 flex-col p-6 sm:min-h-[450px] sm:p-7">
+                  <div className="flex items-center justify-between gap-2">
+                    <span className="badge border-white/30 bg-white/90 text-slate-800 shadow-sm">{card.title}</span>
+                    <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-white/30 bg-white/15 text-white shadow-sm backdrop-blur-md transition-transform duration-300 group-hover:scale-110">
+                      <IconComponent className="h-5 w-5" />
                     </div>
                   </div>
 
-                  {/* Card Title */}
-                  <h3 className="text-lg sm:text-[19px] font-bold text-slate-900 group-hover:text-brand-navy transition-colors font-serif leading-snug">
-                    {card.subtitle}
-                  </h3>
-
-                  {/* Card Body */}
-                  <p className="mt-3 text-sm text-slate-600 leading-relaxed">
-                    {card.body}
-                  </p>
-
-                  {/* Feature Tags for scannability */}
-                  <div className="mt-4 flex flex-wrap gap-1.5 flex-1 items-end">
-                    {card.tags.map((tag) => (
-                      <span
-                        key={tag}
-                        className="px-2 py-0.5 rounded-md bg-slate-100/90 text-slate-600 text-[11px] font-medium"
-                      >
-                        {tag}
-                      </span>
-                    ))}
-                  </div>
-
-                  {/* Sleek CTA Link Button */}
-                  <div className="mt-6 pt-4 border-t border-slate-100">
+                  <div className="mt-auto">
+                    <h3 className="text-xl font-bold leading-snug text-white font-serif sm:text-2xl">
+                      {card.subtitle}
+                    </h3>
+                    <p className="mt-3 text-sm leading-relaxed text-white/80 sm:text-base">
+                      {card.body}
+                    </p>
+                    <div className="mt-5 flex flex-wrap gap-1.5">
+                      {card.tags.map((tag) => (
+                        <span key={tag} className="rounded-md border border-white/15 bg-white/10 px-2 py-1 text-[11px] font-medium text-white/85 backdrop-blur-sm">
+                          {tag}
+                        </span>
+                      ))}
+                    </div>
                     <Link
                       href={card.href}
-                      className="inline-flex items-center justify-between w-full px-3.5 py-2 rounded-xl bg-slate-50 hover:bg-brand-navy text-slate-800 hover:text-white font-bold text-xs sm:text-sm border border-slate-200/70 hover:border-brand-navy shadow-xs transition-all duration-200 group/btn"
+                      className="group/btn mt-6 inline-flex min-h-12 w-full items-center justify-between rounded-xl border border-white/30 bg-white/95 px-4 py-3 text-sm font-bold text-brand-navy shadow-sm transition-all duration-200 hover:bg-white"
                     >
                       <span>{card.cta}</span>
                       <span className="transition-transform duration-200 group-hover/btn:translate-x-1">→</span>
