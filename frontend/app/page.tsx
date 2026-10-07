@@ -16,7 +16,7 @@ export default async function HomePage() {
   return (
     <>
       <HomeHero />
-      <Figures />
+      <Figures team={team} />
       <TwoDoors />
       <ExpertiseIndex />
       <FounderNote />

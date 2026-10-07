@@ -5,7 +5,8 @@ import { TEAMS } from "@/lib/content/site";
 import type { TeamMember } from "@/lib/content/team-seed";
 
 export function TeamPreview({ team }: { team: TeamMember[] }) {
-  const countries = new Set(team.map((m) => m.country)).size;
+  const countries = new Set([...team.map((m) => m.country), "Ghana"]).size;
+  const people = team.length + 1;
   const featured = [...team].sort((a, b) => Number(Boolean(b.photo_url)) - Number(Boolean(a.photo_url))).slice(0, 6);
 
   return (
@@ -16,7 +17,7 @@ export function TeamPreview({ team }: { team: TeamMember[] }) {
             <span className="eyebrow-num">06</span> Our people
           </p>
           <h2 className="display-lg reveal mt-8">
-            {team.length} colleagues. {TEAMS.length} teams. {countries} countries.
+            {people} colleagues. {TEAMS.length} teams. {countries} countries.
           </h2>
           <p className="lede reveal mt-6">
             Every engagement is delivered by the team that owns the capability, never by generalists stretched across all

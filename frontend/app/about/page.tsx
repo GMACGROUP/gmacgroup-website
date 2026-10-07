@@ -3,7 +3,8 @@ import Link from "next/link";
 import { Arrow } from "@/components/ui/Arrow";
 import { AfricaMap } from "@/components/editorial/AfricaMap";
 import { PhotoSlot } from "@/components/editorial/PhotoSlot";
-import { FIGURES, FOUNDER, PARTNERS, PRINCIPLES, SECTORS, SITE, STORY, TEAMS, WHY_GMAC } from "@/lib/content/site";
+import { getTeam } from "@/lib/api/server";
+import { FIGURES, teamFigures, FOUNDER, PARTNERS, PRINCIPLES, SECTORS, SITE, STORY, TEAMS, WHY_GMAC } from "@/lib/content/site";
 
 export const metadata: Metadata = {
   title: "About",
@@ -20,7 +21,11 @@ function Label({ n, children, dark }: { n: string; children: React.ReactNode; da
   );
 }
 
-export default function AboutPage() {
+export const revalidate = 300;
+
+export default async function AboutPage() {
+  const team = await getTeam();
+  const remoteFigures = [FIGURES[1], ...teamFigures(team), { value: 5, display: String(TEAMS.length), label: "Specialist teams" }];
   return (
     <>
       {/* ── Opening ─────────────────────────────────────────── */}
@@ -155,7 +160,7 @@ export default function AboutPage() {
               engagement from the team that owns the capability.
             </p>
             <dl className="mt-10 grid grid-cols-2 border-t border-ink/20">
-              {FIGURES.slice(1).concat([{ value: 5, display: String(TEAMS.length), label: "Specialist teams, each with a named lead" }]).map((f, i) => (
+              {remoteFigures.map((f, i) => (
                 <div key={f.label} className={`border-b border-ink/20 py-5 pr-4 ${i % 2 === 1 ? "border-l pl-5" : ""}`}>
                   <dd className="font-display text-4xl text-ink">{f.display}</dd>
                   <dt className="mt-1 text-sm leading-snug text-ink-500">{f.label}</dt>

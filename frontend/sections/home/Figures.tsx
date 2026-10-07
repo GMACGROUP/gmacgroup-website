@@ -1,10 +1,12 @@
-import { FIGURES } from "@/lib/content/site";
+import { FIGURES, teamFigures } from "@/lib/content/site";
+import type { TeamMember } from "@/lib/content/team-seed";
 
-export function Figures() {
+export function Figures({ team }: { team: TeamMember[] }) {
+  const figures = [...FIGURES, ...teamFigures(team)];
   return (
     <section aria-label="Gmac Group in figures" className="border-b border-rule bg-paper">
       <dl className="wrap grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4">
-        {FIGURES.map((f, i) => (
+        {figures.map((f, i) => (
           <div
             key={f.label}
             className={`reveal border-rule py-10 sm:py-12 ${i > 0 ? "border-t sm:border-t-0" : ""} ${

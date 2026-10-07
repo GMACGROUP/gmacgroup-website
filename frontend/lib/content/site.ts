@@ -24,9 +24,17 @@ export const SITE = {
 export const FIGURES = [
   { value: 2000, display: "2,000+", label: "Registrations across our training sessions and impact webinars" },
   { value: 30, display: "30+", label: "Countries represented among our participants" },
-  { value: 10, display: "10", label: "Countries our team works from" },
-  { value: 22, display: "22", label: "Colleagues across five specialist teams" },
 ];
+
+/** Team figures are calculated from the live team list (founder included), so they never go stale. */
+export function teamFigures(team: { country: string }[]) {
+  const people = team.length + 1;
+  const countries = new Set([...team.map((m) => m.country), "Ghana"]).size;
+  return [
+    { value: countries, display: String(countries), label: "Countries our team works from" },
+    { value: people, display: String(people), label: "Colleagues across five specialist teams" },
+  ];
+}
 
 export const FOCUS_MARKETS = [
   "Ghana",
@@ -348,7 +356,8 @@ export const PARTNERS = [
 ];
 
 export const FOUNDER = {
-  name: "Raphael S. Ajana",
+  name: "Raphael Sochima Ajana",
+  country: "Ghana",
   role: "Founder",
   quote: "Build the people and build the evidence at the same time, from inside the continent they concern.",
   bio: [
@@ -359,7 +368,7 @@ export const FOUNDER = {
 };
 
 export const TEAMS = [
-  { number: "01", name: "Business Development and Partnerships", remit: "Institutional relationships, partner development, sponsorship and framework agreements. Led directly by the founder." },
+  { number: "01", name: "Business Development and Partnerships", remit: "Institutional relationships, partner development, sponsorship and framework agreements." },
   { number: "02", name: "Research", remit: "Applied research, econometric analysis and consulting delivery, led by doctoral researchers with quantitative and policy expertise." },
   { number: "03", name: "Marketing and Communications", remit: "Brand, content, campaigns and communications for every programme and event." },
   { number: "04", name: "Graphic Design and Web", remit: "Visual identity, web, print, sales collateral, and event and sponsor deliverables." },

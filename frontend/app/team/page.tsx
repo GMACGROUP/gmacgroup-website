@@ -12,13 +12,13 @@ export const revalidate = 300;
 export const metadata: Metadata = {
   title: "Our team",
   description:
-    "Twenty two colleagues across five specialist teams, working remotely from ten countries across Africa and beyond.",
+    "The Gmac Group team: colleagues across five specialist teams, working remotely from countries across Africa and beyond.",
   alternates: { canonical: "/team" },
 };
 
 export default async function TeamPage() {
   const members = await getTeam();
-  const countries = new Set(members.map((m) => m.country)).size;
+  const countries = new Set([...members.map((m) => m.country), FOUNDER.country]).size;
 
   return (
     <>
@@ -34,8 +34,8 @@ export default async function TeamPage() {
               {TEAMS.length} teams. {countries} countries. <em className="font-light italic text-ink-500">One standard.</em>
             </h1>
             <p className="lede mt-8 max-w-[56ch]">
-              {members.length} colleagues working remotely across Africa and beyond. Every team has a named lead accountable
-              for delivery quality, and every engagement is staffed from the team that owns the capability.
+              {members.length + 1} colleagues working remotely across Africa and beyond. Every engagement is staffed from the
+              team that owns the capability.
             </p>
           </div>
           <div className="lg:col-span-5">
