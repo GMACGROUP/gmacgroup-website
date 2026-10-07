@@ -36,6 +36,7 @@ const config: Config = {
           300: "#B9BDC4",
         },
         paper: "#FBFAF7",
+        teal: { DEFAULT: "#0B6A92" }, // figures band (from the logo's teal blue)
         stone: "#F2F0EB",
         rule: "#E3DFD6",
         accent: {
