@@ -328,7 +328,7 @@ class StorageService:
         from datetime import datetime, timedelta, timezone
         from urllib.parse import parse_qs, urlparse
 
-        from jose import jwt
+        import jwt
 
         parsed = urlparse(reference)
         supabase_url = self.settings.SUPABASE_URL.rstrip("/")
@@ -377,7 +377,8 @@ class StorageService:
             return None
 
     def read_signed_token(self, token: str) -> Path | None:
-        from jose import JWTError, jwt
+        import jwt
+        from jwt import PyJWTError as JWTError
 
         try:
             claims = jwt.decode(token, self.settings.JWT_SECRET, algorithms=[self.settings.JWT_ALGORITHM])

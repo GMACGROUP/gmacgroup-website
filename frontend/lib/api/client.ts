@@ -1,27 +1,13 @@
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000/api/v1";
 const REQUEST_TIMEOUT_MS = 15000;
 
-function getStoredToken(): string | null {
-  if (typeof window === "undefined") return null;
-  try {
-    return localStorage.getItem("gmac_auth_token");
-  } catch {
-    return null;
-  }
-}
-
 async function request<T>(path: string, options: RequestInit = {}): Promise<T> {
-  const token = getStoredToken();
   const headers: Record<string, string> = {
     "Content-Type": "application/json",
     ...(options.headers as Record<string, string>),
   };
 
   if (headers["Content-Type"] === "") delete headers["Content-Type"];
-
-  if (token && !headers["Authorization"]) {
-    headers["Authorization"] = `Bearer ${token}`;
-  }
 
   const controller = new AbortController();
   const timeout = window.setTimeout(() => controller.abort(), REQUEST_TIMEOUT_MS);
@@ -31,6 +17,8 @@ async function request<T>(path: string, options: RequestInit = {}): Promise<T> {
     res = await fetch(`${API_BASE_URL}${path}`, {
       ...options,
       headers,
+      // The session lives in an httpOnly cookie set by the API; scripts never see it.
+      credentials: "include",
       signal: options.signal ?? controller.signal,
     });
   } catch (error) {

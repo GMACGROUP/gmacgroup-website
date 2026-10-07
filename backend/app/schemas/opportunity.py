@@ -4,7 +4,7 @@ from datetime import datetime
 from enum import Enum
 from typing import Optional
 from uuid import UUID
-from pydantic import BaseModel, ConfigDict, EmailStr
+from pydantic import BaseModel, ConfigDict, EmailStr, Field, field_validator
 
 
 class OpportunityType(str, Enum):
@@ -61,12 +61,27 @@ class OpportunityUpdate(BaseModel):
 
 
 class ApplicationCreate(BaseModel):
-    applicant_name: Optional[str] = None
+    applicant_name: Optional[str] = Field(default=None, max_length=120)
     applicant_email: Optional[EmailStr] = None
-    phone: Optional[str] = None
-    linkedin_url: Optional[str] = None
-    cover_note: Optional[str] = None
-    resume_url: Optional[str] = None
+    phone: Optional[str] = Field(default=None, max_length=40)
+    linkedin_url: Optional[str] = Field(default=None, max_length=300)
+    cover_note: Optional[str] = Field(default=None, max_length=4000)
+    resume_url: Optional[str] = Field(default=None, max_length=500)
+
+    @field_validator("linkedin_url")
+    @classmethod
+    def https_link(cls, v):
+        if v and not v.startswith("https://"):
+            raise ValueError("Profile links must start with https://")
+        return v or None
+
+    @field_validator("resume_url")
+    @classmethod
+    def our_upload_or_https(cls, v):
+        # Either a document uploaded through our form, or an https link the applicant chose.
+        if v and not (v.startswith("/api/v1/uploads/files/") or v.startswith("https://")):
+            raise ValueError("The CV link is not valid")
+        return v or None
     offer_type: OfferType = OfferType.FREE
 
 

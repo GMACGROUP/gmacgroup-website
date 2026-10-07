@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import { apiClient } from "@/lib/api/client";
+import { refreshPublicPages } from "@/lib/api/revalidate";
 import { TEAMS } from "@/lib/content/site";
 
 type Member = {
@@ -57,18 +58,8 @@ export function TeamManager() {
     load();
   }, []);
 
-  /** Ask the website to refresh the public Team page straight away. */
   function publish() {
-    let token: string | null = null;
-    try {
-      token = localStorage.getItem("gmac_auth_token");
-    } catch {}
-    if (!token) return;
-    fetch("/api/revalidate", {
-      method: "POST",
-      headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
-      body: JSON.stringify({ tag: "team" }),
-    }).catch(() => undefined);
+    refreshPublicPages("team");
   }
 
   function flash(kind: "ok" | "error", text: string) {

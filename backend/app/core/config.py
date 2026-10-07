@@ -17,6 +17,15 @@ class Settings(BaseSettings):
     # Frontend origins allowed to call this API
     ALLOWED_ORIGINS: list[str] = ["http://localhost:3000"]
 
+    # Sign-in session cookie. Set SESSION_COOKIE_DOMAIN to "gmac-group.com" once the
+    # API is served from api.gmac-group.com, so the cookie is first party.
+    SESSION_COOKIE_NAME: str = "gmac_session"
+    SESSION_COOKIE_DOMAIN: str = ""
+    SESSION_DAYS: int = 7
+
+    # Error alerts: unhandled API errors are emailed here (at most one per error type per hour).
+    ALERT_EMAIL: str = ""
+
     # Database
     DATABASE_URL: str = "postgresql://user:password@localhost:5432/gmacgroup"
 
@@ -43,9 +52,9 @@ class Settings(BaseSettings):
     EMAIL_PROVIDER: str = "none"
     BREVO_API_KEY: str = ""
     RESEND_API_KEY: str = ""
-    EMAIL_FROM: str = "christian.gmacgroup@gmail.com"
-    EMAIL_FROM_NAME: str = "GMACGROUP"
-    OPERATIONS_EMAIL: str = "workdisal480@gmail.com"
+    EMAIL_FROM: str = "info@gmac-group.com"
+    EMAIL_FROM_NAME: str = "Gmac Group"
+    OPERATIONS_EMAIL: str = "info@gmac-group.com"
 
     # SMTP configuration (for sending from Gmail / standard SMTP without custom domain)
     SMTP_HOST: str = "smtp.gmail.com"
@@ -75,9 +84,15 @@ class Settings(BaseSettings):
                 raise ValueError("JWT_SECRET must be a strong value with at least 32 characters in production")
             if not self.ALLOWED_ORIGINS:
                 raise ValueError("ALLOWED_ORIGINS must contain the deployed frontend origin")
+            if self.FLW_SECRET_KEY and not self.FLW_WEBHOOK_SECRET_HASH:
+                raise ValueError("FLW_WEBHOOK_SECRET_HASH must be set when Flutterwave payments are enabled")
             if self.STORAGE_PROVIDER.lower() == "local":
                 raise ValueError("STORAGE_PROVIDER must use durable object storage in production")
         return self
+
+    @property
+    def is_production(self) -> bool:
+        return self.ENVIRONMENT.lower() in {"production", "staging"}
 
 
 @lru_cache

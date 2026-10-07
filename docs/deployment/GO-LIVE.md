@@ -64,7 +64,9 @@ It should return no rows.
 
 **Check:** paste an old CV link (one containing `/object/public/resumes/`) into a private browser window. It should fail to load.
 
-### 2c. Check who has admin access
+### 2c. Check who has admin access (do this today)
+
+Until the redesign is merged, the old live API lets anyone register as an admin. Check now, and again after launch:
 
 ```sql
 SELECT email, role, created_at FROM users WHERE role = 'admin';
@@ -87,12 +89,42 @@ Render dashboard, `gmacgroup-backend`, Environment. Set or confirm:
 | `STORAGE_BUCKET` | `resumes` |
 | `MEDIA_BUCKET` | `media` |
 | `OPERATIONS_EMAIL` | `info@gmac-group.com` (where contact messages and applications are sent) |
-| `EMAIL_FROM` | an address on gmac-group.com once the domain is verified with your email provider |
+| `EMAIL_FROM` | `info@gmac-group.com` (see step 3b; the domain must be verified first) |
+| `EMAIL_FROM_NAME` | `Gmac Group` |
+| `ALERT_EMAIL` | the person who looks after the website; gets an email when the API hits an unexpected error (at most one per hour per error) |
 | `JWT_SECRET` | already generated; leave it unless it is shorter than 32 characters |
+| `FLW_WEBHOOK_SECRET_HASH` | **required if payments are on.** Any long random string; enter the same value in Flutterwave, Settings, Webhooks, "Secret hash" |
+| `SESSION_COOKIE_DOMAIN` | leave empty until step 3a is done, then `gmac-group.com` |
 
 Then **Manual Deploy, Deploy latest commit**.
 
 **Check:** open `https://<your-api>/health`. It should say `healthy`. Then open `/api/v1/programmes/`. It should return `[]` until you publish something.
+
+### 3a. Give the API its own address on your domain (recommended)
+
+Sign-in now uses a secure cookie that page scripts cannot read. Browsers such as Safari block cookies from a different website, so sign-in works most reliably when the API lives at `api.gmac-group.com` rather than `onrender.com`.
+
+1. Render, `gmacgroup-backend`, Settings, Custom Domains: add `api.gmac-group.com`.
+2. At the domain registrar, add the `CNAME` record Render shows (host `api`).
+3. When Render shows the domain as verified, set `SESSION_COOKIE_DOMAIN` to `gmac-group.com` and `PUBLIC_API_URL` to `https://api.gmac-group.com`, then redeploy.
+4. In Vercel, set `NEXT_PUBLIC_API_URL` to `https://api.gmac-group.com/api/v1` (step 4) and redeploy.
+
+### 3b. Send email from gmac-group.com
+
+Confirmations and notifications go out as "Gmac Group <info@gmac-group.com>". For them to reach inboxes rather than spam, the email provider must be allowed to send for your domain:
+
+1. In your email provider (the settings support **Brevo**, **Resend** or **SMTP**), add `gmac-group.com` as a sending domain.
+2. The provider shows three or four DNS records (SPF, DKIM and usually DMARC). Add them at the domain registrar exactly as shown. They sit alongside your existing MX records; do not change those.
+3. Wait for the provider to show the domain as verified, then set on Render: `EMAIL_PROVIDER` (`brevo`, `resend` or `smtp`), its key or SMTP login, and `EMAIL_FROM`.
+4. Send yourself a message through the website's contact form. The confirmation email should arrive in your inbox, not spam, from info@gmac-group.com.
+
+If you already have a DMARC record, keep it. If you have none, start with `v=DMARC1; p=none; rua=mailto:info@gmac-group.com` and tighten it later.
+
+### 3c. Uptime check
+
+The repository includes a scheduled GitHub check (`docs/deployment/github-workflows/uptime.yml`; copy it into `.github/workflows/` as described in the README beside it) that opens the API and the website every 10 minutes. It keeps the free Render API awake, and if either is down the run fails and GitHub emails whoever last changed that file.
+
+GitHub, the repository, Settings, Secrets and variables, Actions, **Variables**: add `API_URL` (for example `https://api.gmac-group.com`) and `SITE_URL` (`https://gmac-group.com`).
 
 > **Free plan note.** Render's free plan puts the API to sleep after 15 minutes without traffic, and the first request then takes 30 to 60 seconds. The website has fallbacks for the team and events pages, but forms will feel broken to the first visitor after a quiet spell. For a live company site, move the API to a paid instance (Starter is enough).
 
@@ -165,14 +197,15 @@ Sign in at `/login` with an admin account and open `/admin`.
 
 ## What was tested before handover
 
-- 35 backend tests pass (team, events, catalogue, publishing, private CV links, contact form validation, honeypot and rate limits).
-- Production build succeeds.
+- 45 backend tests pass (team, events, catalogue, publishing, private CV links, contact form, sign-in cookies, password reset, cross-site guard, error alerts, payment webhook, rate limits), on a database built only from the migration files.
+- Backend dependencies: `pip-audit` finds no known vulnerabilities. Website: `npm audit` finds none in production packages.
+- Production build succeeds on Next.js 15.5.
 - A crawl of every internal link found no broken links. Old addresses (`/services`, `/insights`, `/opportunities`) redirect to their new pages, and unknown pages return a proper 404.
 - No page scrolls sideways on a 375 pixel wide phone.
 - An automated WCAG 2 AA accessibility scan (axe) passes on all main pages.
 
 ## Known limits
 
-- The form rate limits are kept in the API's memory. That is fine for one API instance; if you ever run several, move them to a shared store.
-- Next.js is on the latest 14.2 release. Some advisories are only fixed in version 15 and later; plan that upgrade as a separate piece of work.
+- The form rate limits and error alert throttle are kept in each API process's memory. The Docker image runs two processes, so the effective limits are about double the stated ones. If you scale up, move them to a shared store.
+- Remaining `npm audit` items are in development-only build tools (Tailwind's file watcher) that only read our own source files.
 - The AI assistant widget (bottom right) calls a separate service at `gmac-group-assistant.onrender.com`. It is unchanged by this redesign; review what it says about the company before launch.

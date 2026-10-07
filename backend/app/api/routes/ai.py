@@ -1,16 +1,20 @@
 """Routes for the separately deployed AI assistant."""
 
 import httpx
-from fastapi import APIRouter, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException, status
 
 from app.core.config import get_settings
+from app.core.ratelimit import rate_limit
 from app.schemas.ai import AssistantQuery, AssistantResponse
 
 router = APIRouter()
 
 
 @router.post("/assistant", response_model=AssistantResponse)
-async def ask_assistant(payload: AssistantQuery):
+async def ask_assistant(
+    payload: AssistantQuery,
+    _: None = Depends(rate_limit("assistant", limit=30, window_seconds=600)),
+):
     """Forward a conversation prompt to the deployed Flask AI service."""
     settings = get_settings()
     if not settings.AI_FLASK_URL:

@@ -10,6 +10,7 @@ from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session
 from app.api.dependencies import get_current_user, get_optional_user
 from app.core.database import get_db
+from app.core.ratelimit import rate_limit
 from app.models.opportunity import Application
 from app.models.user import User
 from app.services.notifications import notification_service
@@ -57,6 +58,7 @@ async def apply_to_opportunity(
     payload: ApplicationCreate,
     current_user: Optional[dict] = Depends(get_optional_user),
     db: Session = Depends(get_db),
+    _: None = Depends(rate_limit("apply", limit=10, window_seconds=600)),
 ):
     """Submit an application for an authenticated user or guest applicant."""
     item = catalogue.get_item(db, "opportunity", opportunity_id)

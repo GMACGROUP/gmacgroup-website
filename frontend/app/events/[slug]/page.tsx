@@ -9,8 +9,10 @@ import { SITE } from "@/lib/content/site";
 
 export const revalidate = 300;
 
-export async function generateMetadata({ params }: { params: { slug: string } }): Promise<Metadata> {
-  const e = await getEvent(params.slug);
+type Props = { params: Promise<{ slug: string }> };
+
+export async function generateMetadata({ params }: Props): Promise<Metadata> {
+  const e = await getEvent((await params).slug);
   if (!e) notFound();
   return {
     title: e.title,
@@ -20,8 +22,8 @@ export async function generateMetadata({ params }: { params: { slug: string } })
   };
 }
 
-export default async function EventPage({ params }: { params: { slug: string } }) {
-  const e = await getEvent(params.slug);
+export default async function EventPage({ params }: Props) {
+  const e = await getEvent((await params).slug);
   if (!e) notFound();
   const past = isPast(e);
   const time = timeLine(e);

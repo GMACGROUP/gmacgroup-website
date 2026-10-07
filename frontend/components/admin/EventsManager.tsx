@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import { apiClient } from "@/lib/api/client";
+import { refreshPublicPages } from "@/lib/api/revalidate";
 import { FORMAT_LABEL, dateLine, isPast, type GmacEvent } from "@/lib/events";
 
 type AdminEvent = GmacEvent & { is_published: boolean };
@@ -68,14 +69,7 @@ export function EventsManager() {
   }, []);
 
   function publish() {
-    let token: string | null = null;
-    try { token = localStorage.getItem("gmac_auth_token"); } catch {}
-    if (!token) return;
-    fetch("/api/revalidate", {
-      method: "POST",
-      headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
-      body: JSON.stringify({ tag: "events" }),
-    }).catch(() => undefined);
+    refreshPublicPages("events");
   }
   function flash(kind: "ok" | "error", text: string) {
     if (kind === "ok") publish();

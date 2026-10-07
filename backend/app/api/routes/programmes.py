@@ -11,6 +11,7 @@ from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session
 from app.api.dependencies import get_current_user, get_optional_user
 from app.core.database import get_db
+from app.core.ratelimit import rate_limit
 from app.models.programme import ProgrammeEnrolment
 from app.models.user import User
 from app.services.notifications import notification_service
@@ -55,6 +56,7 @@ async def enrol_in_programme(
     background_tasks: BackgroundTasks,
     current_user: Optional[dict] = Depends(get_optional_user),
     db: Session = Depends(get_db),
+    _: None = Depends(rate_limit("enrol", limit=10, window_seconds=600)),
 ):
     """Create an enrolment for an authenticated member or guest applicant."""
     item = catalogue.get_item(db, "programme", programme_id)

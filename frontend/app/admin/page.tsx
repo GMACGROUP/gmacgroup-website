@@ -4,6 +4,7 @@ import React, { useEffect, useState } from "react";
 import Link from "next/link";
 import { useAuth } from "@/hooks/useAuth";
 import { apiClient } from "@/lib/api/client";
+import { refreshPublicPages } from "@/lib/api/revalidate";
 import { TeamManager } from "@/components/admin/TeamManager";
 import { EventsManager } from "@/components/admin/EventsManager";
 import {
@@ -503,18 +504,8 @@ export default function AdminPage() {
     }
   }
 
-  /** Ask the website to refresh the public Programmes and Careers pages straight away. */
   function refreshPublicCatalogue() {
-    let token: string | null = null;
-    try {
-      token = localStorage.getItem("gmac_auth_token");
-    } catch {}
-    if (!token) return;
-    fetch("/api/revalidate", {
-      method: "POST",
-      headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
-      body: JSON.stringify({ tag: "catalogue" }),
-    }).catch(() => undefined);
+    refreshPublicPages("catalogue");
   }
 
   async function togglePublished(collection: "programmes" | "opportunities", id: string, next: boolean) {

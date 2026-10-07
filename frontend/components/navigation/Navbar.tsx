@@ -107,7 +107,7 @@ export function Navbar() {
             ) : showPublicAuthActions ? (
               <>
                 <Link href="/login" prefetch={true} className="text-sm text-ink-500 hover:text-ink">
-                  Member sign in
+                  Sign in
                 </Link>
                 <Link href="/contact" prefetch={true} className="btn-primary !px-5 !py-2.5 !text-sm">
                   Start a conversation
@@ -173,7 +173,7 @@ export function Navbar() {
                   Start a conversation
                 </Link>
                 <Link href="/login" prefetch={true} onClick={() => setMobileMenuOpen(false)} className="btn-secondary w-full">
-                  Member sign in
+                  Sign in
                 </Link>
               </>
             ) : null}

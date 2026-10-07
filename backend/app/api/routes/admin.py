@@ -62,12 +62,11 @@ async def test_email_delivery(
     if not recipient:
         raise HTTPException(status_code=400, detail="No test recipient is configured")
 
-    result = await notification_service.send_brevo_email_with_metadata(
-        recipient,
-        payload.subject,
-        payload.message,
-    )
-    return result
+    provider = (settings.EMAIL_PROVIDER or "none").lower()
+    if provider == "brevo":
+        return await notification_service.send_brevo_email_with_metadata(recipient, payload.subject, payload.message)
+    ok = await notification_service.send_email(recipient, payload.subject, payload.message)
+    return {"success": ok, "provider": provider, "recipient": recipient}
 
 
 @router.get("/members", response_model=AdminPage[dict])

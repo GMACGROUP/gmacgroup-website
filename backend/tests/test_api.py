@@ -335,6 +335,7 @@ def test_admin_programme_and_opportunity_crud():
     assert client.delete(f"/api/v1/admin/catalogue/publications/{pub_id}", headers=headers).status_code == 200
 
     # Non-admins cannot list drafts
+    client.cookies.clear()
     assert client.get("/api/v1/admin/catalogue/programmes").status_code in (401, 403)
 
     # 5. Delete opportunity
@@ -384,3 +385,60 @@ def test_login_is_rate_limited():
     codes = [client.post("/api/v1/auth/login", json={"email": "nobody@example.com", "password": "wrongpass1"}).status_code for _ in range(11)]
     assert codes[-1] == 429
     ratelimit._hits.clear()
+
+
+
+def test_session_cookie_login_logout_and_password_change():
+    from app.core import ratelimit
+
+    ratelimit._hits.clear()
+    c = TestClient(app)
+    email = "cookie-test@example.com"
+    from app.core.database import SessionLocal as _S
+    from app.models.user import User as _U
+
+    with _S() as db:
+        db.query(_U).filter(_U.email == email).delete()
+        db.commit()
+    c.post("/api/v1/auth/register", json={"email": email, "password": "firstpass123"})
+    res = c.post("/api/v1/auth/login", json={"email": email, "password": "firstpass123"})
+    cookie = res.headers.get("set-cookie", "")
+    assert "gmac_session=" in cookie and "HttpOnly" in cookie
+    assert c.get("/api/v1/auth/me").status_code == 200  # cookie alone is enough
+    old_token = res.json()["access_token"]
+
+    # A reset link works once, and changing the password ends old sessions
+    from app.api.dependencies import create_password_reset_token
+    from app.core.database import SessionLocal
+    from app.models.user import User
+
+    with SessionLocal() as db:
+        user = db.query(User).filter(User.email == email).first()
+        link = create_password_reset_token(email, user.password_hash)
+    assert c.post("/api/v1/auth/reset-password", json={"token": link, "new_password": "secondpass123"}).status_code == 200
+    assert c.post("/api/v1/auth/reset-password", json={"token": link, "new_password": "thirdpass123"}).status_code == 400
+    assert c.get("/api/v1/auth/me", headers={"Authorization": f"Bearer {old_token}"}).status_code == 401
+
+    # Sign out clears the cookie
+    c.post("/api/v1/auth/login", json={"email": email, "password": "secondpass123"})
+    assert c.post("/api/v1/auth/logout").status_code == 204
+    c.cookies.clear()
+    assert c.get("/api/v1/auth/me").status_code == 401
+    ratelimit._hits.clear()
+
+
+def test_reset_token_is_not_a_session():
+    from app.api.dependencies import create_password_reset_token
+
+    token = create_password_reset_token("someone@example.com")
+    assert client.get("/api/v1/auth/me", headers={"Authorization": f"Bearer {token}"}).status_code == 401
+
+
+def test_action_token_for_admins_only():
+    from app.api.dependencies import create_action_token
+
+    good = create_action_token({"id": "x", "role": "admin"}, "revalidate")
+    bad = create_action_token({"id": "x", "role": "student"}, "revalidate")
+    assert client.post("/api/v1/auth/action-token/verify", json={"token": good}).status_code == 200
+    assert client.post("/api/v1/auth/action-token/verify", json={"token": bad}).status_code == 401
+    assert client.post("/api/v1/auth/action-token/verify", json={"token": "nonsense"}).status_code == 401

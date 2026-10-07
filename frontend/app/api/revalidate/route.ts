@@ -6,23 +6,22 @@ const ALLOWED_TAGS = new Set(["team", "events", "insights", "catalogue"]);
 
 /**
  * Called by the admin panel after a content change so the public pages update
- * immediately instead of waiting for the scheduled refresh. The caller's
- * token is checked against the API and must belong to an admin.
+ * immediately instead of waiting for the scheduled refresh. The admin's browser
+ * passes a five minute token issued by the API, which the API confirms here.
  */
 export async function POST(req: Request) {
-  const auth = req.headers.get("authorization");
-  if (!auth?.startsWith("Bearer ")) return NextResponse.json({ ok: false }, { status: 401 });
-
-  const body = (await req.json().catch(() => null)) as { tag?: string } | null;
+  const body = (await req.json().catch(() => null)) as { tag?: string; token?: string } | null;
   const tag = body?.tag;
   if (!tag || !ALLOWED_TAGS.has(tag)) return NextResponse.json({ ok: false, detail: "Unknown tag" }, { status: 400 });
+  if (!body?.token) return NextResponse.json({ ok: false }, { status: 401 });
 
-  const me = await fetch(`${API_BASE_URL}/auth/me`, { headers: { Authorization: auth }, cache: "no-store" }).catch(() => null);
-  if (!me?.ok) return NextResponse.json({ ok: false }, { status: 401 });
-  const user = (await me.json().catch(() => null)) as { role?: string } | null;
-  if (!user || user.role !== "admin") {
-    return NextResponse.json({ ok: false }, { status: 403 });
-  }
+  const check = await fetch(`${API_BASE_URL}/auth/action-token/verify`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ token: body.token, action: "revalidate" }),
+    cache: "no-store",
+  }).catch(() => null);
+  if (!check?.ok) return NextResponse.json({ ok: false }, { status: 401 });
 
   revalidateTag(tag);
   return NextResponse.json({ ok: true, tag });

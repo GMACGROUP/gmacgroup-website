@@ -50,5 +50,9 @@ services:
         value: "true"
       - key: EMAIL_FROM
         sync: false
+      - key: ALERT_EMAIL
+        sync: false
+      - key: SESSION_COOKIE_DOMAIN
+        sync: false
       - key: OPERATIONS_EMAIL
         value: info@gmac-group.com

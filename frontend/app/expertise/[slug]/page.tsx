@@ -10,8 +10,11 @@ export function generateStaticParams() {
   return PRACTICE_AREAS.map((p) => ({ slug: p.slug }));
 }
 
-export function generateMetadata({ params }: { params: { slug: string } }): Metadata {
-  const p = PRACTICE_AREAS.find((x) => x.slug === params.slug);
+type Props = { params: Promise<{ slug: string }> };
+
+export async function generateMetadata({ params }: Props): Promise<Metadata> {
+  const { slug } = await params;
+  const p = PRACTICE_AREAS.find((x) => x.slug === slug);
   if (!p) return {};
   return {
     title: p.title,
@@ -20,8 +23,9 @@ export function generateMetadata({ params }: { params: { slug: string } }): Meta
   };
 }
 
-export default function PracticeAreaPage({ params }: { params: { slug: string } }) {
-  const idx = PRACTICE_AREAS.findIndex((x) => x.slug === params.slug);
+export default async function PracticeAreaPage({ params }: Props) {
+  const { slug } = await params;
+  const idx = PRACTICE_AREAS.findIndex((x) => x.slug === slug);
   if (idx === -1) notFound();
   const p = PRACTICE_AREAS[idx];
   const next = PRACTICE_AREAS[(idx + 1) % PRACTICE_AREAS.length];

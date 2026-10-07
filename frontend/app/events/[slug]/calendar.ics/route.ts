@@ -12,8 +12,8 @@ const day = (iso: string, addDays = 0) => {
 const esc = (s: string) => s.replace(/\\/g, "\\\\").replace(/;/g, "\;").replace(/,/g, "\\,").replace(/\n/g, "\\n");
 
 /** A downloadable calendar entry for an upcoming event. */
-export async function GET(_req: Request, { params }: { params: { slug: string } }) {
-  const e = await getEvent(params.slug);
+export async function GET(_req: Request, { params }: { params: Promise<{ slug: string }> }) {
+  const e = await getEvent((await params).slug);
   if (!e || !e.start_at) return new Response("Not found", { status: 404 });
 
   const when = e.all_day

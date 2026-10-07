@@ -11,6 +11,8 @@ from sqlalchemy.orm import Session
 from app.api.dependencies import get_optional_user
 from app.core.config import get_settings
 from app.core.database import get_db
+from app.core.ratelimit import rate_limit
+import hmac
 from app.services import catalogue
 from app.models.opportunity import Application
 from app.models.payment import Payment
@@ -133,6 +135,7 @@ async def initialize_payment(
     request: Request,
     current_user: dict | None = Depends(get_optional_user),
     db: Session = Depends(get_db),
+    _: None = Depends(rate_limit("pay-init", limit=10, window_seconds=600)),
 ):
     target, offer = _find_target(db, payload)
     if offer["amount"] <= 0:
@@ -166,7 +169,7 @@ async def initialize_payment(
         "currency": offer["currency"],
         "redirect_url": f"{settings.FRONTEND_URL.rstrip('/')}/payment/callback",
         "customer": {"email": str(payload.email), "name": payload.full_name or str(payload.email)},
-        "customizations": {"title": "GMACGROUP", "description": f"{offer['label']} - {target['title']}"},
+        "customizations": {"title": "Gmac Group", "description": f"{offer['label']} - {target['title']}"},
         "meta": {"target_type": payload.target_type, "target_id": payload.target_id, "offer_type": payload.offer_type},
     }
     async with httpx.AsyncClient(timeout=20) as client:
@@ -218,6 +221,7 @@ async def verify_payment(
     transaction_id: str,
     background_tasks: BackgroundTasks,
     db: Session = Depends(get_db),
+    _: None = Depends(rate_limit("pay-verify", limit=20, window_seconds=600)),
 ):
     return await _verify(reference, transaction_id, db, background_tasks)
 
@@ -229,7 +233,11 @@ async def payment_webhook(
     verif_hash: str | None = Header(default=None, alias="verif-hash"),
     db: Session = Depends(get_db),
 ):
-    if settings.FLW_WEBHOOK_SECRET_HASH and verif_hash != settings.FLW_WEBHOOK_SECRET_HASH:
+    expected = settings.FLW_WEBHOOK_SECRET_HASH
+    if not expected:
+        # Without the shared secret we cannot tell Flutterwave from anyone else.
+        raise HTTPException(status_code=503, detail="Webhook not configured")
+    if not verif_hash or not hmac.compare_digest(verif_hash, expected):
         raise HTTPException(status_code=401, detail="Invalid webhook signature")
     body = await request.json()
     data = body.get("data", {})

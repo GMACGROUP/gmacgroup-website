@@ -1,0 +1,34 @@
+# Checks the live API and website every 10 minutes.
+# - Keeps the Render API awake (the free plan sleeps after 15 idle minutes).
+# - If a check fails, the run fails and GitHub emails the person who last
+#   changed this file (set up email in GitHub Settings > Notifications > Actions).
+# Set two repository variables (Settings > Secrets and variables > Actions > Variables):
+#   API_URL   e.g. https://gmacgroup-backend.onrender.com
+#   SITE_URL  e.g. https://gmac-group.com
+name: Uptime check
+
+on:
+  schedule:
+    - cron: "*/10 * * * *"
+  workflow_dispatch:
+
+permissions: {}
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: API is up and can reach the database
+        if: ${{ vars.API_URL != '' }}
+        run: |
+          for i in 1 2 3; do
+            code=$(curl -s -o /dev/null -w "%{http_code}" --max-time 90 "${{ vars.API_URL }}/ready") && [ "$code" = "200" ] && exit 0
+            echo "Attempt $i returned $code"; sleep 20
+          done
+          echo "::error::API readiness check failed"; exit 1
+      - name: Website home page loads
+        if: ${{ vars.SITE_URL != '' }}
+        run: |
+          code=$(curl -s -o /dev/null -w "%{http_code}" --max-time 60 "${{ vars.SITE_URL }}/")
+          [ "$code" = "200" ] || { echo "::error::Website returned $code"; exit 1; }
