@@ -78,7 +78,7 @@ export function AfricaMap({ className = "", tone = "light", numbered = true, sho
         )}
 
         {numbered && (
-          <g fontFamily="var(--font-plex), 'IBM Plex Sans', sans-serif" fontSize="9" fontWeight={500}>
+          <g fontFamily="var(--font-sans), 'Libre Franklin', sans-serif" fontSize="9" fontWeight={500}>
             {focus.map((c, i) => {
               const [dx, dy] = nudge[c.name] ?? [0, 0];
               const x = c.cx + dx;

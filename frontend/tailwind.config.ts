@@ -75,7 +75,7 @@ const config: Config = {
         },
       },
       fontFamily: {
-        sans: ["var(--font-plex)", "'IBM Plex Sans'", "-apple-system", "BlinkMacSystemFont", "'Segoe UI'", "Roboto", "sans-serif"],
+        sans: ["var(--font-sans)", "'Libre Franklin'", "-apple-system", "BlinkMacSystemFont", "'Segoe UI'", "Roboto", "sans-serif"],
         serif: ["var(--font-newsreader)", "Newsreader", "'Newsreader 16pt'", "Georgia", "serif"],
         display: ["var(--font-newsreader)", "Newsreader", "'Newsreader 16pt'", "Georgia", "serif"],
       },
@@ -99,7 +99,7 @@ const config: Config = {
         prose: "68ch",
       },
       letterSpacing: {
-        label: "0.14em",
+        label: "0.09em",
       },
     },
   },

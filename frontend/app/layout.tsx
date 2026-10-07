@@ -14,9 +14,12 @@ import { SITE } from "@/lib/content/site";
 
 // Fonts are self hosted (SIL Open Font License, see app/fonts) so builds and
 // page loads never depend on a third party font service.
-const plex = localFont({
-  src: [{ path: "./fonts/ibm-plex-sans-latin-wght-normal.woff2", weight: "100 700", style: "normal" }],
-  variable: "--font-plex",
+const franklin = localFont({
+  src: [
+    { path: "./fonts/libre-franklin-latin-wght-normal.woff2", weight: "100 900", style: "normal" },
+    { path: "./fonts/libre-franklin-latin-wght-italic.woff2", weight: "100 900", style: "italic" },
+  ],
+  variable: "--font-sans",
   display: "swap",
   fallback: ["-apple-system", "Segoe UI", "Roboto", "sans-serif"],
 });
@@ -56,7 +59,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en-GB" className={`${plex.variable} ${newsreader.variable}`}>
+    <html lang="en-GB" className={`${franklin.variable} ${newsreader.variable}`}>
       <body className="min-h-screen flex flex-col font-sans">
         <AuthProvider>
           <Suspense fallback={null}>

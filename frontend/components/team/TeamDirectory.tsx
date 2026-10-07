@@ -52,7 +52,7 @@ export function TeamDirectory({ members }: { members: TeamMember[] }) {
 
           <ul className="grid grid-cols-2 gap-x-5 gap-y-10 sm:grid-cols-3 lg:col-span-9 xl:grid-cols-4">
             {g.members.map((m) => (
-              <li key={m.id} className="group">
+              <li key={m.id} tabIndex={0} className="group outline-none focus-visible:ring-2 focus-visible:ring-accent">
                 <Portrait name={m.name} src={m.photo_url} className="aspect-[4/5] w-full" sizes="(max-width: 640px) 50vw, (max-width: 1280px) 25vw, 220px" />
                 <div className="mt-4 border-t border-ink/15 pt-3">
                   <p className="flex items-baseline justify-between gap-2">

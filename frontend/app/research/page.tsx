@@ -176,7 +176,7 @@ export default async function ResearchPage() {
             </div>
             <ul className="mt-12 grid grid-cols-2 gap-x-6 gap-y-10 sm:grid-cols-3 lg:grid-cols-6">
               {researchers.map((m) => (
-                <li key={m.id} className="group">
+                <li key={m.id} tabIndex={0} className="group outline-none focus-visible:ring-2 focus-visible:ring-accent">
                   <Portrait name={m.name} src={m.photo_url} className="aspect-[4/5] w-full" sizes="(max-width: 640px) 45vw, 16vw" />
                   <p className="mt-3 font-medium leading-snug text-ink">{m.name}</p>
                   <p className="mt-1 text-[13px] leading-snug text-ink-500">{m.position}</p>

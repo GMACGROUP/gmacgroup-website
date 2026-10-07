@@ -1,306 +1,209 @@
 "use client";
 
 import { FormEvent, ReactNode, useEffect, useRef, useState } from "react";
+import Link from "next/link";
 
 type Message = { role: "user" | "assistant"; content: string };
 type ChatTurn = [string, string];
 
-const aiApiUrl =
-  process.env.NEXT_PUBLIC_AI_API_URL || "https://gmac-group-assistant.onrender.com/api/chat";
+const aiApiUrl = process.env.NEXT_PUBLIC_AI_API_URL || "https://gmac-group-assistant.onrender.com/api/chat";
 
-function formatInlineText(text: string): ReactNode[] {
-  return text.split(/(\*\*[^*]+\*\*|`[^`]+`)/g).map((part, index) => {
-    if (part.startsWith("**") && part.endsWith("**")) {
-      return <strong key={index} className="font-bold text-white">{part.slice(2, -2)}</strong>;
-    }
-    if (part.startsWith("`") && part.endsWith("`")) {
-      return <code key={index} className="rounded bg-slate-950/80 px-1.5 py-0.5 text-xs font-mono text-accent-soft">{part.slice(1, -1)}</code>;
-    }
-    return <span key={index}>{part}</span>;
-  });
+const WELCOME =
+  "Hello. I can answer questions about Gmac Group: our research and advisory work, programmes, events and how institutions engage with us.";
+const STARTERS = [
+  "What does Gmac Group do?",
+  "How do institutions work with you?",
+  "What events are coming up?",
+];
+
+function inline(text: string): ReactNode[] {
+  return text.split(/(\*\*[^*]+\*\*)/g).map((part, i) =>
+    part.startsWith("**") && part.endsWith("**") ? (
+      <strong key={i} className="font-semibold text-ink">
+        {part.slice(2, -2)}
+      </strong>
+    ) : (
+      <span key={i}>{part.replace(/`/g, "")}</span>
+    ),
+  );
 }
 
-function formatAssistantMessage(content: string): ReactNode {
-  const normalizedContent = content
-    .replace(/\s+(#{1,3}\s+)/g, "\n\n$1")
-    .replace(/\s+(\*|-)\s+(?=\*\*)/g, "\n$1 ");
-
+function Formatted({ content }: { content: string }) {
+  const lines = content.replace(/\s+(#{1,3}\s+)/g, "\n\n$1").split(/\r?\n/);
   return (
-    <div className="space-y-3 text-sm leading-relaxed text-slate-100">
-      {normalizedContent.split(/\r?\n/).map((line, index) => {
-        const trimmedLine = line.trim();
-        if (!trimmedLine) return <div key={index} className="h-1" />;
-
-        const heading = trimmedLine.match(/^#{1,3}\s+(.+)/);
-        if (heading) {
-          return <h4 key={index} className="pt-1 text-sm font-bold leading-snug text-white font-serif">{formatInlineText(heading[1])}</h4>;
-        }
-
-        const bullet = trimmedLine.match(/^(?:\*|-|•)\s+(.+)/);
-        if (bullet) {
+    <div className="space-y-2.5">
+      {lines.map((raw, i) => {
+        const line = raw.trim();
+        if (!line) return null;
+        const heading = line.match(/^#{1,3}\s+(.+)/);
+        if (heading) return <p key={i} className="pt-1 font-display text-[17px] text-ink">{inline(heading[1])}</p>;
+        const bullet = line.match(/^(?:\*|-|•)\s+(.+)/);
+        if (bullet)
           return (
-            <div key={index} className="flex gap-2 pl-1 leading-relaxed">
-              <span className="mt-0.5 text-accent-soft font-bold">•</span>
-              <span>{formatInlineText(bullet[1])}</span>
-            </div>
+            <p key={i} className="grid grid-cols-[0.9rem_1fr]">
+              <span aria-hidden="true" className="text-accent">·</span>
+              <span>{inline(bullet[1])}</span>
+            </p>
           );
-        }
-
-        return <p key={index}>{formatInlineText(trimmedLine)}</p>;
+        return <p key={i}>{inline(line)}</p>;
       })}
     </div>
   );
 }
 
 export function AIChatWidget() {
-  const [isOpen, setIsOpen] = useState(false);
-  const [messages, setMessages] = useState<Message[]>([
-    { role: "assistant", content: "Hello! I am GMAC Group's assistant. How can I help you explore our research, human capital programmes, or investment advisory services?" },
-  ]);
+  const [open, setOpen] = useState(false);
+  const [messages, setMessages] = useState<Message[]>([{ role: "assistant", content: WELCOME }]);
   const [history, setHistory] = useState<ChatTurn[]>([["Hi", ""]]);
-  const [suggestions, setSuggestions] = useState<string[]>([
-    "What services does Gmac Group offer?",
-    "How can institutions partner with Gmac Group?",
-    "What research capabilities are available?",
-  ]);
+  const [suggestions, setSuggestions] = useState<string[]>(STARTERS);
   const [prompt, setPrompt] = useState("");
-  const [isSending, setIsSending] = useState(false);
+  const [sending, setSending] = useState(false);
   const [error, setError] = useState<string | null>(null);
-
-  const messagesEndRef = useRef<HTMLDivElement>(null);
+  const endRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
-    if (isOpen) {
-      setTimeout(() => {
-        inputRef.current?.focus();
-        messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
-      }, 100);
-    }
-  }, [isOpen, messages]);
+    if (!open) return;
+    const t = window.setTimeout(() => {
+      inputRef.current?.focus();
+      endRef.current?.scrollIntoView({ behavior: "smooth", block: "end" });
+    }, 80);
+    return () => window.clearTimeout(t);
+  }, [open, messages]);
 
-  // Handle escape key to close modal
   useEffect(() => {
-    function handleKeyDown(e: KeyboardEvent) {
-      if (e.key === "Escape" && isOpen) {
-        setIsOpen(false);
-      }
-    }
-    window.addEventListener("keydown", handleKeyDown);
-    return () => window.removeEventListener("keydown", handleKeyDown);
-  }, [isOpen]);
+    const onKey = (e: KeyboardEvent) => e.key === "Escape" && setOpen(false);
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, []);
 
-  function resetConversation(showWelcome = true) {
-    setMessages(
-      showWelcome
-        ? [{ role: "assistant", content: "Hello! I am GMAC Group's assistant. How can I help you explore our research, human capital programmes, or investment advisory services?" }]
-        : [],
-    );
+  function reset() {
+    setMessages([{ role: "assistant", content: WELCOME }]);
     setHistory([["Hi", ""]]);
-    setSuggestions(showWelcome ? [
-      "What services does Gmac Group offer?",
-      "How can institutions partner with Gmac Group?",
-      "What research capabilities are available?",
-    ] : []);
+    setSuggestions(STARTERS);
     setPrompt("");
     setError(null);
   }
 
-  async function sendMessage(event: FormEvent<HTMLFormElement>, suggestedPrompt?: string) {
-    event.preventDefault();
-    const message = (suggestedPrompt || prompt).trim();
-    if (!message || isSending) return;
-
-    setMessages((current) => [...current, { role: "user", content: message }]);
+  async function send(event: FormEvent | null, preset?: string) {
+    event?.preventDefault();
+    const message = (preset || prompt).trim();
+    if (!message || sending) return;
+    setMessages((m) => [...m, { role: "user", content: message }]);
     setPrompt("");
     setSuggestions([]);
     setError(null);
-    setIsSending(true);
-
+    setSending(true);
     try {
-      const response = await fetch(aiApiUrl, {
+      const res = await fetch(aiApiUrl, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ message, history }),
       });
-      if (!response.ok) throw new Error("The assistant is temporarily unavailable.");
-
-      const data = (await response.json()) as { reply?: string; suggestions?: string[] };
-      const reply = data.reply || "I could not find an answer for that yet.";
-      setMessages((current) => [...current, { role: "assistant", content: reply }]);
-      setHistory((current) => [...current, [message, reply]]);
-      setSuggestions(Array.isArray(data.suggestions) ? data.suggestions : []);
-    } catch (requestError) {
-      setError(requestError instanceof Error ? requestError.message : "The assistant is temporarily unavailable.");
+      if (!res.ok) throw new Error();
+      const data = (await res.json()) as { reply?: string; suggestions?: string[] };
+      const reply = data.reply || "I don't have an answer for that yet. Our team can help through the contact page.";
+      setMessages((m) => [...m, { role: "assistant", content: reply }]);
+      setHistory((h) => [...h, [message, reply]]);
+      setSuggestions(Array.isArray(data.suggestions) ? data.suggestions.slice(0, 3) : []);
+    } catch {
+      setError("The assistant is not available right now. You can still reach us through the contact page.");
     } finally {
-      setIsSending(false);
+      setSending(false);
     }
   }
 
   return (
     <>
-      {/* Mobile Backdrop for Full Sheet */}
-      {isOpen && (
+      {open && (
         <div
-          onClick={() => setIsOpen(false)}
-          className="fixed inset-0 z-40 bg-black/60 backdrop-blur-xs sm:hidden animate-fadeIn"
-          aria-hidden="true"
-        />
-      )}
-
-      {/* Main AI Chat Modal */}
-      {isOpen && (
-        <section
-          aria-label="GMACGROUP AI assistant"
-          className="fixed inset-x-0 bottom-0 sm:inset-x-auto sm:bottom-6 sm:right-8 z-50 flex h-[88dvh] max-h-[88dvh] sm:h-[min(620px,calc(100dvh-6rem))] sm:w-[min(420px,calc(100vw-2.5rem))] flex-col overflow-hidden rounded-t-3xl sm:rounded-3xl border border-slate-700/80 bg-[#07111F] text-white shadow-[0_25px_80px_rgba(0,0,0,0.55)] backdrop-blur-xl animate-modalPanelIn"
+          role="dialog"
+          aria-modal="false"
+          aria-labelledby="ask-title"
+          className="fixed inset-x-0 bottom-0 z-50 flex h-[85dvh] flex-col border-t-4 border-ink bg-paper shadow-[0_-12px_40px_-12px_rgba(14,26,43,0.35)] sm:inset-x-auto sm:bottom-6 sm:right-6 sm:h-[min(600px,calc(100dvh-6rem))] sm:w-[400px] sm:border sm:border-t-4 sm:border-ink/15 sm:border-t-ink modal-panel-in"
         >
-          {/* Header */}
-          <header className="flex flex-shrink-0 items-center justify-between border-b border-slate-800 bg-[#060E1A] px-5 py-3.5 sm:py-4">
-            <div className="flex items-center gap-3">
-              <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-accent text-white shadow-sm border border-white/20">
-                <svg aria-hidden="true" className="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8">
-                  <path d="m12 3 1.35 5.65L19 10l-5.65 1.35L12 17l-1.35-5.65L5 10l5.65-1.35L12 3Z" strokeLinejoin="round" />
-                  <path d="m19 16 .55 2.45L22 19l-2.45.55L19 22l-.55-2.45L16 19l2.45-.55L19 16Z" strokeLinejoin="round" />
-                </svg>
-              </div>
-              <div>
-                <p className="text-sm font-bold text-white flex items-center gap-1.5">
-                  GMAC Group <span className="rounded-md border border-accent-soft/40 bg-accent-soft/10 px-1.5 py-0.2 text-[10px] font-extrabold text-accent-soft">AI</span>
-                </p>
-                <p className="text-[11px] text-slate-400 flex items-center gap-1.5">
-                  <span className="h-1.5 w-1.5 rounded-full bg-emerald-400 animate-pulse" />
-                  Research &amp; Human Capital
-                </p>
-              </div>
+          <header className="flex items-start justify-between gap-4 border-b border-rule px-5 pb-4 pt-5">
+            <div>
+              <h2 id="ask-title" className="font-display text-2xl leading-tight">Ask Gmac Group</h2>
+              <p className="mt-1 text-[13px] leading-snug text-ink-500">
+                Quick answers about our work. For a proposal, <Link href="/contact" onClick={() => setOpen(false)} className="text-accent underline underline-offset-2">write to the team</Link>.
+              </p>
             </div>
-
-            <div className="flex items-center gap-1">
-              <button
-                type="button"
-                onClick={() => resetConversation(true)}
-                aria-label="Start a new AI conversation"
-                title="New conversation"
-                className="flex h-8 w-8 items-center justify-center rounded-lg text-slate-400 transition hover:bg-white/10 hover:text-white focus:outline-none focus-visible:ring-2 focus-visible:ring-accent-soft"
-              >
-                <svg aria-hidden="true" className="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                  <path d="M20 11a8 8 0 0 0-14.9-4M4 4v4h4M4 13a8 8 0 0 0 14.9 4M20 20v-4h-4" strokeLinecap="round" strokeLinejoin="round" />
-                </svg>
+            <div className="flex shrink-0 items-center gap-1">
+              <button type="button" onClick={reset} className="px-2 py-1 text-[13px] text-ink-500 hover:text-ink">
+                Restart
               </button>
-              <button
-                type="button"
-                onClick={() => resetConversation(false)}
-                aria-label="Delete AI conversation"
-                title="Clear conversation"
-                className="flex h-8 w-8 items-center justify-center rounded-lg text-slate-400 transition hover:bg-red-500/20 hover:text-red-300 focus:outline-none focus-visible:ring-2 focus-visible:ring-accent-soft"
-              >
-                <svg aria-hidden="true" className="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                  <path d="M3 6h18M8 6V4h8v2m-9 0 1 14h8l1-14M10 10v6m4-6v6" strokeLinecap="round" strokeLinejoin="round" />
-                </svg>
-              </button>
-              <button
-                type="button"
-                onClick={() => setIsOpen(false)}
-                aria-label="Close AI assistant"
-                title="Close assistant"
-                className="flex h-8 w-8 items-center justify-center rounded-lg text-slate-400 transition hover:bg-white/10 hover:text-white focus:outline-none focus-visible:ring-2 focus-visible:ring-accent-soft"
-              >
-                <svg aria-hidden="true" className="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                  <path d="M6 6l12 12M18 6L6 18" strokeLinecap="round" />
+              <button type="button" onClick={() => setOpen(false)} aria-label="Close" className="p-1.5 text-ink-400 hover:text-ink">
+                <svg aria-hidden="true" viewBox="0 0 20 20" className="h-5 w-5" fill="none" stroke="currentColor" strokeWidth="1.6">
+                  <path d="M5 5l10 10M15 5L5 15" />
                 </svg>
               </button>
             </div>
           </header>
 
-          {/* Messages Body */}
-          <div className="min-h-0 flex-1 space-y-4 overflow-y-auto overscroll-contain bg-[#0B1523] p-4 sm:p-5" aria-live="polite">
-            {messages.map((message, index) => (
-              <div key={`${message.role}-${index}`} className={`flex ${message.role === "user" ? "justify-end" : "justify-start"}`}>
-                <div
-                  className={`max-w-[88%] rounded-2xl px-4 py-3 text-sm leading-relaxed shadow-sm ${
-                    message.role === "user"
-                      ? "rounded-br-xs bg-brand-red text-white"
-                      : "rounded-bl-xs border border-slate-700/80 bg-[#122033] text-slate-100 shadow-md"
-                  }`}
-                >
-                  {message.role === "assistant" ? formatAssistantMessage(message.content) : message.content}
+          <div className="flex-1 space-y-5 overflow-y-auto px-5 py-5 text-[15px] leading-relaxed text-ink-600" aria-live="polite">
+            {messages.map((m, i) =>
+              m.role === "assistant" ? (
+                <div key={i} className="border-l-2 border-accent/60 pl-4">
+                  <Formatted content={m.content} />
                 </div>
-              </div>
-            ))}
-
-            {isSending && (
-              <div className="flex justify-start">
-                <div className="flex items-center gap-2 rounded-2xl rounded-bl-xs border border-slate-700/80 bg-[#122033] px-4 py-3 text-xs text-accent-soft">
-                  <span className="h-2 w-2 rounded-full bg-accent-soft animate-pulse" />
-                  Thinking...
+              ) : (
+                <div key={i} className="flex justify-end">
+                  <p className="max-w-[85%] bg-accent-light px-4 py-2.5 text-ink">{m.content}</p>
                 </div>
-              </div>
+              ),
             )}
-
-            {!isSending && suggestions.length > 0 && (
-              <div className="flex flex-wrap gap-2 pt-2">
-                {suggestions.map((suggestion) => (
-                  <button
-                    key={suggestion}
-                    type="button"
-                    onClick={(event) => sendMessage(event as unknown as FormEvent<HTMLFormElement>, suggestion)}
-                    className="rounded-xl border border-accent-soft/30 bg-accent-soft/10 px-3 py-1.5 text-left text-xs font-medium text-accent-soft transition hover:bg-accent-soft/20 active:scale-98"
-                  >
-                    {suggestion}
+            {sending && (
+              <p className="border-l-2 border-accent/60 pl-4 text-ink-400">
+                <span className="inline-flex gap-1" aria-label="Writing a reply">
+                  <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-ink-400" />
+                  <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-ink-400 [animation-delay:150ms]" />
+                  <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-ink-400 [animation-delay:300ms]" />
+                </span>
+              </p>
+            )}
+            {error && <p role="alert" className="border-l-2 border-danger pl-4 text-[14px] text-danger">{error}</p>}
+            {suggestions.length > 0 && !sending && (
+              <div className="flex flex-col items-start gap-2 pt-1">
+                {suggestions.map((s) => (
+                  <button key={s} type="button" onClick={() => send(null, s)} className="border border-ink/20 bg-white px-3 py-1.5 text-left text-[14px] text-ink hover:border-accent hover:text-accent">
+                    {s}
                   </button>
                 ))}
               </div>
             )}
-            <div ref={messagesEndRef} />
+            <div ref={endRef} />
           </div>
 
-          {/* Input Form Footer */}
-          <form onSubmit={sendMessage} className="flex-shrink-0 border-t border-slate-800 bg-[#060E1A] p-3 sm:p-4">
-            <div className="flex gap-2 items-center">
-              <label htmlFor="ai-widget-prompt" className="sr-only">Ask the Gmac Group assistant</label>
-              <input
-                ref={inputRef}
-                id="ai-widget-prompt"
-                value={prompt}
-                onChange={(event) => setPrompt(event.target.value)}
-                placeholder="Ask about research, programmes, advisory..."
-                className="min-h-11 min-w-0 flex-1 rounded-xl border border-slate-700 bg-[#122033] px-3.5 text-sm text-white outline-none placeholder:text-slate-500 focus:border-accent-soft transition-colors"
-                disabled={isSending}
-              />
-              <button
-                type="submit"
-                disabled={isSending || !prompt.trim()}
-                aria-label="Send message"
-                className="flex h-11 w-11 flex-shrink-0 items-center justify-center rounded-xl bg-brand-red text-white shadow-sm transition hover:bg-brand-redDark disabled:cursor-not-allowed disabled:opacity-40 active:scale-95"
-              >
-                <svg aria-hidden="true" className="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                  <path d="m4 4 16 8-16 8 3-8-3-8Zm3 8h13" strokeLinecap="round" strokeLinejoin="round" />
-                </svg>
-              </button>
-            </div>
-            {error && <p className="mt-2 text-xs text-red-400">{error}</p>}
+          <form onSubmit={send} className="flex items-center gap-2 border-t border-rule px-4 py-3">
+            <label htmlFor="ask-input" className="sr-only">Your question</label>
+            <input
+              id="ask-input"
+              ref={inputRef}
+              value={prompt}
+              onChange={(e) => setPrompt(e.target.value)}
+              maxLength={1000}
+              placeholder="Type a question"
+              className="min-w-0 flex-1 border-0 bg-transparent py-2 text-[15px] text-ink placeholder:text-ink-400 focus:outline-none"
+            />
+            <button type="submit" disabled={!prompt.trim() || sending} className="btn-primary !px-4 !py-2 !text-sm disabled:opacity-40">
+              Send
+            </button>
           </form>
-        </section>
+          <p className="px-5 pb-3 text-[11.5px] text-ink-400">Automated answers can be wrong. Please confirm important details with our team.</p>
+        </div>
       )}
 
-      {/* Floating Trigger Button Dock */}
-      {!isOpen && (
+      {!open && (
         <button
           type="button"
-          onClick={() => setIsOpen(true)}
-          aria-label="Open AI assistant"
-          title="Open GMAC Group AI"
-          className="fixed bottom-5 right-5 sm:bottom-6 sm:right-8 z-40 flex items-center justify-center gap-2 bg-ink text-white shadow-[0_10px_30px_-10px_rgba(11,26,44,0.5)] transition-colors duration-200 hover:bg-accent focus:outline-none focus-visible:ring-2 focus-visible:ring-accent-soft h-12 w-12 sm:h-12 sm:w-auto sm:px-5"
+          onClick={() => setOpen(true)}
+          className="fixed bottom-5 right-5 z-40 flex items-center gap-2.5 border border-ink/15 bg-paper py-2.5 pl-3 pr-4 text-[14px] font-medium text-ink shadow-[0_10px_30px_-12px_rgba(14,26,43,0.45)] transition-colors hover:border-ink sm:bottom-6 sm:right-6"
         >
-          <svg aria-hidden="true" className="h-5 w-5 flex-shrink-0 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8">
-            <path d="m12 3 1.35 5.65L19 10l-5.65 1.35L12 17l-1.35-5.65L5 10l5.65-1.35L12 3Z" strokeLinejoin="round" />
-            <path d="m19 16 .55 2.45L22 19l-2.45.55L19 22l-.55-2.45L16 19l2.45-.55L19 16Z" strokeLinejoin="round" />
-          </svg>
-          <span className="hidden sm:inline text-xs sm:text-sm font-bold tracking-wide">
-            AI Assistant
-          </span>
-          <span className="hidden sm:inline-block h-2 w-2 rounded-full bg-emerald-400 animate-pulse ml-0.5" />
+          <span aria-hidden="true" className="flex h-7 w-7 items-center justify-center bg-ink font-display text-[15px] text-white">G</span>
+          Ask Gmac
         </button>
       )}
     </>
   );
-}
+}

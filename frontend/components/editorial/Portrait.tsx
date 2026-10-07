@@ -11,7 +11,7 @@ function initials(name: string) {
 
 type Props = { name: string; src?: string | null; className?: string; sizes?: string };
 
-/** Team portrait with a consistent treatment; monogram when no photo is on file. */
+/** Team portrait: black and white until hovered, focused or tapped; monogram when no photo is on file. */
 export function Portrait({ name, src, className = "", sizes = "200px" }: Props) {
   return (
     <div className={`relative overflow-hidden bg-stone ${className}`}>
@@ -21,7 +21,7 @@ export function Portrait({ name, src, className = "", sizes = "200px" }: Props) 
           alt={`Portrait of ${name}`}
           fill
           sizes={sizes}
-          className="object-cover transition-transform duration-700 group-hover:scale-[1.04]"
+          className="object-cover grayscale transition-[filter,transform] duration-500 group-hover:scale-[1.03] group-hover:grayscale-0 group-focus-within:grayscale-0 group-focus:grayscale-0 group-active:grayscale-0"
         />
       ) : (
         <div className="flex h-full w-full items-center justify-center" aria-hidden="true">
