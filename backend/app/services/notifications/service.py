@@ -259,33 +259,36 @@ class NotificationService:
         self._print_dev_fallback("DEV - NO EMAIL PROVIDER CONFIGURED", to, subject, body)
         return True
 
-    async def notify_contact_request(self, name: str, email: str, subject: str, message: str):
+    async def notify_contact_request(
+        self, name: str, email: str, subject: str, message: str, organization: str | None = None
+    ):
         settings = get_settings()
         deliveries = []
         if settings.OPERATIONS_EMAIL:
             deliveries.append(
                 self.send_email(
                     settings.OPERATIONS_EMAIL,
-                    f"[GMAC GROUP FEEDBACK] {subject}",
-                    f"GMAC GROUP FEEDBACK SUBMISSION\n\n"
+                    f"[Website enquiry] {subject}",
+                    f"New enquiry from the website\n\n"
                     f"From: {name} <{email}>\n"
+                    f"Organisation: {organization or 'Not given'}\n"
                     f"Subject: {subject}\n\n"
                     f"Message:\n{message}",
                     reply_to=email,
                 )
             )
 
+        # The acknowledgement deliberately does not repeat the visitor's message,
+        # so the form cannot be used to send arbitrary text to arbitrary addresses.
         deliveries.append(
             self.send_email(
                 email,
-                f"[GMAC GROUP] Feedback received",
-                f"GMAC GROUP FEEDBACK CONFIRMATION\n\n"
-                f"Hi {name},\n\n"
-                "Thank you for contacting GMAC GROUP. We have received your message "
-                "and a member of our team will get back to you.\n\n"
-                f"Feedback subject: {subject}\n"
-                f"Your message:\n{message}\n\n"
-                "Best,\nThe GMAC GROUP Team",
+                "We have received your message",
+                f"Hello {name},\n\n"
+                "Thank you for contacting Gmac Group. We have received your message "
+                "and the right member of our team will reply to you.\n\n"
+                "Gmac Group\n"
+                "info@gmac-group.com",
             )
         )
         await asyncio.gather(*deliveries)
@@ -340,7 +343,7 @@ class NotificationService:
             f"Questions? Just reply to this email or write to {support_email}.\n\n"
             f"Best,\n"
             f"The GMAC GROUP Team\n"
-            f"Accra, Ghana"
+            f"gmac-group.com"
         )
 
         await self.send_email(email, subject, plain_text)
@@ -407,8 +410,7 @@ class NotificationService:
                 "Thank you for subscribing to GMAC Insights. You will receive our "
                 "periodic briefings on workforce trends, research, and fellowship cohorts.\n\n"
                 "Best,\n"
-                "The GMAC GROUP Team\n"
-                "Accra, Ghana"
+                "Gmac Group"
             ),
         )
 
@@ -480,7 +482,7 @@ class NotificationService:
             f"If you did not ask for this, just ignore this email. Your account is safe.\n\n"
             f"Best,\n"
             f"The GMAC GROUP Team\n"
-            f"Accra, Ghana"
+            f"gmac-group.com"
         )
 
         await self.send_email(email, subject, plain_text)

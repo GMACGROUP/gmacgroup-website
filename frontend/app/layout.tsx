@@ -9,6 +9,7 @@ import { AIChatWidget } from "@/components/common/AIChatWidget";
 import { NavigationProgressBar } from "@/components/common/NavigationProgressBar";
 import { AuthProvider } from "@/hooks/useAuth";
 import { Reveal } from "@/components/editorial/Reveal";
+import { Analytics } from "@vercel/analytics/react";
 import { SITE } from "@/lib/content/site";
 
 // Fonts are self hosted (SIL Open Font License, see app/fonts) so builds and
@@ -43,8 +44,9 @@ export const metadata: Metadata = {
     title: "Gmac Group",
     description: SITE.positioning,
     url: "/",
+    images: [{ url: "/og-image.png", width: 1200, height: 630, alt: "Gmac Group" }],
   },
-  twitter: { card: "summary_large_image", title: "Gmac Group", description: SITE.positioning },
+  twitter: { card: "summary_large_image", title: "Gmac Group", description: SITE.positioning, images: ["/og-image.png"] },
   alternates: { canonical: "/" },
 };
 
@@ -54,7 +56,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en" className={`${plex.variable} ${newsreader.variable}`}>
+    <html lang="en-GB" className={`${plex.variable} ${newsreader.variable}`}>
       <body className="min-h-screen flex flex-col font-sans">
         <AuthProvider>
           <Suspense fallback={null}>
@@ -66,6 +68,7 @@ export default function RootLayout({
           <ScrollProgress />
           <AIChatWidget />
           <Reveal />
+          <Analytics />
         </AuthProvider>
       </body>
     </html>

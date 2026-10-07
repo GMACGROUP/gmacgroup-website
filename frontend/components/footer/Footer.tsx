@@ -68,6 +68,7 @@ export function Footer() {
       links: [
         { href: "/about", label: "About" },
         { href: "/team", label: "Team" },
+        { href: "/how-we-engage", label: "How we engage" },
         { href: "/research", label: "Research" },
         { href: "/events", label: "Events" },
         { href: "/programmes", label: "Programmes" },
@@ -165,8 +166,8 @@ export function Footer() {
         <div className="wrap flex flex-col gap-4 py-6 text-sm text-white/50 sm:flex-row sm:items-center sm:justify-between">
           <p>© {new Date().getFullYear()} Gmac Advisory and Consulting Ltd. All rights reserved.</p>
           <div className="flex gap-6">
-            <Link href="/about" className="hover:text-white">Privacy</Link>
-            <Link href="/about" className="hover:text-white">Terms</Link>
+            <Link href="/privacy" className="hover:text-white">Privacy</Link>
+            <Link href="/terms" className="hover:text-white">Terms</Link>
             <Link href="/contact" className="hover:text-white">Support</Link>
           </div>
         </div>
