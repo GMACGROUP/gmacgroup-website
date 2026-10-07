@@ -373,3 +373,79 @@ html {
   background-size: 200% 100%;
   animation: shimmer 1.5s infinite;
 }
+
+
+/* ---------------------------------------------------------------------------
+   Creative blue variant
+   --------------------------------------------------------------------------- */
+@layer components {
+  .band-blue {
+    background-color: #0A2A5E;
+    background-image:
+      radial-gradient(1200px 500px at 85% -10%, rgba(59, 130, 196, 0.45), transparent 60%),
+      radial-gradient(900px 400px at -10% 110%, rgba(11, 92, 173, 0.5), transparent 60%);
+  }
+  .pattern-dots {
+    background-image: radial-gradient(rgba(11, 92, 173, 0.18) 1px, transparent 1px);
+    background-size: 18px 18px;
+  }
+  .band-blue .pattern-grid,
+  .pattern-grid {
+    background-image:
+      linear-gradient(rgba(255, 255, 255, 0.06) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(255, 255, 255, 0.06) 1px, transparent 1px);
+    background-size: 56px 56px;
+  }
+  .frame-offset {
+    position: relative;
+  }
+  .frame-offset::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    transform: translate(16px, 16px);
+    border: 1px solid rgba(156, 192, 230, 0.7);
+    z-index: 0;
+  }
+  .frame-offset > * {
+    position: relative;
+    z-index: 1;
+  }
+  .band-blue .btn-primary {
+    @apply bg-white text-midnight hover:bg-sky;
+  }
+  .lift {
+    transition: transform 0.35s cubic-bezier(0.2, 0.7, 0.2, 1), box-shadow 0.35s;
+  }
+  .lift:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 22px 40px -24px rgba(10, 42, 94, 0.45);
+  }
+  .marquee {
+    display: flex;
+    width: max-content;
+    animation: marquee 48s linear infinite;
+  }
+  .marquee:hover {
+    animation-play-state: paused;
+  }
+  .ink-sweep {
+    background-image: linear-gradient(transparent 62%, rgba(156, 192, 230, 0.55) 62%);
+    background-repeat: no-repeat;
+    background-size: 0% 100%;
+    animation: sweep 1.2s 0.4s cubic-bezier(0.2, 0.7, 0.2, 1) forwards;
+  }
+}
+
+@keyframes marquee {
+  from { transform: translateX(0); }
+  to { transform: translateX(-50%); }
+}
+@keyframes sweep {
+  to { background-size: 100% 100%; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .marquee { animation: none; }
+  .ink-sweep { animation: none; background-size: 100% 100%; }
+  .lift:hover { transform: none; }
+}

@@ -36,6 +36,9 @@ const config: Config = {
           300: "#B9BDC4",
         },
         paper: "#FBFAF7",
+        // Creative blue variant: one blue family built around the original accent.
+        midnight: { DEFAULT: "#0A2A5E", deep: "#071D44" },
+        sky: { DEFAULT: "#EDF4FC", line: "#C9DCF2" },
         stone: "#F2F0EB",
         rule: "#E3DFD6",
         accent: {
@@ -45,7 +48,7 @@ const config: Config = {
           soft: "#9CC0E6",
         },
         clay: {
-          DEFAULT: "#A84D27", // 4.9:1 on stone (WCAG AA)
+          DEFAULT: "#0A4F96", // creative blue: labels in deep blue, no reds outside the logo
           light: "#F5E6DE",
         },
         success: "#1F7A4D",

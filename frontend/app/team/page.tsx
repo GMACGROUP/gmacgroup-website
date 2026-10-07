@@ -51,7 +51,7 @@ export default async function TeamPage() {
         </div>
       </section>
 
-      <section className="border-b border-rule bg-ink text-white">
+      <section className="border-b border-rule band-blue text-white">
         <div className="wrap grid grid-cols-1 gap-10 py-16 lg:grid-cols-12 lg:py-20">
           <PhotoSlot
             src={FOUNDER.photo}

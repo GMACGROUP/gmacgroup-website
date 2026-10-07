@@ -14,14 +14,14 @@ type Props = { name: string; src?: string | null; className?: string; sizes?: st
 /** Team portrait with a consistent treatment; monogram when no photo is on file. */
 export function Portrait({ name, src, className = "", sizes = "200px" }: Props) {
   return (
-    <div className={`relative overflow-hidden bg-stone ${className}`}>
+    <div className={`relative overflow-hidden bg-sky ${className}`}>
       {src ? (
         <Image
           src={src}
           alt={`Portrait of ${name}`}
           fill
           sizes={sizes}
-          className="object-cover grayscale transition-[filter] duration-500 group-hover:grayscale-0"
+          className="object-cover transition-transform duration-700 group-hover:scale-[1.04]"
         />
       ) : (
         <div className="flex h-full w-full items-center justify-center" aria-hidden="true">

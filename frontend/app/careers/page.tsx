@@ -72,7 +72,7 @@ export default async function CareersPage() {
         </div>
       </section>
 
-      <section aria-labelledby="teams-title" className="site-section border-y border-rule bg-stone">
+      <section aria-labelledby="teams-title" className="site-section border-y border-rule bg-sky">
         <div className="wrap grid grid-cols-1 gap-12 lg:grid-cols-12">
           <div className="lg:col-span-4">
             <p className="eyebrow"><span className="eyebrow-num">02</span> How we work</p>

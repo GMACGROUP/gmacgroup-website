@@ -75,7 +75,7 @@ export default async function ProgrammesPage() {
         </div>
       </section>
 
-      <section aria-labelledby="covers-title" className="site-section border-y border-rule bg-stone">
+      <section aria-labelledby="covers-title" className="site-section border-y border-rule bg-sky">
         <div className="wrap grid grid-cols-1 gap-12 lg:grid-cols-12">
           <div className="lg:col-span-4">
             <p className="eyebrow"><span className="eyebrow-num">02</span> For individuals</p>
@@ -116,7 +116,7 @@ export default async function ProgrammesPage() {
         </div>
       </section>
 
-      <section className="bg-ink text-white">
+      <section className="band-blue text-white">
         <div className="wrap flex flex-col gap-8 py-16 lg:flex-row lg:items-end lg:justify-between">
           <h2 className="max-w-[22ch] font-display text-4xl leading-tight text-white sm:text-5xl">
             Running provision for a university or employer?

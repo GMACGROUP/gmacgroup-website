@@ -100,7 +100,7 @@ export default async function AboutPage() {
       </section>
 
       {/* ── Founder ─────────────────────────────────────────── */}
-      <section className="bg-ink text-white">
+      <section className="band-blue text-white">
         <div className="wrap grid grid-cols-1 gap-12 py-20 sm:py-24 lg:grid-cols-12 lg:py-28">
           <div className="lg:col-span-4">
             <Label n="02" dark>A word from the founder</Label>
@@ -150,7 +150,7 @@ export default async function AboutPage() {
       </section>
 
       {/* ── Remote by design ────────────────────────────────── */}
-      <section className="border-y border-rule bg-stone">
+      <section className="border-y border-rule bg-sky">
         <div className="wrap grid grid-cols-1 gap-14 py-20 sm:py-24 lg:grid-cols-12 lg:py-28">
           <div className="lg:col-span-5">
             <Label n="04">Remote by design</Label>
@@ -238,7 +238,7 @@ export default async function AboutPage() {
       </section>
 
       {/* ── Invitation ──────────────────────────────────────── */}
-      <section className="bg-ink text-white">
+      <section className="band-blue text-white">
         <div className="wrap flex flex-col gap-10 py-20 lg:flex-row lg:items-end lg:justify-between">
           <h2 className="max-w-[18ch] font-display text-4xl leading-[1.08] text-white sm:text-5xl">
             Tell us the decision you are trying to make.

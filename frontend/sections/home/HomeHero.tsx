@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { Arrow } from "@/components/ui/Arrow";
 import { AfricaMap } from "@/components/editorial/AfricaMap";
-import { SITE } from "@/lib/content/site";
+import { FOCUS_MARKETS, SITE } from "@/lib/content/site";
 
 export function HomeHero() {
   return (
@@ -15,7 +15,8 @@ export function HomeHero() {
           </p>
 
           <h1 className="display-xl mt-8 max-w-[14ch] text-ink">
-            We build the people, <em className="font-light italic text-ink-500">and</em> the evidence to deploy them.
+            We build the people, <em className="font-light italic text-accent">and</em> the{" "}
+            <span className="ink-sweep">evidence</span> to deploy them.
           </h1>
 
           <p className="lede mt-8 max-w-[56ch]">{SITE.positioning}</p>
@@ -41,7 +42,24 @@ export function HomeHero() {
               <span>Ten focus markets</span>
             </p>
           </div>
-          <AfricaMap className="mt-6" />
+          <div className="pattern-dots mt-6 bg-sky p-5 sm:p-6">
+            <AfricaMap />
+          </div>
+        </div>
+      </div>
+      {/* Focus markets, scrolling. Decorative duplicate of the list in the map key. */}
+      <div className="overflow-hidden border-t border-rule bg-white py-4" aria-hidden="true">
+        <div className="marquee">
+          {[0, 1].map((k) => (
+            <ul key={k} className="flex shrink-0 items-center">
+              {FOCUS_MARKETS.map((m) => (
+                <li key={m} className="flex items-center gap-10 pr-10 font-display text-2xl text-ink-600">
+                  {m}
+                  <span className="h-1.5 w-1.5 rounded-full bg-accent" />
+                </li>
+              ))}
+            </ul>
+          ))}
         </div>
       </div>
     </section>

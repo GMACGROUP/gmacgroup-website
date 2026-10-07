@@ -83,7 +83,7 @@ export default async function ResearchPage() {
       </section>
 
       {/* Method */}
-      <section aria-labelledby="method-title" className="site-section border-y border-rule bg-stone">
+      <section aria-labelledby="method-title" className="site-section border-y border-rule bg-sky">
         <div className="wrap">
           <p className="eyebrow"><span className="eyebrow-num">02</span> How a study runs</p>
           <h2 id="method-title" className="display-lg mt-6 max-w-[22ch]">Five stages, each one written down.</h2>
@@ -188,7 +188,7 @@ export default async function ResearchPage() {
         </section>
       )}
 
-      <section className="bg-ink text-white">
+      <section className="band-blue text-white">
         <div className="wrap grid grid-cols-1 gap-10 py-16 lg:grid-cols-12 lg:py-20">
           <div className="lg:col-span-6">
             <h2 className="font-display text-4xl leading-tight text-white sm:text-5xl">Commission a study.</h2>

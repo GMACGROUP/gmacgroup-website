@@ -5,25 +5,27 @@ import { FOUNDER } from "@/lib/content/site";
 
 export function FounderNote() {
   return (
-    <section className="site-section bg-ink text-white">
+    <section className="site-section band-blue text-white">
       <div className="wrap grid grid-cols-1 gap-12 lg:grid-cols-12 lg:gap-16">
         <div className="lg:col-span-4">
           <p className="eyebrow !text-white/60">
             <span className="eyebrow-num !text-accent-soft">03</span> Founding principle
           </p>
+          <div className="frame-offset mt-10 w-full max-w-sm">
           <PhotoSlot
             src={FOUNDER.photo}
             alt={`Portrait of ${FOUNDER.name}`}
             awaiting="founder portrait"
             tone="dark"
             sizes="(max-width: 1024px) 100vw, 30vw"
-            className="mt-10 aspect-[4/5] w-full max-w-sm"
+            className="aspect-[4/5] w-full"
           />
+          </div>
         </div>
         <div className="flex flex-col justify-between lg:col-span-8">
-          <blockquote className="reveal">
+          <blockquote className="reveal relative">
+            <span aria-hidden="true" className="pointer-events-none absolute -left-2 -top-24 select-none font-display text-[14rem] leading-none text-accent-soft/20">&ldquo;</span>
             <p className="font-display text-[2rem] font-light leading-[1.15] text-white sm:text-5xl lg:text-[3.6rem]">
-              <span className="text-accent-soft">&ldquo;</span>
               {FOUNDER.quote}
               <span className="text-accent-soft">&rdquo;</span>
             </p>

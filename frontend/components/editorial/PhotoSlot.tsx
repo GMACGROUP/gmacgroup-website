@@ -19,7 +19,7 @@ type Props = {
 export function PhotoSlot({ src, alt, awaiting, className = "", sizes = "100vw", priority, tone = "light" }: Props) {
   if (src) {
     return (
-      <div className={`relative overflow-hidden bg-stone ${className}`}>
+      <div className={`relative overflow-hidden bg-sky ${className}`}>
         <Image src={src} alt={alt} fill sizes={sizes} priority={priority} className="object-cover [filter:saturate(0.85)_contrast(1.03)]" />
       </div>
     );
@@ -28,7 +28,7 @@ export function PhotoSlot({ src, alt, awaiting, className = "", sizes = "100vw",
   const dark = tone === "dark";
   return (
     <div
-      className={`relative flex items-end overflow-hidden ${dark ? "bg-ink-700 text-white/60" : "bg-stone text-ink-400"} ${className}`}
+      className={`relative flex items-end overflow-hidden ${dark ? "bg-ink-700 text-white/60" : "bg-sky text-ink-400"} ${className}`}
       role="img"
       aria-label={alt}
     >

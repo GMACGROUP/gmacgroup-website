@@ -79,7 +79,7 @@ export default async function PracticeAreaPage({ params }: Props) {
           )}
 
           {example && (
-            <section className="mt-16 bg-stone p-8 sm:p-10">
+            <section className="mt-16 bg-sky p-8 sm:p-10">
               <p className="text-[12px] font-medium uppercase tracking-label text-ink-400">Illustrative engagement, not a client case study</p>
               <h2 className="mt-3 font-display text-2xl">{example.title}</h2>
               <dl className="mt-6 grid grid-cols-1 gap-6 sm:grid-cols-3">
@@ -123,7 +123,7 @@ export default async function PracticeAreaPage({ params }: Props) {
         </aside>
       </div>
 
-      <Link href={`/expertise/${next.slug}`} className="group block border-t border-rule bg-ink text-white">
+      <Link href={`/expertise/${next.slug}`} className="group block border-t border-rule band-blue text-white">
         <div className="wrap flex items-center justify-between gap-6 py-12">
           <div>
             <p className="text-[12px] font-medium uppercase tracking-label text-white/50">Next practice area</p>

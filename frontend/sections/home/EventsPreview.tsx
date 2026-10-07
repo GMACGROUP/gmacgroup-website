@@ -6,7 +6,7 @@ import { FORMAT_LABEL, dateLine, type GmacEvent } from "@/lib/events";
 export function EventsPreview({ next }: { next?: GmacEvent | null }) {
   const flagships = EVENTS.filter((e) => e.tier === "Flagship");
   return (
-    <section className="site-section border-t border-rule bg-stone">
+    <section className="site-section border-t border-rule bg-sky">
       <div className="wrap">
         <div className="flex flex-col justify-between gap-8 lg:flex-row lg:items-end">
           <div>

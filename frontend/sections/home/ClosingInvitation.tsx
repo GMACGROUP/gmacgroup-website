@@ -18,14 +18,14 @@ export function ClosingInvitation() {
         </div>
       </section>
 
-      <section className="site-section">
-        <div className="wrap grid grid-cols-1 gap-12 lg:grid-cols-12">
+      <section className="site-section band-blue text-white">
+        <div className="pattern-grid wrap grid grid-cols-1 gap-12 lg:grid-cols-12">
           <div className="lg:col-span-8">
-            <p className="eyebrow">An invitation</p>
-            <h2 className="display-xl reveal mt-8 max-w-[16ch]">Tell us the decision you are trying to make.</h2>
+            <p className="eyebrow !text-accent-soft">An invitation</p>
+            <h2 className="display-xl reveal mt-8 max-w-[16ch] text-white">Tell us the decision you are trying to make.</h2>
           </div>
           <div className="flex flex-col justify-end gap-8 lg:col-span-4">
-            <p className="lede">
+            <p className="lede !text-white/75">
               Or the capability you are trying to build. We will tell you plainly whether we are the right people, and what it
               would take.
             </p>
@@ -34,7 +34,7 @@ export function ClosingInvitation() {
                 Start a conversation
                 <Arrow />
               </Link>
-              <a href={`mailto:${SITE.email}`} className="link-arrow">
+              <a href={`mailto:${SITE.email}`} className="link-arrow !text-white">
                 {SITE.email}
               </a>
             </div>

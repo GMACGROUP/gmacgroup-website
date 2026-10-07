@@ -105,7 +105,7 @@ export function ContactForm() {
         <legend className={label}>What is it about?</legend>
         <div className="mt-1 flex flex-wrap gap-2">
           {CONTACT_TOPICS.map((t) => (
-            <label key={t.value} className={`cursor-pointer border px-3 py-2 text-sm transition-colors ${topic === t.value ? "border-ink bg-ink text-white" : "border-ink/20 text-ink-600 hover:border-ink/50"}`}>
+            <label key={t.value} className={`cursor-pointer border px-3 py-2 text-sm transition-colors ${topic === t.value ? "border-ink band-blue text-white" : "border-ink/20 text-ink-600 hover:border-ink/50"}`}>
               <input type="radio" name="topic" value={t.value} checked={topic === t.value} onChange={() => setTopic(t.value)} className="sr-only" />
               {t.label}
             </label>

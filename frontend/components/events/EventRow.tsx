@@ -41,7 +41,7 @@ export function EventRow({ event, past = false }: { event: GmacEvent; past?: boo
         </div>
 
         {event.image_url && (
-          <div className="relative hidden h-28 w-28 overflow-hidden border border-rule bg-stone sm:block">
+          <div className="relative hidden h-28 w-28 overflow-hidden border border-rule bg-sky sm:block">
             <Image src={event.image_url} alt="" fill sizes="112px" className="object-cover object-top" />
           </div>
         )}
