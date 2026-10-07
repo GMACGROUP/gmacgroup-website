@@ -85,8 +85,7 @@ export default async function CareersPage() {
           </div>
           <ol className="border-t border-ink lg:col-span-7 lg:col-start-6">
             {TEAMS.map((t) => (
-              <li key={t.name} className="grid grid-cols-[3rem_1fr] gap-4 border-b border-ink/15 py-6">
-                <span className="tabular-nums text-accent">{t.number}</span>
+              <li key={t.name} className="border-b border-ink/15 py-6">
                 <div>
                   <h3 className="font-display text-xl">{t.name}</h3>
                   <p className="mt-1.5 text-[15px] leading-relaxed text-ink-600">{t.remit}</p>

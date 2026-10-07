@@ -28,10 +28,7 @@ export function TeamPreview({ team }: { team: TeamMember[] }) {
               const n = team.filter((m) => m.team === t.name).length;
               return (
                 <li key={t.name} className="flex items-baseline justify-between gap-4 border-b border-rule py-4 text-[15px]">
-                  <span className="flex items-baseline gap-4">
-                    <span className="text-sm tabular-nums text-accent">{t.number}</span>
-                    <span className="text-ink">{t.name}</span>
-                  </span>
+                  <span className="text-ink">{t.name}</span>
                   <span className="tabular-nums text-ink-400">{n}</span>
                 </li>
               );
