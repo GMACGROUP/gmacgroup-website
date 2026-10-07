@@ -364,7 +364,7 @@ export const FOUNDER = {
     "Raphael is an economist trained at the University of Ghana, with research and advisory experience across labour markets, development policy, and capital mobilisation for African markets. He founded Gmac Group to bring rigorous evidence and practical capability building into the same firm.",
     "He leads Gmac Group’s executive advisory work and the monthly Personal Brand and Professional Positioning Series, and chairs the firm’s flagship convenings. The Business Development and Partnerships team reports to him directly.",
   ],
-  photo: null as string | null,
+  photo: "/images/people/raphael-sochima-ajana.jpg" as string | null,
 };
 
 export const TEAMS = [
