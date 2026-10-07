@@ -12,7 +12,7 @@ export function EngagementFile() {
   return (
     <section className="site-section">
       <div className="wrap">
-        <div className="grid gap-8 lg:grid-cols-12">
+        <div className="grid grid-cols-1 gap-8 lg:grid-cols-12">
           <div className="lg:col-span-4">
             <p className="eyebrow">
               <span className="eyebrow-num">04</span> How we engage
@@ -47,12 +47,12 @@ export function EngagementFile() {
             ))}
           </div>
 
-          <div id="eng-panel" role="tabpanel" aria-labelledby={`eng-tab-${i}`} className="grid gap-10 py-12 lg:grid-cols-12">
+          <div id="eng-panel" role="tabpanel" aria-labelledby={`eng-tab-${i}`} className="grid grid-cols-1 gap-10 py-12 lg:grid-cols-12">
             <div className="lg:col-span-4">
               <p className="text-[12px] font-medium uppercase tracking-label text-ink-400">{ex.practice}</p>
               <h3 className="mt-3 font-display text-3xl leading-tight">{ex.title}</h3>
             </div>
-            <dl className="grid gap-8 sm:grid-cols-3 lg:col-span-8">
+            <dl className="grid grid-cols-1 gap-8 sm:grid-cols-3 lg:col-span-8">
               {[
                 ["The question", ex.question],
                 ["Our approach", ex.approach],

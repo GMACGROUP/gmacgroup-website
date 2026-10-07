@@ -6,7 +6,7 @@ import { SITE } from "@/lib/content/site";
 export function HomeHero() {
   return (
     <section className="relative border-b border-rule">
-      <div className="wrap grid gap-14 pb-16 pt-14 sm:pt-20 lg:grid-cols-12 lg:gap-10 lg:pb-24 lg:pt-24">
+      <div className="wrap grid grid-cols-1 gap-14 pb-16 pt-14 sm:pt-20 lg:grid-cols-12 lg:gap-10 lg:pb-24 lg:pt-24">
         <div className="lg:col-span-7 lg:pr-8">
           <p className="eyebrow">
             <span className="eyebrow-num">Gmac Group</span>

@@ -12,7 +12,7 @@ export function ExpertiseIndex() {
   return (
     <section className="site-section border-y border-rule bg-stone">
       <div className="wrap">
-        <div className="grid gap-8 lg:grid-cols-12">
+        <div className="grid grid-cols-1 gap-8 lg:grid-cols-12">
           <div className="lg:col-span-4">
             <p className="eyebrow">
               <span className="eyebrow-num">02</span> Expertise
@@ -27,7 +27,7 @@ export function ExpertiseIndex() {
           </div>
         </div>
 
-        <div className="mt-16 grid gap-10 lg:grid-cols-12">
+        <div className="mt-16 grid grid-cols-1 gap-10 lg:grid-cols-12">
           <ol className="lg:col-span-7">
             {PRACTICE_AREAS.map((p, i) => (
               <li key={p.slug} className="border-t border-ink/15 last:border-b">

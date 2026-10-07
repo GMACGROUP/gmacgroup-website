@@ -6,7 +6,7 @@ export function TwoDoors() {
   return (
     <section className="site-section">
       <div className="wrap">
-        <div className="grid gap-8 lg:grid-cols-12">
+        <div className="grid grid-cols-1 gap-8 lg:grid-cols-12">
           <div className="lg:col-span-4">
             <p className="eyebrow">
               <span className="eyebrow-num">01</span> Who we serve
@@ -25,7 +25,7 @@ export function TwoDoors() {
           <div className="reveal bg-ink p-8 text-white sm:p-12 lg:col-span-7">
             <p className="text-[12px] font-medium uppercase tracking-label text-accent-soft">Institutions</p>
             <h3 className="mt-4 font-display text-3xl text-white sm:text-4xl">Organisations making decisions that have to hold.</h3>
-            <ul className="mt-10 grid gap-x-10 sm:grid-cols-2">
+            <ul className="mt-10 grid grid-cols-1 gap-x-10 sm:grid-cols-2">
               {AUDIENCES.institutions.map((a) => (
                 <li key={a.who} className="border-t border-white/15 py-5">
                   <p className="font-medium text-white">{a.who}</p>

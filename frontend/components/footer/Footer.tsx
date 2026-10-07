@@ -86,7 +86,7 @@ export function Footer() {
 
   return (
     <footer className="bg-ink-900 text-white/70">
-      <div className="wrap grid gap-12 py-16 sm:py-20 lg:grid-cols-12">
+      <div className="wrap grid grid-cols-1 gap-12 py-16 sm:py-20 lg:grid-cols-12">
         <div className="lg:col-span-4">
           <div className="inline-block bg-white p-3">
             <Logo size="md" />

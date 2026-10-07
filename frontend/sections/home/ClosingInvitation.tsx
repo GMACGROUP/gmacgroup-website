@@ -19,7 +19,7 @@ export function ClosingInvitation() {
       </section>
 
       <section className="site-section">
-        <div className="wrap grid gap-12 lg:grid-cols-12">
+        <div className="wrap grid grid-cols-1 gap-12 lg:grid-cols-12">
           <div className="lg:col-span-8">
             <p className="eyebrow">An invitation</p>
             <h2 className="display-xl reveal mt-8 max-w-[16ch]">Tell us the decision you are trying to make.</h2>

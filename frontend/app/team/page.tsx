@@ -23,7 +23,7 @@ export default async function TeamPage() {
   return (
     <>
       <section className="border-b border-rule">
-        <div className="wrap grid gap-14 pb-16 pt-14 sm:pt-20 lg:grid-cols-12 lg:pb-20 lg:pt-24">
+        <div className="wrap grid grid-cols-1 gap-14 pb-16 pt-14 sm:pt-20 lg:grid-cols-12 lg:pb-20 lg:pt-24">
           <div className="lg:col-span-7">
             <nav aria-label="Breadcrumb" className="text-sm text-ink-400">
               <Link href="/" className="hover:text-ink">Home</Link>
@@ -52,7 +52,7 @@ export default async function TeamPage() {
       </section>
 
       <section className="border-b border-rule bg-ink text-white">
-        <div className="wrap grid gap-10 py-16 lg:grid-cols-12 lg:py-20">
+        <div className="wrap grid grid-cols-1 gap-10 py-16 lg:grid-cols-12 lg:py-20">
           <PhotoSlot
             src={FOUNDER.photo}
             alt={`Portrait of ${FOUNDER.name}`}

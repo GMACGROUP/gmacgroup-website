@@ -365,3 +365,37 @@ export const TEAMS = [
   { number: "04", name: "Graphic Design and Web", remit: "Visual identity, web, print, sales collateral, and event and sponsor deliverables." },
   { number: "05", name: "Operations and Programmes", remit: "Delivery operations, participant experience, logistics and programme quality." },
 ];
+
+export const STORY = {
+  opening:
+    "Gmac Group began with a gap that was visible from both sides of the same room. Graduates were leaving university with credentials but without a route into work. Institutions were making decisions about those same graduates, and about the markets they were entering, on evidence that was thin, imported, or several years out of date.",
+  growth:
+    "The firm started where the need was loudest: training, coaching and convening. Workshops became series. Series became cohorts. Cohorts became a community of young professionals who kept coming back, and who told us plainly what the labour market was doing to them.",
+  research:
+    "Alongside that work, a research practice took shape, led by doctoral researchers who wanted to produce evidence about their own markets rather than interpret someone else's. That capability now serves institutions directly: baseline studies, labour market assessments, sector diagnostics and feasibility work.",
+  vision:
+    "The vision behind Gmac Group is simple. Build the people and build the evidence at the same time, from inside the continent they concern, and hold both to a standard that travels.",
+  remote: "Gmac Group works remotely by design. The team assembles around a brief rather than a building.",
+  stages: ["Workshops", "Series", "Cohorts", "Community", "Research practice"],
+};
+
+export const WHY_GMAC = [
+  { title: "Africa based, with genuine local context", body: "We live in the markets we study. Fieldwork starts sooner, respondents answer, and the findings account for how things actually work on the ground." },
+  { title: "Doctoral depth, applied to real decisions", body: "Our research practice is led by doctoral researchers with quantitative and policy expertise. Methodology is documented, defensible and handed over." },
+  { title: "Competitive against Washington and London", body: "Comparable rigour at a materially lower cost base, so more of your budget goes into fieldwork and analysis rather than overhead." },
+  { title: "Reach across the continent", body: "A remote team working from ten countries, with programme participants from more than thirty." },
+  { title: "Dual sided market insight", body: "We serve talent and employers in the same week. That vantage point makes our advice on either side sharper." },
+  { title: "Clear scope from the start", body: "Defined practice areas, deliverables and bands. Procurement teams can evaluate us without a discovery process first." },
+  { title: "Five specialist teams, one standard", body: "Work is staffed from the teams that own the capability, and the founder stays close to institutional relationships throughout." },
+  { title: "An audience we can convene", body: "Our events reach graduates, professionals and leaders across the region, a distribution channel for partners as well as a platform for us." },
+];
+
+export const SECTORS = [
+  "Development finance and donor programmes",
+  "Financial services",
+  "Telecommunications",
+  "Higher education",
+  "Government and public agencies",
+  "Investment funds and family offices",
+  "NGOs and foundations",
+];

@@ -36,7 +36,7 @@ export default function PracticeAreaPage({ params }: { params: { slug: string } 
             <span className="mx-2" aria-hidden="true">/</span>
             <span className="text-ink">{p.title}</span>
           </nav>
-          <div className="mt-10 grid gap-8 lg:grid-cols-12">
+          <div className="mt-10 grid grid-cols-1 gap-8 lg:grid-cols-12">
             <p className="font-display text-7xl font-light leading-none text-accent lg:col-span-2 lg:text-8xl">{p.number}</p>
             <div className="lg:col-span-9">
               <h1 className="display-lg">{p.title}</h1>
@@ -46,7 +46,7 @@ export default function PracticeAreaPage({ params }: { params: { slug: string } 
         </div>
       </header>
 
-      <div className="wrap grid gap-16 py-16 lg:grid-cols-12 lg:py-24">
+      <div className="wrap grid grid-cols-1 gap-16 py-16 lg:grid-cols-12 lg:py-24">
         <div className="lg:col-span-7">
           <section>
             <h2 className="eyebrow">What it is</h2>
@@ -76,7 +76,7 @@ export default function PracticeAreaPage({ params }: { params: { slug: string } 
             <section className="mt-16 bg-stone p-8 sm:p-10">
               <p className="text-[12px] font-medium uppercase tracking-label text-ink-400">Illustrative engagement, not a client case study</p>
               <h2 className="mt-3 font-display text-2xl">{example.title}</h2>
-              <dl className="mt-6 grid gap-6 sm:grid-cols-3">
+              <dl className="mt-6 grid grid-cols-1 gap-6 sm:grid-cols-3">
                 {[
                   ["The question", example.question],
                   ["Our approach", example.approach],

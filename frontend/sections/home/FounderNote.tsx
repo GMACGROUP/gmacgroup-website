@@ -6,7 +6,7 @@ import { FOUNDER } from "@/lib/content/site";
 export function FounderNote() {
   return (
     <section className="site-section bg-ink text-white">
-      <div className="wrap grid gap-12 lg:grid-cols-12 lg:gap-16">
+      <div className="wrap grid grid-cols-1 gap-12 lg:grid-cols-12 lg:gap-16">
         <div className="lg:col-span-4">
           <p className="eyebrow !text-white/60">
             <span className="eyebrow-num !text-accent-soft">03</span> Founding principle
@@ -35,7 +35,7 @@ export function FounderNote() {
               </span>
             </footer>
           </blockquote>
-          <div className="mt-14 grid gap-8 border-t border-white/15 pt-8 sm:grid-cols-2">
+          <div className="mt-14 grid grid-cols-1 gap-8 border-t border-white/15 pt-8 sm:grid-cols-2">
             <p className="text-[15px] leading-relaxed text-white/70">
               Gmac Group began with a gap visible from both sides of the same room. Graduates were leaving university with
               credentials but without a route into work. Institutions were making decisions about those same graduates on

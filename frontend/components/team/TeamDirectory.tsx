@@ -42,7 +42,7 @@ export function TeamDirectory({ members }: { members: TeamMember[] }) {
       </div>
 
       {groups.map((g) => (
-        <section key={g.name} aria-labelledby={`team-${g.number}`} className="grid gap-10 border-b border-rule py-14 lg:grid-cols-12 lg:py-20">
+        <section key={g.name} aria-labelledby={`team-${g.number}`} className="grid grid-cols-1 gap-10 border-b border-rule py-14 lg:grid-cols-12 lg:py-20">
           <header className="lg:col-span-3">
             <p className="text-sm tabular-nums text-accent">Unit {g.number}</p>
             <h2 id={`team-${g.number}`} className="mt-3 font-display text-3xl leading-tight">
