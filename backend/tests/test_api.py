@@ -359,3 +359,28 @@ def test_admin_gets_short_lived_signed_document_link():
     # Links to anything that is not one of our stored documents are never signed
     assert asyncio.run(storage_service.signed_document_url("/etc/passwd")) is None
     assert asyncio.run(storage_service.signed_document_url("/api/v1/uploads/files/../../x")) is None
+
+
+def test_cannot_self_register_as_admin():
+    from app.core import ratelimit
+
+    ratelimit._hits.clear()
+    res = client.post(
+        "/api/v1/auth/register",
+        json={"email": "would-be-admin@example.com", "password": "longenough123", "role": "admin"},
+    )
+    assert res.status_code in (201, 400)
+    login = client.post("/api/v1/auth/login", json={"email": "would-be-admin@example.com", "password": "longenough123"})
+    token = login.json()["access_token"]
+    me = client.get("/api/v1/auth/me", headers={"Authorization": f"Bearer {token}"}).json()
+    assert me["role"] != "admin"
+    assert client.get("/api/v1/admin/catalogue/programmes", headers={"Authorization": f"Bearer {token}"}).status_code == 403
+
+
+def test_login_is_rate_limited():
+    from app.core import ratelimit
+
+    ratelimit._hits.clear()
+    codes = [client.post("/api/v1/auth/login", json={"email": "nobody@example.com", "password": "wrongpass1"}).status_code for _ in range(11)]
+    assert codes[-1] == 429
+    ratelimit._hits.clear()

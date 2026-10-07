@@ -12,6 +12,7 @@ from app.api.dependencies import (
     verify_password_reset_token,
 )
 from app.core.database import get_db
+from app.core.ratelimit import rate_limit
 from app.core.passwords import hash_password, verify_password
 from app.models.user import User
 from app.schemas.user import (
@@ -32,6 +33,7 @@ router = APIRouter()
 async def register(
     payload: UserCreate,
     db: Session = Depends(get_db),
+    _: None = Depends(rate_limit("register", limit=5, window_seconds=3600)),
 ):
     """Register a new user, store profile, and return JWT access token."""
     email_lower = payload.email.lower().strip()
@@ -43,14 +45,15 @@ async def register(
             detail="An account with this email address already exists.",
         )
 
-    if len(payload.password) < 6:
+    if len(payload.password) < 8:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
-            detail="Password must be at least 6 characters.",
+            detail="Password must be at least 8 characters.",
         )
 
     requested_role = payload.role.value if hasattr(payload.role, "value") else str(payload.role)
-    role = requested_role if requested_role in {"student", "professional", "researcher", "employer", "institution", "employee", "admin"} else "student"
+    # Admin and staff roles are never self-assigned; they are granted in the database.
+    role = requested_role if requested_role in {"student", "professional", "researcher", "employer", "institution"} else "student"
     user = User(
         email=email_lower,
         full_name=payload.full_name or email_lower.split("@")[0].capitalize(),
@@ -91,7 +94,11 @@ async def register(
 
 
 @router.post("/login", response_model=AuthResponse)
-def login(payload: UserLogin, db: Session = Depends(get_db)):
+def login(
+    payload: UserLogin,
+    db: Session = Depends(get_db),
+    _: None = Depends(rate_limit("login", limit=10, window_seconds=600)),
+):
     """Authenticate user with email and password and return JWT access token."""
     email_lower = payload.email.lower().strip()
     user = db.scalar(select(User).where(User.email == email_lower))
@@ -120,6 +127,7 @@ def login(payload: UserLogin, db: Session = Depends(get_db)):
 async def forgot_password(
     payload: PasswordResetRequest,
     db: Session = Depends(get_db),
+    _: None = Depends(rate_limit("forgot", limit=5, window_seconds=3600)),
 ):
     """Initiate self-service password recovery."""
     email_lower = payload.email.lower().strip()
@@ -152,10 +160,10 @@ def reset_password(payload: PasswordResetConfirm, db: Session = Depends(get_db))
             detail="The password reset link is invalid or has expired. Please request a new one.",
         )
 
-    if len(payload.new_password) < 6:
+    if len(payload.new_password) < 8:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
-            detail="Password must be at least 6 characters.",
+            detail="Password must be at least 8 characters.",
         )
 
     user = db.scalar(select(User).where(User.email == email))

@@ -143,8 +143,8 @@ export default function RegisterPage() {
               <input
                 name="password"
                 type="password"
-                placeholder="Min. 6 characters"
-                minLength={6}
+                placeholder="At least 8 characters"
+                minLength={8}
                 required
                 className="w-full rounded-xl border border-slate-300 bg-slate-50 px-4 py-3 text-sm font-medium text-slate-900 placeholder:text-slate-400 transition-all focus:border-brand-navy focus:bg-white focus:outline-none focus:ring-2 focus:ring-brand-navy/20"
               />
