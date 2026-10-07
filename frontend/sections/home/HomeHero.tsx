@@ -5,14 +5,23 @@ import { FOUNDER, SITE } from "@/lib/content/site";
 import type { TeamMember } from "@/lib/content/team-seed";
 
 export function HomeHero({ team }: { team: TeamMember[] }) {
-  // Real team portraits only: leads first, then everyone else with a photo, founder included.
-  const withPhotos = [
+  // Real team portraits only, in a fixed, balanced order (women and men alternating on every row).
+  // Anyone else with a photo fills in after, so the grid never has gaps.
+  const HERO_ORDER = [
+    "raphael-sochima-ajana", "victoria-dzifa-atisoe", "richard-klutse", "maureen-mushwimba",
+    "favour-ohiemi", "ismail-saani", "apollo-samantha-dorcas", "jude-van-tagoe",
+    "atta-gyasi-domson", "yolanda-chibaya", "evans-essene-dzidzienyo", "delasi-kumapley",
+  ];
+  const all = [
     ...(FOUNDER.photo ? [{ name: FOUNDER.name, photo: FOUNDER.photo, country: FOUNDER.country }] : []),
-    ...team
-      .filter((m) => m.photo_url)
-      .sort((a, b) => Number(Boolean(b.is_lead)) - Number(Boolean(a.is_lead)))
-      .map((m) => ({ name: m.name, photo: m.photo_url as string, country: m.country })),
-  ].slice(0, 12);
+    ...team.filter((m) => m.photo_url).map((m) => ({ name: m.name, photo: m.photo_url as string, country: m.country })),
+  ];
+  const slugOf = (photo: string) => photo.split("/").pop()?.replace(/\.[a-z]+$/i, "") ?? "";
+  const rank = (photo: string) => {
+    const i = HERO_ORDER.indexOf(slugOf(photo));
+    return i === -1 ? HERO_ORDER.length : i;
+  };
+  const withPhotos = [...all].sort((x, y) => rank(x.photo) - rank(y.photo)).slice(0, 12);
 
   return (
     <section className="band-blue relative overflow-hidden text-white">
