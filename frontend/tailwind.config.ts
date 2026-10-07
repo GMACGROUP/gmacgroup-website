@@ -1,5 +1,19 @@
 import type { Config } from "tailwindcss";
 
+/*
+ * GMAC Group design system: "Clean corporate advisory"
+ *
+ * Ink      #0B1A2C  primary text, dark sections
+ * Blue     #0B5CAD  single accent (drawn from the logo globe)
+ * Mist     #F4F6F9  alternate section background
+ * Line     #E2E6EC  hairlines and borders
+ *
+ * Legacy token names (red, gold, cyan, ivory...) are kept and remapped so
+ * every existing page picks up the new palette without a rewrite.
+ */
+const ink = "#0B1A2C";
+const blue = "#0B5CAD";
+
 const config: Config = {
   content: [
     "./app/**/*.{js,ts,jsx,tsx,mdx}",
@@ -9,51 +23,68 @@ const config: Config = {
   theme: {
     extend: {
       colors: {
+        ink: {
+          DEFAULT: ink,
+          900: "#07111E",
+          800: ink,
+          700: "#1C2B3F",
+          600: "#3A4859",
+          500: "#5B6676",
+          400: "#8A93A0",
+          300: "#B8BEC8",
+        },
+        accent: {
+          DEFAULT: blue,
+          dark: "#084785",
+          light: "#E8F0FA",
+          soft: "#9CC3EC",
+        },
+        mist: "#F4F6F9",
+        line: "#E2E6EC",
         brand: {
-          DEFAULT: "#16294B",
-          navy: "#16294B",
-          navyDark: "#132542",
-          navyDeep: "#132542",
-          navyLight: "#294368",
-          red: "#9A3722",
-          redDark: "#762817",
-          redLight: "#F4E2DC",
-          cyan: "#2A8C8C",
-          sky: "#2A8C8C",
-          ice: "#F5F3EE",
-          sand: "#EFEDE6",
-          ivory: "#F5F3EE",
-          warm: "#EFEDE6",
-          gold: "#E7C67C",
-          teal: "#2A8C8C",
+          DEFAULT: ink,
+          navy: ink,
+          navyDark: "#07111E",
+          navyDeep: "#07111E",
+          navyLight: "#1C2B3F",
+          red: blue,
+          redDark: "#084785",
+          redLight: "#E8F0FA",
+          cyan: blue,
+          sky: blue,
+          teal: blue,
+          gold: "#9CC3EC",
+          ice: "#FFFFFF",
+          ivory: "#FFFFFF",
+          sand: "#F4F6F9",
+          warm: "#F4F6F9",
         },
       },
       fontFamily: {
-        sans: [
-          "var(--font-libre-franklin)",
-          "'Libre Franklin'",
-          "-apple-system",
-          "BlinkMacSystemFont",
-          "'Segoe UI'",
-          "Roboto",
-          "sans-serif",
-        ],
-        serif: [
-          "var(--font-cormorant)",
-          "'Cormorant Garamond'",
-          "Georgia",
-          "'Times New Roman'",
-          "serif",
-        ],
+        sans: ["var(--font-inter)", "Inter", "-apple-system", "BlinkMacSystemFont", "'Segoe UI'", "Roboto", "sans-serif"],
+        // "serif" is kept as the heading family name so existing markup keeps working;
+        // it now resolves to a tight grotesk for a crisp corporate voice.
+        serif: ["var(--font-inter-tight)", "'Inter Tight'", "var(--font-inter)", "sans-serif"],
+        display: ["var(--font-inter-tight)", "'Inter Tight'", "sans-serif"],
+      },
+      borderRadius: {
+        // Squarer corners across the whole site
+        lg: "4px",
+        xl: "4px",
+        "2xl": "6px",
+        "3xl": "8px",
       },
       boxShadow: {
-        card: "0 1px 3px rgba(0,0,0,0.06), 0 4px 16px -2px rgba(14, 77, 130, 0.08)",
-        "card-hover": "0 8px 30px -4px rgba(14, 77, 130, 0.18), 0 2px 8px -2px rgba(0,0,0,0.06)",
-        "card-featured": "0 12px 40px -8px rgba(14, 77, 130, 0.22), 0 4px 12px -4px rgba(0,0,0,0.07)",
-        elevate: "0 10px 30px -5px rgba(14, 77, 130, 0.15), 0 4px 6px -2px rgba(0, 0, 0, 0.06)",
-        "elevate-red": "0 10px 30px -5px rgba(229, 25, 36, 0.22), 0 4px 6px -2px rgba(0, 0, 0, 0.05)",
-        glow: "0 0 30px rgba(0, 196, 255, 0.4)",
-        "glow-red": "0 0 30px rgba(229, 25, 36, 0.3)",
+        card: "0 1px 2px rgba(11,26,44,0.04)",
+        "card-hover": "0 12px 32px -12px rgba(11,26,44,0.18)",
+        "card-featured": "0 12px 32px -12px rgba(11,26,44,0.18)",
+        elevate: "0 12px 32px -12px rgba(11,26,44,0.18)",
+        "elevate-red": "none",
+        glow: "none",
+        "glow-red": "none",
+      },
+      maxWidth: {
+        site: "1240px",
       },
     },
   },

@@ -40,7 +40,7 @@ export function Navbar() {
     { href: "/contact", label: "Contact" },
   ];
 
-  const isActive = (href: string) => safePathname === href;
+  const isActive = (href: string) => (href === "/" ? safePathname === "/" : safePathname.startsWith(href));
 
   const handleLogout = () => {
     logout();
@@ -56,200 +56,129 @@ export function Navbar() {
 
   return (
     <header
-      className={`fixed top-0 left-0 right-0 z-50 w-full bg-white/95 backdrop-blur-md transition-all duration-300 ease-in-out ${
-        isScrolled
-          ? "border-b border-slate-200 shadow-[0_1px_12px_rgba(0,0,0,0.08)] py-2"
-          : "border-b border-slate-100 shadow-none py-3 sm:py-4"
+      className={`fixed top-0 left-0 right-0 z-50 w-full bg-white transition-shadow duration-300 ${
+        isScrolled ? "shadow-[0_1px_0_#E2E6EC,0_8px_24px_-16px_rgba(11,26,44,0.25)]" : "shadow-[0_1px_0_#E2E6EC]"
       }`}
     >
-      <div className="w-full max-w-screen-xl mx-auto px-3 sm:px-6 lg:px-10">
-        <nav className="flex min-h-10 items-center justify-between gap-2 overflow-hidden sm:gap-4">
-
-          {/* Far Left: Brand Logo */}
-          <div className="flex-shrink-0 flex items-center pr-2">
-            <Logo size="md" className="h-11 sm:h-12 w-auto" />
+      <div className="wrap">
+        <nav className="flex h-[72px] items-center justify-between gap-6">
+          <div className="flex flex-shrink-0 items-center">
+            <Logo size="md" className="h-11 w-auto sm:h-12" />
           </div>
 
-          {/* Center: All Navigation Tabs */}
-          <div className="hidden lg:flex items-center justify-center flex-1 px-4">
-            <ul className="flex items-center gap-0.5 bg-slate-100/80 border border-slate-200/70 rounded-full p-1">
-              {navLinks.map((link) => {
-                const active = isActive(link.href);
-                return (
-                  <li key={link.href}>
-                    <Link
-                      href={link.href}
-                      prefetch={true}
-                      className={`flex items-center gap-1.5 px-3 xl:px-4 py-1.5 rounded-full text-xs xl:text-[13px] font-semibold transition-all duration-200 ${
-                        active
-                          ? "bg-white text-brand-navy font-bold shadow-sm border border-slate-200/60"
-                          : "text-slate-600 hover:text-brand-navy hover:bg-white/70"
+          <ul className="hidden h-full flex-1 items-stretch justify-center gap-1 lg:flex xl:gap-3">
+            {navLinks.filter((l) => l.href !== "/").map((link) => {
+              const active = isActive(link.href);
+              return (
+                <li key={link.href} className="flex">
+                  <Link
+                    href={link.href}
+                    prefetch={true}
+                    className={`relative flex items-center px-3 text-[14px] font-medium transition-colors ${
+                      active ? "text-ink" : "text-ink-500 hover:text-ink"
+                    }`}
+                  >
+                    {link.label}
+                    <span
+                      className={`absolute inset-x-3 bottom-0 h-[2px] bg-accent transition-transform duration-300 origin-left ${
+                        active ? "scale-x-100" : "scale-x-0"
                       }`}
-                    >
-                      {active && (
-                        <span className="w-1.5 h-1.5 rounded-full bg-brand-red flex-shrink-0" />
-                      )}
-                      {link.label}
-                    </Link>
-                  </li>
-                );
-              })}
-            </ul>
-          </div>
+                    />
+                  </Link>
+                </li>
+              );
+            })}
+          </ul>
 
-          {/* Far Right: Auth / Member CTAs */}
-          <div className="hidden lg:flex items-center gap-2 flex-shrink-0">
+          <div className="hidden flex-shrink-0 items-center gap-5 lg:flex">
             {user ? (
-              <div className="flex items-center gap-2">
-                <Link
-                  href="/dashboard"
-                  prefetch={true}
-                  className="flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-800 text-xs font-bold transition-all border border-slate-200"
-                >
-                  <span className="w-6 h-6 rounded-full bg-brand-navy text-white flex items-center justify-center text-[10px] uppercase font-bold">
+              <>
+                <Link href="/dashboard" prefetch={true} className="flex items-center gap-2.5 text-sm font-medium text-ink">
+                  <span className="flex h-8 w-8 items-center justify-center rounded-full bg-ink text-[11px] font-semibold uppercase text-white">
                     {displayName.slice(0, 2)}
                   </span>
-                  <span className="truncate max-w-[110px]">{displayName}</span>
+                  <span className="max-w-[120px] truncate">{displayName}</span>
                 </Link>
-                <button
-                  type="button"
-                  onClick={handleLogout}
-                  className="px-3 py-1.5 text-xs font-semibold text-slate-500 hover:text-brand-red hover:bg-red-50 rounded-full transition-colors"
-                  title="Sign Out"
-                >
-                  Logout
+                <button type="button" onClick={handleLogout} className="text-sm font-medium text-ink-500 hover:text-ink">
+                  Sign out
                 </button>
-              </div>
+              </>
             ) : showPublicAuthActions ? (
               <>
-                <Link
-                  href="/login"
-                  prefetch={true}
-                  className="px-4 py-2 text-xs xl:text-sm font-semibold text-slate-700 hover:text-brand-navy hover:bg-slate-100 rounded-full transition-all duration-200"
-                >
-                  Login
+                <Link href="/login" prefetch={true} className="text-sm font-medium text-ink-500 hover:text-ink">
+                  Sign in
                 </Link>
-                <Link
-                  href="/register"
-                  prefetch={true}
-                  className="px-4 xl:px-5 py-2 text-xs xl:text-sm font-bold text-white bg-brand-red hover:bg-brand-redDark shadow-md hover:shadow-lg rounded-full transition-all duration-200 hover:scale-105 active:scale-95"
-                >
-                  Join Network
+                <Link href="/register" prefetch={true} className="btn-primary !px-5 !py-2.5">
+                  Join the network
                 </Link>
               </>
             ) : null}
           </div>
 
-          {/* Mobile Menu Toggle */}
-          <div className="flex flex-shrink-0 lg:hidden items-center ml-auto">
-            <button
-              type="button"
-              onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-              className="flex h-10 w-10 items-center justify-center rounded-xl border border-slate-200 bg-slate-50 text-slate-700 shadow-sm transition-colors hover:border-brand-navy/40 hover:text-brand-navy focus:outline-none"
-              aria-label="Toggle Navigation Menu"
-            >
-              {mobileMenuOpen ? (
-                <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                </svg>
-              ) : (
-                <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
-                </svg>
-              )}
-            </button>
-          </div>
+          <button
+            type="button"
+            onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+            className="ml-auto flex h-10 w-10 items-center justify-center text-ink lg:hidden"
+            aria-label="Toggle navigation menu"
+            aria-expanded={mobileMenuOpen}
+          >
+            {mobileMenuOpen ? (
+              <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+              </svg>
+            ) : (
+              <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M4 7h16M4 12h16M4 17h16" />
+              </svg>
+            )}
+          </button>
         </nav>
-
-        {/* Mobile Navigation Drawer */}
-        {mobileMenuOpen && (
-          <div className="lg:hidden mt-2 max-h-[calc(100dvh-5rem)] overflow-y-auto rounded-2xl border border-slate-200 bg-white/95 p-3 shadow-lg shadow-slate-200/60 backdrop-blur-sm animate-fadeIn">
-            <ul className="space-y-1.5">
-              {navLinks.map((link) => (
-                <li key={link.href}>
-                  <Link
-                    href={link.href}
-                    prefetch={true}
-                    onClick={() => setMobileMenuOpen(false)}
-                    className={`flex min-h-11 items-center gap-2 px-3 py-2.5 rounded-xl text-sm font-medium transition-colors ${
-                      isActive(link.href)
-                        ? "bg-brand-ice text-brand-navy font-bold"
-                        : "text-slate-700 hover:bg-slate-50 hover:text-brand-navy"
-                    }`}
-                  >
-                    {isActive(link.href) && (
-                      <span className="w-1.5 h-1.5 rounded-full bg-brand-red flex-shrink-0" />
-                    )}
-                    {link.label}
-                  </Link>
-                </li>
-              ))}
-              {user && (
-                <li>
-                  <Link
-                    href="/dashboard"
-                    prefetch={true}
-                    onClick={() => setMobileMenuOpen(false)}
-                    className={`flex min-h-11 items-center gap-2 rounded-xl px-3 py-2.5 text-sm font-bold transition-colors ${
-                      isDashboardPage
-                        ? "bg-brand-ice text-brand-navy"
-                        : "text-brand-navy hover:bg-brand-ice/70"
-                    }`}
-                  >
-                    {isDashboardPage && (
-                      <span className="h-1.5 w-1.5 flex-shrink-0 rounded-full bg-brand-red" />
-                    )}
-                    Dashboard
-                  </Link>
-                </li>
-              )}
-            </ul>
-            <div className="mt-3 pt-3 border-t border-slate-100 flex flex-col gap-2">
-              {user ? (
-                <div className="space-y-2">
-                  <Link
-                    href="/dashboard"
-                    prefetch={true}
-                    onClick={() => setMobileMenuOpen(false)}
-                    className="block px-3 py-2 bg-slate-50 rounded-xl text-xs font-medium text-slate-600 hover:bg-slate-100"
-                  >
-                    Signed in as <strong className="text-slate-900">{displayName}</strong>
-                  </Link>
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setMobileMenuOpen(false);
-                      handleLogout();
-                    }}
-                    className="w-full text-center px-4 py-2 text-xs font-semibold text-brand-red hover:bg-red-50 rounded-xl border border-red-200"
-                  >
-                    Sign Out
-                  </button>
-                </div>
-              ) : showPublicAuthActions ? (
-                <>
-                  <Link
-                    href="/login"
-                    prefetch={true}
-                    onClick={() => setMobileMenuOpen(false)}
-                    className="w-full text-center px-4 py-2.5 text-sm font-semibold text-brand-navy border border-slate-200 rounded-xl hover:bg-slate-50"
-                  >
-                    Login
-                  </Link>
-                  <Link
-                    href="/register"
-                    prefetch={true}
-                    onClick={() => setMobileMenuOpen(false)}
-                    className="w-full text-center px-4 py-2.5 text-sm font-bold text-white bg-brand-red rounded-xl shadow-sm hover:bg-brand-redDark"
-                  >
-                    Join Network
-                  </Link>
-                </>
-              ) : null}
-            </div>
-          </div>
-        )}
       </div>
+
+      {mobileMenuOpen && (
+        <div className="max-h-[calc(100dvh-72px)] overflow-y-auto border-t border-line bg-white lg:hidden">
+          <ul className="wrap py-2">
+            {[...navLinks, ...(user ? [{ href: "/dashboard", label: "Dashboard" }] : [])].map((link) => (
+              <li key={link.href} className="border-b border-line last:border-0">
+                <Link
+                  href={link.href}
+                  prefetch={true}
+                  onClick={() => setMobileMenuOpen(false)}
+                  className={`flex min-h-[52px] items-center justify-between text-[15px] font-medium ${
+                    isActive(link.href) ? "text-accent" : "text-ink"
+                  }`}
+                >
+                  {link.label}
+                  <span aria-hidden="true" className="text-ink-300">&rarr;</span>
+                </Link>
+              </li>
+            ))}
+          </ul>
+          <div className="wrap flex flex-col gap-2 pb-6 pt-2">
+            {user ? (
+              <button
+                type="button"
+                onClick={() => {
+                  setMobileMenuOpen(false);
+                  handleLogout();
+                }}
+                className="btn-secondary w-full"
+              >
+                Sign out ({displayName})
+              </button>
+            ) : showPublicAuthActions ? (
+              <>
+                <Link href="/register" prefetch={true} onClick={() => setMobileMenuOpen(false)} className="btn-primary w-full">
+                  Join the network
+                </Link>
+                <Link href="/login" prefetch={true} onClick={() => setMobileMenuOpen(false)} className="btn-secondary w-full">
+                  Sign in
+                </Link>
+              </>
+            ) : null}
+          </div>
+        </div>
+      )}
     </header>
   );
 }

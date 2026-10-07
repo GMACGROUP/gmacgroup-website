@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { Suspense } from "react";
-import { Cormorant_Garamond, Libre_Franklin } from "next/font/google";
+import { Inter, Inter_Tight } from "next/font/google";
 import "../styles/globals.css";
 import { Navbar } from "@/components/navigation/Navbar";
 import { Footer } from "@/components/footer/Footer";
@@ -9,19 +9,17 @@ import { AIChatWidget } from "@/components/common/AIChatWidget";
 import { NavigationProgressBar } from "@/components/common/NavigationProgressBar";
 import { AuthProvider } from "@/hooks/useAuth";
 
-const libreFranklin = Libre_Franklin({
+const inter = Inter({
   subsets: ["latin"],
-  variable: "--font-libre-franklin",
+  variable: "--font-inter",
   display: "swap",
-  preload: true,
 });
 
-const cormorant = Cormorant_Garamond({
+const interTight = Inter_Tight({
   subsets: ["latin"],
   weight: ["400", "500", "600", "700"],
-  variable: "--font-cormorant",
+  variable: "--font-inter-tight",
   display: "swap",
-  preload: true,
 });
 
 export const metadata: Metadata = {
@@ -36,14 +34,14 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en" className={`${libreFranklin.variable} ${cormorant.variable}`}>
+    <html lang="en" className={`${inter.variable} ${interTight.variable}`}>
       <body className="min-h-screen flex flex-col font-sans">
         <AuthProvider>
           <Suspense fallback={null}>
             <NavigationProgressBar />
           </Suspense>
           <Navbar />
-          <main className="flex-1 pt-16">{children}</main>
+          <main className="flex-1 pt-[72px]">{children}</main>
           <Footer />
           <ScrollProgress />
           <AIChatWidget />

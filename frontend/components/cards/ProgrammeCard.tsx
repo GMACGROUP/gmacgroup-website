@@ -30,28 +30,28 @@ export function ProgrammeCard({
 
   const categoryConfig: Record<string, { label: string; badge: string; accent: string; icon: typeof AcademicCapIcon; image: string }> = {
     student: {
-      label: "Student Pathway",
+      label: "Student pathway",
       badge: "bg-sky-50 text-sky-700 border-sky-200",
       accent: "bg-sky-500",
       icon: AcademicCapIcon,
       image: "/images/service-employability.jpg",
     },
     professional_development: {
-      label: "Professional Dev",
+      label: "Professional development",
       badge: "bg-blue-50 text-brand-navy border-blue-200",
       accent: "bg-brand-navy",
       icon: BriefcaseIcon,
       image: "/images/service-workforce-consulting.jpg",
     },
     training: {
-      label: "Specialized Training",
+      label: "Specialised training",
       badge: "bg-red-50 text-brand-red border-red-200",
       accent: "bg-brand-red",
       icon: WrenchIcon,
       image: "/images/service-capacity-building.jpg",
     },
     institutional: {
-      label: "Institutional Capacity",
+      label: "Institutional capacity",
       badge: "bg-emerald-50 text-emerald-700 border-emerald-200",
       accent: "bg-emerald-500",
       icon: BuildingIcon,
@@ -67,8 +67,7 @@ export function ProgrammeCard({
     image: "/images/service-signature-events.jpg",
   };
 
-  const IconComp = cfg.icon;
-
+  
   const handleEnrolClick = () => {
     if (onEnrol && programme) {
       onEnrol(programme);
@@ -84,73 +83,52 @@ export function ProgrammeCard({
   };
 
   return (
-    <div className="group relative flex flex-col bg-white rounded-2xl border border-slate-200 shadow-card hover:shadow-card-hover hover:border-brand-navy/25 hover:-translate-y-1 transition-all duration-300 overflow-hidden">
-      {/* Thumbnail Banner */}
-      <div className="relative h-44 w-full bg-slate-100 overflow-hidden">
+    <article className="group flex flex-col border-t-2 border-ink bg-white">
+      <div className="relative aspect-[16/10] w-full overflow-hidden bg-mist">
         <Image
           src={cfg.image}
-          alt={displayTitle}
+          alt=""
           fill
-          className="object-cover group-hover:scale-105 transition-transform duration-500"
+          sizes="(max-width: 768px) 100vw, 33vw"
+          className="object-cover transition-transform duration-500 group-hover:scale-[1.03]"
         />
-        <div className="absolute inset-0 bg-gradient-to-t from-black/75 via-black/20 to-transparent" />
-        <div className="absolute top-3 left-3">
-          <span className={`badge ${cfg.badge} uppercase shadow-sm`}>
-            {cfg.label}
-          </span>
-        </div>
-        <div className="absolute bottom-3 left-4 right-4 flex items-center justify-between text-white">
-          <div className="flex items-center gap-2">
-            <div className="w-7 h-7 rounded-lg bg-white/20 backdrop-blur-md flex items-center justify-center border border-white/30">
-              <IconComp className="w-4 h-4 text-white" />
-            </div>
-            <span className="text-xs font-semibold text-slate-200">Cohort Track</span>
-          </div>
-          {displayDate && (
-            <span className="text-xs font-bold bg-black/40 px-2.5 py-1 rounded-md backdrop-blur-sm border border-white/20">
-              {new Date(displayDate).toLocaleDateString("en-US", { month: "short", day: "numeric" })}
-            </span>
-          )}
-          {isClosed && (
-            <span className="text-xs font-bold bg-slate-900/80 text-white px-2.5 py-1 rounded-md border border-white/20">
-              Closed
-            </span>
-          )}
-        </div>
       </div>
 
-      {/* Top accent bar */}
-      <div className={`h-1 w-full ${cfg.accent}`} />
+      <div className="flex flex-1 flex-col pt-6">
+        <div className="flex items-center justify-between gap-3 text-[12px] font-semibold uppercase tracking-[0.12em]">
+          <span className="text-accent">{cfg.label}</span>
+          {isClosed ? (
+            <span className="text-ink-400">Closed</span>
+          ) : displayDate ? (
+            <span className="text-ink-500">
+              Starts {new Date(displayDate).toLocaleDateString("en-GB", { day: "numeric", month: "short" })}
+            </span>
+          ) : null}
+        </div>
 
-      <div className="flex flex-col flex-1 p-6">
-        <h3 className="mb-2 text-base font-extrabold leading-snug text-slate-900 transition-colors group-hover:text-brand-navy sm:text-lg">
-          {displayTitle}
-        </h3>
+        <h3 className="mt-3 text-xl font-semibold leading-snug text-ink">{displayTitle}</h3>
 
         {displayDescription && (
-          <p className="line-clamp-3 flex-1 text-xs leading-relaxed text-slate-600 sm:text-sm">
-            {displayDescription}
-          </p>
+          <p className="mt-3 line-clamp-3 flex-1 text-[15px] leading-relaxed text-ink-500">{displayDescription}</p>
         )}
 
-        <div className="mt-6 pt-5 border-t border-slate-100 flex items-center justify-between">
-          <Link
-            href={`/contact?subject=Inquiry: ${encodeURIComponent(displayTitle)}`}
-            className="inline-flex items-center text-xs font-bold text-slate-500 hover:text-brand-navy transition-colors gap-1 group/link"
-          >
-            <span>Learn More</span>
-            <span className="transform group-hover/link:translate-x-1 transition-transform">→</span>
-          </Link>
+        <div className="mt-7 flex items-center gap-6">
           <button
             type="button"
             onClick={handleEnrolClick}
             disabled={isClosed}
-            className="px-4 py-2 text-xs font-bold rounded-xl bg-brand-navy text-white hover:bg-brand-navyDark shadow-sm hover:shadow-md active:scale-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-cyan transition-all disabled:cursor-not-allowed disabled:bg-slate-300 disabled:text-slate-500 disabled:shadow-none"
+            className="btn-dark !px-5 !py-2.5 disabled:cursor-not-allowed disabled:bg-ink-300"
           >
-            {isClosed ? "Closed" : "Enrol Now →"}
+            {isClosed ? "Closed" : "Enrol"}
           </button>
+          <Link
+            href={`/contact?subject=Inquiry: ${encodeURIComponent(displayTitle)}`}
+            className="text-sm font-semibold text-ink hover:text-accent"
+          >
+            Learn more
+          </Link>
         </div>
       </div>
-    </div>
+    </article>
   );
 }

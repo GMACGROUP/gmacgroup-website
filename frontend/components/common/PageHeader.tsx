@@ -7,36 +7,15 @@ interface PageHeaderProps {
   className?: string;
 }
 
-export function PageHeader({
-  title,
-  subtitle,
-  badge,
-  className = "",
-}: PageHeaderProps) {
+export function PageHeader({ title, subtitle, badge, className = "" }: PageHeaderProps) {
   return (
-    <section
-      className={`relative overflow-hidden border-b border-[#D7B56D]/20 bg-[#061C30] py-10 text-white sm:py-12 lg:py-14 ${className}`}
-    >
-      <div className="absolute inset-x-0 top-0 h-4 bg-[linear-gradient(90deg,#D7B56D_0%,#D7B56D_20%,#E56F42_20%,#E56F42_40%,#F4C95D_40%,#F4C95D_60%,#2C6EAD_60%,#2C6EAD_80%,#D7B56D_80%,#D7B56D_100%)]" />
-      <div className="absolute inset-0 opacity-20 pointer-events-none">
-        <div className="absolute -top-12 -right-12 h-64 w-64 rounded-full bg-[#D7B56D] blur-3xl" />
-        <div className="absolute -bottom-12 -left-12 h-64 w-64 rounded-full bg-[#2C6EAD] blur-3xl" />
-      </div>
-
-      <div className="container relative z-10 mx-auto max-w-4xl px-4 text-center sm:px-6">
-        {badge && (
-          <span className="page-header-badge">
-            {badge}
-          </span>
-        )}
-        <h1 className="font-serif text-3xl font-extrabold leading-tight tracking-tight text-[#F3E7C9] drop-shadow-sm sm:text-3xl lg:text-4xl">
-          {title}
-        </h1>
-        {subtitle && (
-          <p className="mx-auto mt-3 max-w-2xl text-sm font-normal leading-relaxed text-slate-200 sm:text-sm md:text-base">
-            {subtitle}
-          </p>
-        )}
+    <section className={`bg-ink text-white ${className}`}>
+      <div className="wrap py-16 sm:py-20 lg:py-24">
+        <div className="max-w-3xl">
+          {badge && <p className="page-header-badge">{badge}</p>}
+          <h1 className="text-4xl font-semibold leading-[1.08] text-white sm:text-5xl lg:text-[3.5rem]">{title}</h1>
+          {subtitle && <p className="mt-6 max-w-2xl text-lg leading-relaxed text-white/70">{subtitle}</p>}
+        </div>
       </div>
     </section>
   );
