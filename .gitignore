@@ -29,4 +29,6 @@ Thumbs.db
 # Local uploads (development only)
 uploads/*
 !uploads/.gitkeep
+# Uploaded files must never be committed (they contain personal data)
+uploads/
 backend/uploads/
