@@ -13,11 +13,15 @@ services:
       - key: DATABASE_URL
         sync: false
       - key: ALLOWED_ORIGINS
-        value: '["https://gmacgroup.vercel.app"]'
+        value: '["https://gmac-group.com","https://www.gmac-group.com","https://gmacgroup.vercel.app"]'
       - key: JWT_SECRET
         generateValue: true
       - key: FRONTEND_URL
-        value: https://gmacgroup.vercel.app
+        value: https://gmac-group.com
+      - key: PUBLIC_API_URL
+        sync: false
+      - key: MEDIA_BUCKET
+        value: media
       - key: AI_FLASK_URL
         sync: false
       - key: SUPABASE_URL
@@ -47,4 +51,4 @@ services:
       - key: EMAIL_FROM
         sync: false
       - key: OPERATIONS_EMAIL
-        value: workdisal480@gmail.com
+        value: info@gmac-group.com

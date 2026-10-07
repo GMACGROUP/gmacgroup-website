@@ -236,4 +236,4 @@ async def payment_webhook(
     reference = data.get("tx_ref")
     if reference and data.get("id"):
         await _verify(reference, str(data["id"]), db, background_tasks)
-    return {"received": True}
+    return {"received": True}

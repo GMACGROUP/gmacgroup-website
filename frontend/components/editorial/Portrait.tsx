@@ -25,7 +25,7 @@ export function Portrait({ name, src, className = "", sizes = "200px" }: Props) 
         />
       ) : (
         <div className="flex h-full w-full items-center justify-center" aria-hidden="true">
-          <span className="font-display text-[2.5rem] font-light text-ink-300">{initials(name)}</span>
+          <span className="font-display text-[2.5rem] font-light text-ink-400">{initials(name)}</span>
         </div>
       )}
     </div>

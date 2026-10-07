@@ -6,7 +6,7 @@ import type { Config } from "tailwindcss";
  * Ink    #0E1A2B  text, dark sections
  * Paper  #FBFAF7  page background
  * Blue   #0B5CAD  the single working accent (from the logo globe)
- * Clay   #B4532A  data highlights only (a muted take on the logo red)
+ * Clay   #A84D27  data highlights only (a muted take on the logo red)
  * Stone  #F2F0EB  alternate section background
  * Rule   #E3DFD6  hairlines and borders
  *
@@ -32,7 +32,7 @@ const config: Config = {
           700: "#1F2C3E",
           600: "#3C4757",
           500: "#5A6372",
-          400: "#868D98",
+          400: "#5F6B7A", // 4.7:1 on stone, 5.2:1 on paper (WCAG AA)
           300: "#B9BDC4",
         },
         paper: "#FBFAF7",
@@ -45,7 +45,7 @@ const config: Config = {
           soft: "#9CC0E6",
         },
         clay: {
-          DEFAULT: "#B4532A",
+          DEFAULT: "#A84D27", // 4.9:1 on stone (WCAG AA)
           light: "#F5E6DE",
         },
         success: "#1F7A4D",
