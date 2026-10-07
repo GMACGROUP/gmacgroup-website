@@ -59,3 +59,26 @@ SELECT * FROM (VALUES
     ('Emmanuel Nyamekye', 'Operations & Program Intern', 'Ghana', 'Operations and Programmes', false, 240)
 ) AS seed(name, position, country, team, is_lead, sort_order)
 WHERE NOT EXISTS (SELECT 1 FROM team_members);
+
+-- Starter portraits shipped with the website (replace any of them in Admin > Team)
+UPDATE team_members SET photo_url = '/images/people/richard-klutse.jpg' WHERE name = 'Richard Klutse' AND photo_url IS NULL;
+UPDATE team_members SET photo_url = '/images/people/atigsimah-richard-akamboe.jpg' WHERE name = 'Atigsimah Richard Akamboe' AND photo_url IS NULL;
+UPDATE team_members SET photo_url = '/images/people/ismail-saani.jpg' WHERE name = 'Ismail Saani' AND photo_url IS NULL;
+UPDATE team_members SET photo_url = '/images/people/evans-essene-dzidzienyo.jpg' WHERE name = 'Evans Essene Dzidzienyo' AND photo_url IS NULL;
+UPDATE team_members SET photo_url = '/images/people/oluwatosin-temitope-ogungbade.jpg' WHERE name = 'Oluwatosin Temitope Ogungbade' AND photo_url IS NULL;
+UPDATE team_members SET photo_url = '/images/people/atta-gyasi-domson.jpg' WHERE name = 'Atta Gyasi Domson' AND photo_url IS NULL;
+UPDATE team_members SET photo_url = '/images/people/maureen-mushwimba.jpg' WHERE name = 'Maureen Mushwimba' AND photo_url IS NULL;
+UPDATE team_members SET photo_url = '/images/people/jude-van-tagoe.jpg' WHERE name = 'Jude Van-Tagoe' AND photo_url IS NULL;
+UPDATE team_members SET photo_url = '/images/people/victoria-dzifa-atisoe.jpg' WHERE name = 'Victoria Dzifa Atisoe' AND photo_url IS NULL;
+UPDATE team_members SET photo_url = '/images/people/favour-ohiemi.jpg' WHERE name = 'Favour Ohiemi' AND photo_url IS NULL;
+UPDATE team_members SET photo_url = '/images/people/yolanda-chibaya.jpg' WHERE name = 'Yolanda Chibaya' AND photo_url IS NULL;
+UPDATE team_members SET photo_url = '/images/people/silas-bivamwijuru.jpg' WHERE name = 'Silas Bivamwijuru' AND photo_url IS NULL;
+UPDATE team_members SET photo_url = '/images/people/christian-agyapong.jpg' WHERE name = 'Christian Agyapong' AND photo_url IS NULL;
+UPDATE team_members SET photo_url = '/images/people/maranatha-okeley-odai.jpg' WHERE name = 'Maranatha Okeley Odai' AND photo_url IS NULL;
+UPDATE team_members SET photo_url = '/images/people/wendy-gerrar-otu.jpg' WHERE name = 'Wendy Gerrar Otu' AND photo_url IS NULL;
+UPDATE team_members SET photo_url = '/images/people/apollo-samantha-dorcas.jpg' WHERE name = 'Apollo Samantha Dorcas' AND photo_url IS NULL;
+UPDATE team_members SET photo_url = '/images/people/delasi-kumapley.jpg' WHERE name = 'Delasi Kumapley' AND photo_url IS NULL;
+UPDATE team_members SET photo_url = '/images/people/faustino-albert.jpg' WHERE name = 'Faustino Albert' AND photo_url IS NULL;
+UPDATE team_members SET photo_url = '/images/people/addai-kojo-richmond.jpg' WHERE name = 'Addai Kojo Richmond' AND photo_url IS NULL;
+UPDATE team_members SET photo_url = '/images/people/mphoyame-thole.jpg' WHERE name = 'Mphoyame Thole' AND photo_url IS NULL;
+UPDATE team_members SET photo_url = '/images/people/emmanuel-nyamekye.jpg' WHERE name = 'Emmanuel Nyamekye' AND photo_url IS NULL;
