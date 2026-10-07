@@ -17,6 +17,7 @@ from app.api.routes import (
     payments,
     admin,
     uploads,
+    team,
 )
 
 logger = logging.getLogger(__name__)
@@ -33,7 +34,7 @@ app.add_middleware(
     allow_origins=settings.ALLOWED_ORIGINS + ["http://127.0.0.1:3000", "http://localhost:3000"],
     allow_origin_regex=r"^https?://(localhost|127\.0\.0\.1)(:\d+)?$",
     allow_credentials=True,
-    allow_methods=["GET", "POST", "PATCH", "DELETE", "OPTIONS"],
+    allow_methods=["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
     allow_headers=["Accept", "Authorization", "Content-Type"],
 )
 
@@ -49,6 +50,8 @@ app.include_router(contact.router, prefix=f"{API_PREFIX}/contact", tags=["Contac
 app.include_router(ai.router, prefix=f"{API_PREFIX}/ai", tags=["AI"])
 app.include_router(payments.router, prefix=f"{API_PREFIX}/payments", tags=["Payments"])
 app.include_router(admin.router, prefix=f"{API_PREFIX}/admin", tags=["Admin Operations"])
+app.include_router(team.router, prefix=f"{API_PREFIX}/team", tags=["Team"])
+app.include_router(team.admin_router, prefix=f"{API_PREFIX}/admin/team", tags=["Admin Operations"])
 app.include_router(uploads.router, prefix=f"{API_PREFIX}/uploads", tags=["Document Uploads"])
 
 

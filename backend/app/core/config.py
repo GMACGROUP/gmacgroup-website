@@ -60,6 +60,11 @@ class Settings(BaseSettings):
     UPLOAD_DIR: str = "uploads"
     STORAGE_BUCKET: str = "resumes"
     MAX_UPLOAD_SIZE_MB: int = 10
+    # Public bucket for website images (team portraits). Must be set to public in Supabase.
+    MEDIA_BUCKET: str = "media"
+    # Public base URL of this API, used for locally stored images in development
+    PUBLIC_API_URL: str = "http://localhost:8000"
+    MAX_IMAGE_SIZE_MB: int = 5
 
     model_config = SettingsConfigDict(env_file=".env", extra="ignore")
 

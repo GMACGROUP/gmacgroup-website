@@ -1,21 +1,29 @@
-import { Hero } from "@/sections/hero/Hero";
-import { ValuePropSection } from "@/sections/value-prop/ValuePropSection";
-import { EcosystemSection } from "@/sections/ecosystem/EcosystemSection";
-import { ApproachSection } from "@/sections/approach/ApproachSection";
-import { ProgrammesSection } from "@/sections/programmes/ProgrammesSection";
-import { TestimonialsSection } from "@/sections/testimonials/TestimonialsSection";
-import { CtaBanner } from "@/sections/cta/CtaBanner";
+import { HomeHero } from "@/sections/home/HomeHero";
+import { Figures } from "@/sections/home/Figures";
+import { TwoDoors } from "@/sections/home/TwoDoors";
+import { ExpertiseIndex } from "@/sections/home/ExpertiseIndex";
+import { FounderNote } from "@/sections/home/FounderNote";
+import { EngagementFile } from "@/sections/home/EngagementFile";
+import { EventsPreview } from "@/sections/home/EventsPreview";
+import { TeamPreview } from "@/sections/home/TeamPreview";
+import { ClosingInvitation } from "@/sections/home/ClosingInvitation";
+import { getTeam } from "@/lib/api/server";
 
-export default function HomePage() {
+export const revalidate = 300;
+
+export default async function HomePage() {
+  const team = await getTeam();
   return (
     <>
-      <Hero />
-      <ValuePropSection />
-      <EcosystemSection />
-      <ApproachSection />
-      <ProgrammesSection />
-      <TestimonialsSection />
-      <CtaBanner />
+      <HomeHero />
+      <Figures />
+      <TwoDoors />
+      <ExpertiseIndex />
+      <FounderNote />
+      <EngagementFile />
+      <EventsPreview />
+      <TeamPreview team={team} />
+      <ClosingInvitation />
     </>
   );
 }

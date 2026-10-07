@@ -1,17 +1,19 @@
 import type { Config } from "tailwindcss";
 
 /*
- * GMAC Group design system: "Clean corporate advisory"
+ * GMAC Group design system: "The Evidence Ledger"
  *
- * Ink      #0B1A2C  primary text, dark sections
- * Blue     #0B5CAD  single accent (drawn from the logo globe)
- * Mist     #F4F6F9  alternate section background
- * Line     #E2E6EC  hairlines and borders
+ * Ink    #0E1A2B  text, dark sections
+ * Paper  #FBFAF7  page background
+ * Blue   #0B5CAD  the single working accent (from the logo globe)
+ * Clay   #B4532A  data highlights only (a muted take on the logo red)
+ * Stone  #F2F0EB  alternate section background
+ * Rule   #E3DFD6  hairlines and borders
  *
- * Legacy token names (red, gold, cyan, ivory...) are kept and remapped so
- * every existing page picks up the new palette without a rewrite.
+ * Legacy token names (brand.red, brand.gold, brand.cyan, ...) are remapped so
+ * older pages pick up the palette until they are rebuilt.
  */
-const ink = "#0B1A2C";
+const ink = "#0E1A2B";
 const blue = "#0B5CAD";
 
 const config: Config = {
@@ -25,66 +27,78 @@ const config: Config = {
       colors: {
         ink: {
           DEFAULT: ink,
-          900: "#07111E",
+          900: "#08111D",
           800: ink,
-          700: "#1C2B3F",
-          600: "#3A4859",
-          500: "#5B6676",
-          400: "#8A93A0",
-          300: "#B8BEC8",
+          700: "#1F2C3E",
+          600: "#3C4757",
+          500: "#5A6372",
+          400: "#868D98",
+          300: "#B9BDC4",
         },
+        paper: "#FBFAF7",
+        stone: "#F2F0EB",
+        rule: "#E3DFD6",
         accent: {
           DEFAULT: blue,
-          dark: "#084785",
-          light: "#E8F0FA",
-          soft: "#9CC3EC",
+          dark: "#08467F",
+          light: "#E7EFF8",
+          soft: "#9CC0E6",
         },
-        mist: "#F4F6F9",
-        line: "#E2E6EC",
+        clay: {
+          DEFAULT: "#B4532A",
+          light: "#F5E6DE",
+        },
+        success: "#1F7A4D",
+        warning: "#A86A06",
+        danger: "#B42318",
+        // v1 aliases
+        mist: "#F2F0EB",
+        line: "#E3DFD6",
         brand: {
           DEFAULT: ink,
           navy: ink,
-          navyDark: "#07111E",
-          navyDeep: "#07111E",
-          navyLight: "#1C2B3F",
+          navyDark: "#08111D",
+          navyDeep: "#08111D",
+          navyLight: "#1F2C3E",
           red: blue,
-          redDark: "#084785",
-          redLight: "#E8F0FA",
+          redDark: "#08467F",
+          redLight: "#E7EFF8",
           cyan: blue,
           sky: blue,
           teal: blue,
-          gold: "#9CC3EC",
-          ice: "#FFFFFF",
-          ivory: "#FFFFFF",
-          sand: "#F4F6F9",
-          warm: "#F4F6F9",
+          gold: "#9CC0E6",
+          ice: "#FBFAF7",
+          ivory: "#FBFAF7",
+          sand: "#F2F0EB",
+          warm: "#F2F0EB",
         },
       },
       fontFamily: {
-        sans: ["var(--font-inter)", "Inter", "-apple-system", "BlinkMacSystemFont", "'Segoe UI'", "Roboto", "sans-serif"],
-        // "serif" is kept as the heading family name so existing markup keeps working;
-        // it now resolves to a tight grotesk for a crisp corporate voice.
-        serif: ["var(--font-inter-tight)", "'Inter Tight'", "var(--font-inter)", "sans-serif"],
-        display: ["var(--font-inter-tight)", "'Inter Tight'", "sans-serif"],
+        sans: ["var(--font-plex)", "'IBM Plex Sans'", "-apple-system", "BlinkMacSystemFont", "'Segoe UI'", "Roboto", "sans-serif"],
+        serif: ["var(--font-newsreader)", "Newsreader", "'Newsreader 16pt'", "Georgia", "serif"],
+        display: ["var(--font-newsreader)", "Newsreader", "'Newsreader 16pt'", "Georgia", "serif"],
       },
       borderRadius: {
-        // Squarer corners across the whole site
-        lg: "4px",
-        xl: "4px",
-        "2xl": "6px",
-        "3xl": "8px",
+        lg: "3px",
+        xl: "3px",
+        "2xl": "4px",
+        "3xl": "6px",
       },
       boxShadow: {
-        card: "0 1px 2px rgba(11,26,44,0.04)",
-        "card-hover": "0 12px 32px -12px rgba(11,26,44,0.18)",
-        "card-featured": "0 12px 32px -12px rgba(11,26,44,0.18)",
-        elevate: "0 12px 32px -12px rgba(11,26,44,0.18)",
+        card: "none",
+        "card-hover": "0 18px 40px -24px rgba(14,26,43,0.35)",
+        "card-featured": "0 18px 40px -24px rgba(14,26,43,0.35)",
+        elevate: "0 18px 40px -24px rgba(14,26,43,0.35)",
         "elevate-red": "none",
         glow: "none",
         "glow-red": "none",
       },
       maxWidth: {
-        site: "1240px",
+        site: "1280px",
+        prose: "68ch",
+      },
+      letterSpacing: {
+        label: "0.14em",
       },
     },
   },

@@ -80,3 +80,19 @@ def view_application_document(
         "document_url": application.resume_url,
         "is_internal": application.resume_url.startswith("/api/v1/uploads/"),
     }
+
+
+MEDIA_TYPES = {".jpg": "image/jpeg", ".png": "image/png", ".webp": "image/webp"}
+
+
+@router.get("/media/{folder}/{filename}")
+async def get_media(folder: str, filename: str):
+    """Serve a locally stored public image (development only; production uses Supabase)."""
+    path = storage_service.get_local_media_path(folder, filename)
+    if path is None:
+        raise HTTPException(status_code=404, detail="Image not found")
+    return FileResponse(
+        path,
+        media_type=MEDIA_TYPES[path.suffix],
+        headers={"Cache-Control": "public, max-age=31536000, immutable", "X-Content-Type-Options": "nosniff"},
+    )

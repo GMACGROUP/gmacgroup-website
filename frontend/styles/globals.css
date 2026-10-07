@@ -4,14 +4,18 @@
 
 @layer base {
   body {
-    @apply bg-white text-ink antialiased font-sans selection:bg-accent selection:text-white;
+    @apply bg-paper text-ink antialiased font-sans selection:bg-accent selection:text-white;
     overflow-x: hidden;
-    font-feature-settings: "cv11", "ss01";
+    text-rendering: optimizeLegibility;
   }
 
-  h1, h2, h3, h4, h5, h6 {
-    @apply font-display text-ink;
-    letter-spacing: -0.02em;
+  h1, h2, h3, h4 {
+    @apply font-display text-ink font-normal;
+    letter-spacing: -0.015em;
+    font-optical-sizing: auto;
+  }
+  h5, h6 {
+    @apply font-sans text-ink;
   }
 
   p {
@@ -20,83 +24,104 @@
 
   :focus-visible {
     outline: 2px solid #0B5CAD;
-    outline-offset: 2px;
+    outline-offset: 3px;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+      scroll-behavior: auto !important;
+    }
   }
 }
 
 @layer components {
   /* Layout */
   .wrap {
-    @apply mx-auto w-full max-w-site px-5 sm:px-8 lg:px-10;
+    @apply mx-auto w-full max-w-site px-5 sm:px-8 lg:px-12;
   }
-
   .site-section {
-    @apply py-16 sm:py-20 lg:py-28;
+    @apply py-20 sm:py-24 lg:py-32;
   }
 
-  /* Eyebrow: small uppercase label with a short rule */
-  .eyebrow {
-    @apply inline-flex items-center gap-3 text-[12px] font-semibold uppercase tracking-[0.14em] text-accent;
+  /* Type scale */
+  .display-xl {
+    @apply font-display text-[2.75rem] leading-[1.02] sm:text-[4rem] lg:text-[5.5rem];
+    letter-spacing: -0.025em;
   }
-  .eyebrow::before {
-    content: "";
-    @apply block h-px w-8 bg-current;
+  .display-lg {
+    @apply font-display text-[2.25rem] leading-[1.06] sm:text-5xl lg:text-[3.75rem];
+    letter-spacing: -0.02em;
+  }
+  .display-md {
+    @apply font-display text-3xl leading-[1.1] sm:text-4xl lg:text-[2.75rem];
+  }
+  .lede {
+    @apply text-lg leading-relaxed text-ink-500 sm:text-xl;
+  }
+
+  /* Report style label: "01  Expertise" */
+  .eyebrow {
+    @apply inline-flex items-center gap-3 font-sans text-[12px] font-medium uppercase tracking-label text-ink-500;
+  }
+  .eyebrow-num {
+    @apply font-sans text-[12px] font-medium tracking-label text-accent;
+  }
+
+  .rule-top {
+    @apply border-t border-ink;
   }
 
   /* Cards */
   .card {
-    @apply bg-white rounded-none border border-line transition-all duration-300;
+    @apply bg-white border border-rule transition-colors duration-300;
   }
   .card-hover {
-    @apply hover:border-ink/30 hover:shadow-card-hover transition-all duration-300;
+    @apply hover:border-ink/40 transition-colors duration-300;
   }
   .card-featured {
-    @apply bg-white border border-ink/20;
+    @apply bg-white border border-ink/30;
   }
 
   /* Section backgrounds */
   .section-light {
-    @apply bg-mist border-b border-line;
+    @apply bg-stone border-b border-rule;
   }
   .section-white {
-    @apply bg-white border-b border-line;
+    @apply bg-paper border-b border-rule;
   }
   .section-navy {
     @apply bg-ink text-white;
   }
 
-  /* Badges: quiet rectangular tags */
+  /* Badges */
   .badge {
-    @apply inline-flex items-center gap-1.5 px-2 py-0.5 rounded-sm text-[11px] font-semibold border tracking-wide uppercase;
+    @apply inline-flex items-center gap-1.5 px-2 py-0.5 text-[11px] font-medium border tracking-wide uppercase;
   }
   .badge-red, .badge-navy, .badge-cyan {
     @apply bg-accent-light text-accent-dark border-accent/20;
   }
   .badge-green {
-    @apply bg-emerald-50 text-emerald-800 border-emerald-200;
+    @apply bg-emerald-50 text-success border-emerald-200;
   }
   .badge-purple, .badge-slate {
-    @apply bg-mist text-ink-600 border-line;
+    @apply bg-stone text-ink-600 border-rule;
   }
 
-  /* Typography helpers */
+  /* Legacy helpers used by older pages */
   .section-label {
-    @apply inline-flex items-center gap-3 !bg-transparent !border-0 !shadow-none !px-0 !py-0 text-[12px] font-semibold tracking-[0.14em] uppercase !text-accent;
+    @apply inline-flex items-center gap-3 !bg-transparent !border-0 !shadow-none !px-0 !py-0 text-[12px] font-medium tracking-label uppercase !text-ink-500;
   }
   .section-label > span:first-child {
     @apply !h-px !w-8 !rounded-none !bg-accent !animate-none;
   }
-
   .page-header-badge {
-    @apply mb-5 inline-flex items-center gap-3 text-[12px] font-semibold uppercase tracking-[0.14em] text-accent-soft;
+    @apply mb-6 inline-flex items-center gap-3 text-[12px] font-medium uppercase tracking-label text-white/60;
   }
-  .page-header-badge::before {
-    content: "";
-    @apply block h-px w-8 bg-current;
-  }
-
   .section-title {
-    @apply text-3xl sm:text-4xl lg:text-[2.75rem] font-display font-semibold text-ink leading-[1.1];
+    @apply display-md text-ink;
   }
   .section-subtitle {
     @apply text-base sm:text-lg text-ink-500 leading-relaxed max-w-3xl;
@@ -104,13 +129,13 @@
 
   /* Filter tabs */
   .filter-bar {
-    @apply inline-flex flex-wrap items-center gap-0 border-b border-line;
+    @apply inline-flex flex-wrap items-center gap-0 border-b border-rule !rounded-none !bg-transparent !p-0 !shadow-none;
   }
   .filter-tab {
-    @apply -mb-px px-4 py-3 text-sm font-medium border-b-2 transition-colors duration-200 cursor-pointer;
+    @apply -mb-px px-4 py-3 text-sm font-medium border-b-2 !rounded-none transition-colors duration-200 cursor-pointer;
   }
   .filter-tab-active {
-    @apply border-accent text-ink;
+    @apply border-accent text-ink !bg-transparent !shadow-none;
   }
   .filter-tab-inactive {
     @apply border-transparent text-ink-500 hover:text-ink;
@@ -118,39 +143,58 @@
 
   /* Buttons */
   .btn-primary {
-    @apply inline-flex items-center justify-center gap-2 px-6 py-3.5 rounded-[2px] font-semibold text-sm text-white bg-accent hover:bg-accent-dark transition-colors duration-200;
+    @apply inline-flex items-center justify-center gap-2.5 px-6 py-3.5 font-medium text-[15px] text-white bg-accent hover:bg-accent-dark transition-colors duration-200;
   }
   .btn-secondary {
-    @apply inline-flex items-center justify-center gap-2 px-6 py-3.5 rounded-[2px] font-semibold text-sm text-ink bg-white border border-ink/25 hover:border-ink transition-colors duration-200;
-  }
-  .btn-ghost {
-    @apply inline-flex items-center justify-center gap-2 px-0 py-2 font-semibold text-sm text-ink hover:text-accent transition-colors duration-200;
+    @apply inline-flex items-center justify-center gap-2.5 px-6 py-3.5 font-medium text-[15px] text-ink bg-transparent border border-ink/30 hover:border-ink transition-colors duration-200;
   }
   .btn-dark {
-    @apply inline-flex items-center justify-center gap-2 px-6 py-3.5 rounded-[2px] font-semibold text-sm text-white bg-ink hover:bg-ink-700 transition-colors duration-200;
+    @apply inline-flex items-center justify-center gap-2.5 px-6 py-3.5 font-medium text-[15px] text-white bg-ink hover:bg-ink-700 transition-colors duration-200;
+  }
+  .btn-ghost {
+    @apply inline-flex items-center gap-2 py-2 font-medium text-[15px] text-ink hover:text-accent transition-colors duration-200;
   }
 
-  /* Text link with arrow */
   .link-arrow {
-    @apply inline-flex items-center gap-2 text-sm font-semibold text-ink hover:text-accent transition-colors;
+    @apply inline-flex items-center gap-2 text-[15px] font-medium text-ink transition-colors hover:text-accent;
   }
   .link-arrow svg {
     @apply transition-transform duration-200;
   }
-  .link-arrow:hover svg {
+  .link-arrow:hover svg, .group:hover .link-arrow svg {
     @apply translate-x-1;
   }
 
   .stat-number {
-    @apply text-4xl sm:text-5xl font-display font-semibold tracking-tight text-ink;
+    @apply font-display text-5xl sm:text-6xl text-ink;
+    letter-spacing: -0.03em;
   }
 
   .empty-state {
-    @apply flex flex-col items-center justify-center text-center py-16 px-8 bg-white border border-dashed border-line max-w-lg mx-auto;
+    @apply flex flex-col items-center justify-center text-center py-16 px-8 bg-white border border-dashed border-rule max-w-lg mx-auto;
   }
 
   .woven-band {
     @apply bg-accent;
+  }
+
+  /* Form fields */
+  .field {
+    @apply w-full border border-ink/20 bg-white px-4 py-3 text-[15px] text-ink placeholder:text-ink-400 transition-colors focus:border-accent focus:outline-none;
+  }
+  .field-label {
+    @apply mb-2 block text-sm font-medium text-ink;
+  }
+
+  /* Scroll reveal (progressive: content is visible without JS) */
+  .js .reveal {
+    opacity: 0;
+    transform: translateY(14px);
+    transition: opacity 700ms cubic-bezier(0.2, 0.7, 0.2, 1), transform 700ms cubic-bezier(0.2, 0.7, 0.2, 1);
+  }
+  .js .reveal.is-visible {
+    opacity: 1;
+    transform: none;
   }
 }
 

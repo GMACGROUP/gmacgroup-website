@@ -53,22 +53,26 @@ export function Footer() {
 
   const columns = [
     {
-      title: "Company",
+      title: "Expertise",
       links: [
-        { href: "/about", label: "About us" },
-        { href: "/services", label: "Services" },
-        { href: "/research", label: "Research" },
-        { href: "/insights", label: "Insights" },
-        { href: "/contact", label: "Contact" },
+        { href: "/expertise/applied-research-and-policy-consulting", label: "Applied research and policy" },
+        { href: "/expertise/institutional-capacity-building", label: "Institutional capacity building" },
+        { href: "/expertise/human-capital-and-workforce-consulting", label: "Human capital and workforce" },
+        { href: "/expertise/employability-programmes", label: "Employability programmes" },
+        { href: "/expertise/signature-events-and-workshops", label: "Signature events" },
+        { href: "/expertise/investment-facilitation", label: "Investment facilitation" },
       ],
     },
     {
-      title: "Programmes",
+      title: "Gmac Group",
       links: [
-        { href: "/programmes", label: "Development programmes" },
-        { href: "/opportunities", label: "Careers and fellowships" },
-        { href: "/services#education-employability", label: "Education and employability" },
-        { href: "/services#consulting-and-advisory", label: "Human capital advisory" },
+        { href: "/about", label: "About" },
+        { href: "/team", label: "Team" },
+        { href: "/research", label: "Research" },
+        { href: "/events", label: "Events" },
+        { href: "/programmes", label: "Programmes" },
+        { href: "/opportunities", label: "Careers" },
+        { href: "/contact", label: "Contact" },
       ],
     },
   ];
@@ -88,8 +92,8 @@ export function Footer() {
             <Logo size="md" />
           </div>
           <p className="mt-6 max-w-sm text-[15px] leading-relaxed">
-            GMAC Group builds people and the evidence institutions need to deploy them well. Based in Accra, working
-            across Africa.
+            A research and advisory firm that builds human capital, produces decision ready evidence, and connects
+            investors to investable projects across Africa. Remote by design, working from ten countries.
           </p>
           <div className="mt-6 flex items-center gap-2">
             {socials.map(({ href, label, Icon }) => (
@@ -108,8 +112,8 @@ export function Footer() {
         </div>
 
         {columns.map((col) => (
-          <div key={col.title} className={col.title === "Company" ? "lg:col-span-2" : "lg:col-span-3"}>
-            <h4 className="text-[12px] font-semibold uppercase tracking-[0.14em] text-white">{col.title}</h4>
+          <div key={col.title} className={col.title === "Gmac Group" ? "lg:col-span-2" : "lg:col-span-3"}>
+            <h4 className="font-sans text-[12px] font-medium uppercase tracking-label text-white">{col.title}</h4>
             <ul className="mt-5 space-y-3 text-[15px]">
               {col.links.map((l) => (
                 <li key={l.href + l.label}>
@@ -123,7 +127,7 @@ export function Footer() {
         ))}
 
         <div className="lg:col-span-3">
-          <h4 className="text-[12px] font-semibold uppercase tracking-[0.14em] text-white">GMAC Insights</h4>
+          <h4 className="font-sans text-[12px] font-medium uppercase tracking-label text-white">Gmac Insights</h4>
           <p className="mt-5 text-[15px] leading-relaxed">
             Periodic briefings on workforce trends, research and fellowship cohorts.
           </p>
@@ -159,7 +163,7 @@ export function Footer() {
 
       <div className="border-t border-white/10">
         <div className="wrap flex flex-col gap-4 py-6 text-sm text-white/50 sm:flex-row sm:items-center sm:justify-between">
-          <p>© {new Date().getFullYear()} GMAC Group. All rights reserved.</p>
+          <p>© {new Date().getFullYear()} Gmac Advisory and Consulting Ltd. All rights reserved.</p>
           <div className="flex gap-6">
             <Link href="/about" className="hover:text-white">Privacy</Link>
             <Link href="/about" className="hover:text-white">Terms</Link>

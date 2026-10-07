@@ -4,6 +4,7 @@ import React, { useEffect, useState } from "react";
 import Link from "next/link";
 import { useAuth } from "@/hooks/useAuth";
 import { apiClient } from "@/lib/api/client";
+import { TeamManager } from "@/components/admin/TeamManager";
 import {
   DocumentIcon,
   EyeIcon,
@@ -90,8 +91,8 @@ interface AdminPage<T> {
   items: T[];
 }
 
-type Queue = "applications" | "enrolments" | "members" | "contacts" | "payments" | "catalogue";
-type AdminQueue = Exclude<Queue, "catalogue">;
+type Queue = "applications" | "enrolments" | "members" | "contacts" | "payments" | "catalogue" | "team";
+type AdminQueue = Exclude<Queue, "catalogue" | "team">;
 
 interface PaginationState {
   page: number;
@@ -586,7 +587,7 @@ export default function AdminPage() {
         </div>
 
         <nav className="flex gap-2 overflow-x-auto border-b border-slate-200 pb-2">
-          {(["applications", "enrolments", "members", "contacts", "payments", "catalogue"] as Queue[]).map((item) => (
+          {(["applications", "enrolments", "members", "contacts", "payments", "catalogue", "team"] as Queue[]).map((item) => (
             <button
               key={item}
               onClick={() => {
@@ -842,6 +843,9 @@ export default function AdminPage() {
             />
           </section>
         )}
+
+        {/* ── Team directory ── */}
+        {queue === "team" && <TeamManager />}
 
         {/* ── Catalogue Management ── */}
         {queue === "catalogue" && (

@@ -6,6 +6,7 @@ from app.models.opportunity import Application, ApplicationEvent, Opportunity
 from app.models.payment import Payment
 from app.models.programme import Programme, ProgrammeEnrolment
 from app.models.research import ResearchProject
+from app.models.team import TeamMember
 from app.models.user import User
 
 __all__ = [
@@ -18,5 +19,6 @@ __all__ = [
 	"Programme",
 	"ProgrammeEnrolment",
 	"ResearchProject",
+	"TeamMember",
 	"User",
 ]

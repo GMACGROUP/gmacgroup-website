@@ -32,12 +32,13 @@ export function Navbar() {
 
   const navLinks = [
     { href: "/", label: "Home" },
-    { href: "/about", label: "About" },
-    { href: "/services", label: "Services" },
-    { href: "/programmes", label: "Programmes" },
+    { href: "/expertise", label: "Expertise" },
     { href: "/research", label: "Research" },
-    { href: "/opportunities", label: "Opportunities" },
-    { href: "/contact", label: "Contact" },
+    { href: "/programmes", label: "Programmes" },
+    { href: "/events", label: "Events" },
+    { href: "/about", label: "About" },
+    { href: "/team", label: "Team" },
+    { href: "/opportunities", label: "Careers" },
   ];
 
   const isActive = (href: string) => (href === "/" ? safePathname === "/" : safePathname.startsWith(href));
@@ -56,8 +57,8 @@ export function Navbar() {
 
   return (
     <header
-      className={`fixed top-0 left-0 right-0 z-50 w-full bg-white transition-shadow duration-300 ${
-        isScrolled ? "shadow-[0_1px_0_#E2E6EC,0_8px_24px_-16px_rgba(11,26,44,0.25)]" : "shadow-[0_1px_0_#E2E6EC]"
+      className={`fixed top-0 left-0 right-0 z-50 w-full bg-paper/95 backdrop-blur-sm transition-shadow duration-300 ${
+        isScrolled ? "shadow-[0_1px_0_#E3DFD6,0_8px_24px_-16px_rgba(11,26,44,0.25)]" : "shadow-[0_1px_0_#E3DFD6]"
       }`}
     >
       <div className="wrap">
@@ -74,7 +75,7 @@ export function Navbar() {
                   <Link
                     href={link.href}
                     prefetch={true}
-                    className={`relative flex items-center px-3 text-[14px] font-medium transition-colors ${
+                    className={`relative flex items-center px-3 text-[14.5px] transition-colors ${
                       active ? "text-ink" : "text-ink-500 hover:text-ink"
                     }`}
                   >
@@ -105,11 +106,11 @@ export function Navbar() {
               </>
             ) : showPublicAuthActions ? (
               <>
-                <Link href="/login" prefetch={true} className="text-sm font-medium text-ink-500 hover:text-ink">
-                  Sign in
+                <Link href="/login" prefetch={true} className="text-sm text-ink-500 hover:text-ink">
+                  Member sign in
                 </Link>
-                <Link href="/register" prefetch={true} className="btn-primary !px-5 !py-2.5">
-                  Join the network
+                <Link href="/contact" prefetch={true} className="btn-primary !px-5 !py-2.5 !text-sm">
+                  Start a conversation
                 </Link>
               </>
             ) : null}
@@ -136,10 +137,10 @@ export function Navbar() {
       </div>
 
       {mobileMenuOpen && (
-        <div className="max-h-[calc(100dvh-72px)] overflow-y-auto border-t border-line bg-white lg:hidden">
+        <div className="max-h-[calc(100dvh-72px)] overflow-y-auto border-t border-rule bg-paper lg:hidden">
           <ul className="wrap py-2">
             {[...navLinks, ...(user ? [{ href: "/dashboard", label: "Dashboard" }] : [])].map((link) => (
-              <li key={link.href} className="border-b border-line last:border-0">
+              <li key={link.href} className="border-b border-rule last:border-0">
                 <Link
                   href={link.href}
                   prefetch={true}
@@ -168,11 +169,11 @@ export function Navbar() {
               </button>
             ) : showPublicAuthActions ? (
               <>
-                <Link href="/register" prefetch={true} onClick={() => setMobileMenuOpen(false)} className="btn-primary w-full">
-                  Join the network
+                <Link href="/contact" prefetch={true} onClick={() => setMobileMenuOpen(false)} className="btn-primary w-full">
+                  Start a conversation
                 </Link>
                 <Link href="/login" prefetch={true} onClick={() => setMobileMenuOpen(false)} className="btn-secondary w-full">
-                  Sign in
+                  Member sign in
                 </Link>
               </>
             ) : null}

@@ -28,6 +28,14 @@ MAGIC_BYTES = {
 }
 ALLOWED_STORAGE_FOLDERS = {"resumes"}
 
+# Public website images (team portraits, event photos)
+IMAGE_SIGNATURES = {
+    "image/jpeg": (".jpg", lambda b: b[:3] == b"\xff\xd8\xff"),
+    "image/png": (".png", lambda b: b[:8] == b"\x89PNG\r\n\x1a\n"),
+    "image/webp": (".webp", lambda b: b[:4] == b"RIFF" and b[8:12] == b"WEBP"),
+}
+ALLOWED_MEDIA_FOLDERS = {"team", "events", "insights"}
+
 
 def sanitize_filename(filename: str) -> str:
     """Sanitize filename to prevent directory traversal and illegal characters."""
@@ -217,6 +225,84 @@ class StorageService:
         except Exception:
             logger.exception("Error uploading to Supabase Storage, using local fallback.")
             return await self._save_to_local(content, content_type, size, folder, file_id, safe_filename, original_filename)
+
+    async def save_image(self, file: UploadFile, folder: str) -> dict:
+        """Validate and store a public website image. Returns {"file_url": ...}.
+
+        The type is decided from the file's own bytes, not its name or the
+        browser supplied header, so a renamed script cannot pass as a photo.
+        """
+        folder = folder.strip().lower()
+        if folder not in ALLOWED_MEDIA_FOLDERS:
+            raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Unsupported image folder.")
+
+        max_bytes = self.settings.MAX_IMAGE_SIZE_MB * 1024 * 1024
+        content = await file.read(max_bytes + 1)
+        if not content:
+            raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Uploaded image is empty.")
+        if len(content) > max_bytes:
+            raise HTTPException(
+                status_code=status.HTTP_413_REQUEST_ENTITY_TOO_LARGE,
+                detail=f"Image exceeds the maximum size of {self.settings.MAX_IMAGE_SIZE_MB}MB.",
+            )
+
+        content_type, ext = None, None
+        for mime, (extension, check) in IMAGE_SIGNATURES.items():
+            if check(content):
+                content_type, ext = mime, extension
+                break
+        if content_type is None:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="Please upload a JPG, PNG or WebP image.",
+            )
+
+        file_id = str(uuid4())
+        filename = f"{file_id}{ext}"
+        provider = self.settings.STORAGE_PROVIDER.lower()
+
+        if provider == "supabase" and self.settings.SUPABASE_URL and self.settings.SUPABASE_SERVICE_ROLE_KEY:
+            supabase_url = self.settings.SUPABASE_URL.rstrip("/")
+            path = f"{folder}/{filename}"
+            try:
+                async with httpx.AsyncClient(timeout=20) as client:
+                    res = await client.post(
+                        f"{supabase_url}/storage/v1/object/{self.settings.MEDIA_BUCKET}/{path}",
+                        content=content,
+                        headers={
+                            "Authorization": f"Bearer {self.settings.SUPABASE_SERVICE_ROLE_KEY}",
+                            "Content-Type": content_type,
+                            "Cache-Control": "public, max-age=31536000, immutable",
+                        },
+                    )
+                if res.status_code >= 400:
+                    logger.error("Supabase image upload failed: %s", res.text)
+                    raise HTTPException(status_code=status.HTTP_502_BAD_GATEWAY, detail="Image storage is unavailable.")
+            except httpx.HTTPError:
+                logger.exception("Supabase image upload error")
+                raise HTTPException(status_code=status.HTTP_502_BAD_GATEWAY, detail="Image storage is unavailable.")
+            return {
+                "file_url": f"{supabase_url}/storage/v1/object/public/{self.settings.MEDIA_BUCKET}/{path}",
+                "content_type": content_type,
+                "size_bytes": len(content),
+            }
+
+        target_dir = self._get_upload_base_dir() / "media" / folder
+        target_dir.mkdir(parents=True, exist_ok=True)
+        (target_dir / filename).write_bytes(content)
+        return {
+            "file_url": f"{self.settings.PUBLIC_API_URL.rstrip('/')}/api/v1/uploads/media/{folder}/{filename}",
+            "content_type": content_type,
+            "size_bytes": len(content),
+        }
+
+    def get_local_media_path(self, folder: str, filename: str) -> Path | None:
+        if folder not in ALLOWED_MEDIA_FOLDERS:
+            return None
+        if not re.fullmatch(r"[0-9a-f-]{36}\.(jpg|png|webp)", filename):
+            return None
+        path = self._get_upload_base_dir() / "media" / folder / filename
+        return path if path.is_file() else None
 
     def get_local_file_path(self, file_id: str, filename: str, folder: str = "resumes") -> Path | None:
         """Retrieve local file path if it exists."""

@@ -17,6 +17,8 @@ async function request<T>(path: string, options: RequestInit = {}): Promise<T> {
     ...(options.headers as Record<string, string>),
   };
 
+  if (headers["Content-Type"] === "") delete headers["Content-Type"];
+
   if (token && !headers["Authorization"]) {
     headers["Authorization"] = `Bearer ${token}`;
   }
@@ -49,6 +51,7 @@ async function request<T>(path: string, options: RequestInit = {}): Promise<T> {
     throw new Error(message);
   }
 
+  if (res.status === 204) return undefined as T;
   return res.json() as Promise<T>;
 }
 
@@ -75,4 +78,10 @@ export const apiClient = {
     }),
   delete: <T>(path: string, headers?: Record<string, string>) =>
     request<T>(path, { method: "DELETE", headers }),
+  /** Multipart upload. The browser sets the multipart Content-Type boundary itself. */
+  upload: <T>(path: string, file: File, field = "file") => {
+    const form = new FormData();
+    form.append(field, file);
+    return request<T>(path, { method: "POST", body: form, headers: { "Content-Type": "" } });
+  },
 };
