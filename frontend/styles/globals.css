@@ -67,7 +67,11 @@
     @apply inline-flex items-center gap-3 font-sans text-[12px] font-medium uppercase tracking-label text-ink-500;
   }
   .eyebrow-num {
-    @apply font-sans text-[12px] font-medium tracking-label text-accent;
+    @apply font-sans text-[12px] font-medium tracking-label text-signal;
+  }
+  /* Colour trial: calls to action on navy bands use the logo red. */
+  .bg-navy .btn-primary {
+    @apply bg-signal text-white hover:bg-[#A91D23];
   }
 
   .rule-top {

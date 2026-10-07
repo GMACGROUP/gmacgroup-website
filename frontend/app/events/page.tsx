@@ -55,7 +55,7 @@ export default async function EventsPage() {
 
       {/* Featured upcoming */}
       {featured && (
-        <section aria-labelledby="featured-title" className="bg-ink text-white">
+        <section aria-labelledby="featured-title" className="bg-navy text-white">
           <div className="wrap grid grid-cols-1 gap-10 py-16 sm:py-20 lg:grid-cols-12">
             <div className="lg:col-span-3">
               <p className="text-[12px] font-medium uppercase tracking-label text-accent-soft">Next flagship</p>
@@ -138,7 +138,7 @@ export default async function EventsPage() {
       </section>
 
       {/* Calendar of programmes */}
-      <section aria-labelledby="calendar-title" className="site-section border-t border-rule bg-stone">
+      <section aria-labelledby="calendar-title" className="site-section border-t border-rule bg-sand">
         <div className="wrap">
           <div className="grid grid-cols-1 gap-8 lg:grid-cols-12">
             <div className="lg:col-span-4">
@@ -176,7 +176,7 @@ export default async function EventsPage() {
       </section>
 
       {/* Sponsorship */}
-      <section className="bg-ink text-white">
+      <section className="bg-navy text-white">
         <div className="wrap flex flex-col gap-10 py-16 lg:flex-row lg:items-end lg:justify-between">
           <div className="max-w-2xl">
             <p className="text-[12px] font-medium uppercase tracking-label text-accent-soft">Sponsorship and partnership</p>

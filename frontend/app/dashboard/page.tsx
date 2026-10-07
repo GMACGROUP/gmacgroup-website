@@ -177,7 +177,7 @@ function DashboardContent() {
       </header>
 
       {welcome && (
-        <div className="border-b border-rule bg-stone">
+        <div className="border-b border-rule bg-sand">
           <p className="wrap py-5 text-[15px] text-ink-600">
             Your account is ready. Enrol in a programme or apply for a role and it will appear here.
           </p>

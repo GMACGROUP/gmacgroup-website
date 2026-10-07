@@ -36,6 +36,11 @@ const config: Config = {
           300: "#B9BDC4",
         },
         paper: "#FBFAF7",
+        // Colour trial: taken from the logo (royal navy, teal blue, red) plus a warm sand.
+        navy: { DEFAULT: "#13237A", dark: "#0D1858" },
+        teal: { DEFAULT: "#0B6A92", light: "#E3EFF4" },
+        signal: "#C8242B",
+        sand: "#F5EEE2",
         stone: "#F2F0EB",
         rule: "#E3DFD6",
         accent: {
@@ -45,7 +50,7 @@ const config: Config = {
           soft: "#9CC0E6",
         },
         clay: {
-          DEFAULT: "#A84D27", // 4.9:1 on stone (WCAG AA)
+          DEFAULT: "#C8242B", // colour trial: logo red, 4.9:1 on sand (WCAG AA)
           light: "#F5E6DE",
         },
         success: "#1F7A4D",

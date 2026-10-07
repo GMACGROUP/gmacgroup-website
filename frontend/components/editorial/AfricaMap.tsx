@@ -68,7 +68,7 @@ export function AfricaMap({ className = "", tone = "light", numbered = true, sho
                   cx={c.cx + dx + 9}
                   cy={c.cy + dy + 9}
                   r={2.6}
-                  fill="#B4532A"
+                  fill="#C8242B"
                   stroke={dark ? "#0E1A2B" : "#FBFAF7"}
                   strokeWidth={1.2}
                 />

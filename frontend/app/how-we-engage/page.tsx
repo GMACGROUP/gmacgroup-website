@@ -56,7 +56,7 @@ export default function HowWeEngagePage() {
       </section>
 
       {/* Models */}
-      <section aria-labelledby="models-title" className="site-section border-y border-rule bg-stone">
+      <section aria-labelledby="models-title" className="site-section border-y border-rule bg-sand">
         <div className="wrap grid grid-cols-1 gap-12 lg:grid-cols-12">
           <div className="lg:col-span-4">
             <p className="eyebrow"><span className="eyebrow-num">02</span> Partnership models</p>
@@ -119,7 +119,7 @@ export default function HowWeEngagePage() {
         </div>
       </section>
 
-      <section className="bg-ink text-white">
+      <section className="bg-navy text-white">
         <div className="wrap flex flex-col gap-8 py-16 lg:flex-row lg:items-end lg:justify-between">
           <h2 className="max-w-[20ch] font-display text-4xl leading-tight text-white sm:text-5xl">Tell us the decision you are trying to make.</h2>
           <div className="flex flex-col gap-3 sm:flex-row">

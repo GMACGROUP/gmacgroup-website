@@ -22,7 +22,7 @@ export function TwoDoors() {
 
         <div className="mt-16 grid lg:grid-cols-12">
           {/* Institutions */}
-          <div className="reveal bg-ink p-8 text-white sm:p-12 lg:col-span-7">
+          <div className="reveal bg-navy p-8 text-white sm:p-12 lg:col-span-7">
             <p className="text-[12px] font-medium uppercase tracking-label text-accent-soft">Institutions</p>
             <h3 className="mt-4 font-display text-3xl text-white sm:text-4xl">Organisations making decisions that have to hold.</h3>
             <ul className="mt-10 grid grid-cols-1 gap-x-10 sm:grid-cols-2">

@@ -83,7 +83,7 @@ export default function ContactPage() {
         </aside>
       </section>
 
-      <section className="border-t border-rule bg-stone">
+      <section className="border-t border-rule bg-sand">
         <div className="wrap grid grid-cols-1 gap-10 py-16 lg:grid-cols-12">
           <div className="lg:col-span-4">
             <p className="eyebrow">For institutions</p>

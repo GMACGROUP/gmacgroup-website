@@ -5,7 +5,7 @@ import { FOUNDER } from "@/lib/content/site";
 
 export function FounderNote() {
   return (
-    <section className="site-section bg-ink text-white">
+    <section className="site-section bg-navy text-white">
       <div className="wrap grid grid-cols-1 gap-12 lg:grid-cols-12 lg:gap-16">
         <div className="lg:col-span-4">
           <p className="eyebrow !text-white/60">
