@@ -78,7 +78,7 @@ export default async function TeamPage() {
         <div className="wrap flex flex-col justify-between gap-10 lg:flex-row lg:items-end">
           <h2 className="display-lg max-w-[18ch]">Want to work with us?</h2>
           <div className="flex flex-col gap-4 sm:flex-row">
-            <Link href="/opportunities" className="btn-dark">
+            <Link href="/careers" className="btn-dark">
               Open roles and fellowships
               <Arrow />
             </Link>

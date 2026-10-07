@@ -422,7 +422,7 @@ function DashboardContent() {
                 <p className="text-xs text-slate-500">Submitted fellowship & opening dossiers</p>
               </div>
               <Link
-                href="/opportunities"
+                href="/careers"
                 prefetch={true}
                 className="text-xs font-bold text-brand-navy hover:text-brand-red transition-colors"
               >
@@ -459,7 +459,7 @@ function DashboardContent() {
                   <BriefcaseIcon className="w-8 h-8 text-slate-300 mx-auto" />
                   <p className="text-xs text-slate-500">No active applications submitted yet.</p>
                   <Link
-                    href="/opportunities"
+                    href="/careers"
                     prefetch={true}
                     className="inline-block text-xs font-bold text-brand-navy hover:underline pt-1"
                   >

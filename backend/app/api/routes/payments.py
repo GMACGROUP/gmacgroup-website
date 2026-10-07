@@ -11,7 +11,7 @@ from sqlalchemy.orm import Session
 from app.api.dependencies import get_optional_user
 from app.core.config import get_settings
 from app.core.database import get_db
-from app.data import OPPORTUNITIES, PROGRAMMES
+from app.services import catalogue
 from app.models.opportunity import Application
 from app.models.payment import Payment
 from app.models.programme import ProgrammeEnrolment
@@ -22,13 +22,14 @@ router = APIRouter()
 settings = get_settings()
 
 
-def _find_target(payload: PaymentInitialize) -> tuple[dict, dict]:
-    collection = PROGRAMMES if payload.target_type == "programme" else OPPORTUNITIES
-    target = next((item for item in collection if item["id"] == payload.target_id), None)
-    if target is None:
+def _find_target(db: Session, payload: PaymentInitialize) -> tuple[dict, dict]:
+    kind = "programme" if payload.target_type == "programme" else "opportunity"
+    try:
+        item = catalogue.get_item(db, kind, payload.target_id)
+    except HTTPException:
         raise HTTPException(status_code=404, detail="Programme or opportunity not found")
-    closing_date = target.get("deadline") if payload.target_type == "opportunity" else target.get("end_date")
-    if closing_date and datetime.fromisoformat(closing_date.replace("Z", "+00:00")) < datetime.now(timezone.utc):
+    target = catalogue.to_public(item)
+    if catalogue.is_closed(item):
         raise HTTPException(status_code=410, detail="This event or opportunity is closed")
     offer = next((item for item in target.get("offers", []) if item["type"] == payload.offer_type), None)
     if offer is None:
@@ -133,7 +134,7 @@ async def initialize_payment(
     current_user: dict | None = Depends(get_optional_user),
     db: Session = Depends(get_db),
 ):
-    target, offer = _find_target(payload)
+    target, offer = _find_target(db, payload)
     if offer["amount"] <= 0:
         return PaymentInitializeOut(status="free", amount=0, currency=offer["currency"])
     if not settings.FLW_SECRET_KEY:

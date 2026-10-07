@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import { revalidateTag } from "next/cache";
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000/api/v1";
-const ALLOWED_TAGS = new Set(["team", "events", "insights"]);
+const ALLOWED_TAGS = new Set(["team", "events", "insights", "catalogue"]);
 
 /**
  * Called by the admin panel after a content change so the public pages update

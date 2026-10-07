@@ -1,323 +1,218 @@
-"use client";
-
-import { useEffect, useState } from "react";
+import type { Metadata } from "next";
 import Link from "next/link";
-import Image from "next/image";
-import { apiClient } from "@/lib/api/client";
-import { ResearchProject, Publication, Expert } from "@/types";
-import { PageHeader } from "@/components/common/PageHeader";
-import { PaperRequestModal } from "@/components/modals/PaperRequestModal";
-import { MicroscopeIcon, BookOpenIcon, AcademicCapIcon, FileTextIcon } from "@/components/common/Icons";
+import { Arrow } from "@/components/ui/Arrow";
+import { Portrait } from "@/components/editorial/Portrait";
+import { PRACTICE_AREAS } from "@/lib/content/site";
+import { getPublications, getTeam, type Publication } from "@/lib/api/server";
 
-const TABS = [
-  { key: "projects", label: "Research Projects", icon: MicroscopeIcon },
-  { key: "publications", label: "Publications & Working Papers", icon: BookOpenIcon },
-  { key: "experts", label: "Faculty & Fellow Network", icon: AcademicCapIcon },
-] as const;
+export const revalidate = 300;
 
-type TabKey = typeof TABS[number]["key"];
+export const metadata: Metadata = {
+  title: "Research",
+  description:
+    "Applied research from inside African markets: baseline studies, evaluations, labour market assessments, sector diagnostics, policy briefs and feasibility work.",
+  alternates: { canonical: "/research" },
+};
 
-export default function ResearchPage() {
-  const [activeTab, setActiveTab] = useState<TabKey>("projects");
-  const [projects, setProjects] = useState<ResearchProject[]>([]);
-  const [publications, setPublications] = useState<Publication[]>([]);
-  const [experts, setExperts] = useState<Expert[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [selectedPublication, setSelectedPublication] = useState<Publication | null>(null);
+const PUB_TYPE: Record<Publication["type"], string> = {
+  report: "Report",
+  policy_brief: "Policy brief",
+  working_paper: "Working paper",
+  article: "Article",
+  dataset: "Dataset",
+};
 
-  useEffect(() => {
-    setLoading(true);
-    Promise.all([
-      apiClient.get<ResearchProject[]>("/research/projects").catch(() => []),
-      apiClient.get<Publication[]>("/research/publications").catch(() => []),
-      apiClient.get<Expert[]>("/research/experts").catch(() => []),
-    ])
-      .then(([proj, pub, exp]) => {
-        setProjects(proj);
-        setPublications(pub);
-        setExperts(exp);
-      })
-      .finally(() => setLoading(false));
-  }, []);
+const METHOD = [
+  { step: "Question", body: "We start from the decision you have to make and write the research question around it, with a protocol you sign off." },
+  { step: "Instruments", body: "Survey instruments, interview guides and a sampling frame designed for the population and the market in question." },
+  { step: "Fieldwork", body: "Data collection by people who work in the region, so access is quicker and respondents answer." },
+  { step: "Analysis", body: "Quantitative and econometric analysis alongside qualitative synthesis, each checked against the other." },
+  { step: "Handover", body: "A written report, a policy brief and a briefing for your team, with the methodology documented in full." },
+];
 
-  const counts: Record<TabKey, number> = {
-    projects: projects.length,
-    publications: publications.length,
-    experts: experts.length,
-  };
-
-  const expertPhotos: Record<string, string> = {
-    "Dr. Kwesi Mensah": "/images/testimonial-mensah.jpg",
-    "Ama Serwaa": "/images/audience-professionals.jpg",
-    "Marcus Chen": "/images/audience-employers.jpg",
-  };
+export default async function ResearchPage() {
+  const [publications, team] = await Promise.all([getPublications(), getTeam()]);
+  const researchers = team
+    .filter((m) => m.team === "Research")
+    .sort((a, b) => Number(Boolean(b.is_lead)) - Number(Boolean(a.is_lead)) || (a.sort_order ?? 0) - (b.sort_order ?? 0));
+  const practice = PRACTICE_AREAS.find((p) => p.slug === "applied-research-and-policy-consulting")!;
 
   return (
-    <div className="bg-slate-50 min-h-screen">
-      {/* Page Header */}
-      <PageHeader
-        badge="Evidence & Rigor"
-        title="Applied Research & Policy Center"
-        subtitle="Generating empirical evidence, econometric diagnostics, and policy frameworks to inform workforce development and institutional strategy."
-      />
-
-      {/* Main Container */}
-      <section className="container mx-auto max-w-6xl space-y-8 px-5 py-8 sm:space-y-10 sm:px-6 sm:py-14 lg:px-8">
-
-        {/* ── Prominent Interactive Navigation Bar ── */}
-        <div className="rounded-2xl border border-slate-200 bg-white p-2 shadow-sm">
-          <div className="-mx-1 flex gap-1.5 overflow-x-auto px-1 pb-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden sm:mx-0 sm:flex-wrap sm:overflow-visible sm:px-0 sm:pb-0">
-            {TABS.map((tab) => {
-              const Icon = tab.icon;
-              const isActive = activeTab === tab.key;
-              return (
-                <button
-                  key={tab.key}
-                  onClick={() => setActiveTab(tab.key)}
-                  role="tab"
-                  aria-selected={isActive}
-                  className={`flex shrink-0 items-center gap-2 whitespace-nowrap rounded-xl px-3 py-2 text-[11px] font-bold transition-all duration-200 sm:px-4 sm:py-2.5 sm:text-sm ${
-                    isActive
-                      ? "bg-brand-navy text-white shadow-sm"
-                      : "text-slate-600 hover:text-brand-navy hover:bg-slate-100"
-                  }`}
-                >
-                  <Icon className="w-4 h-4" />
-                  <span>{tab.label}</span>
-                  {!loading && counts[tab.key] > 0 && (
-                    <span
-                      className={`text-[10px] font-extrabold px-1.5 py-0.5 rounded-md ${
-                        isActive
-                          ? "bg-white/20 text-white"
-                          : "bg-slate-100 text-slate-700"
-                      }`}
-                    >
-                      {counts[tab.key]}
-                    </span>
-                  )}
-                </button>
-              );
-            })}
-          </div>
-
-        </div>
-
-        {/* ── Loading Skeletons ── */}
-        {loading && (
-          <div className="grid gap-6 md:grid-cols-2">
-            {[1, 2, 3, 4].map((n) => (
-              <div key={n} className="bg-white rounded-2xl border border-slate-200 shadow-card p-6">
-                <div className="w-24 h-5 skeleton-shimmer rounded-full mb-4" />
-                <div className="w-4/5 h-6 skeleton-shimmer rounded mb-3" />
-                <div className="w-full h-3 skeleton-shimmer rounded mb-2" />
-                <div className="w-3/4 h-3 skeleton-shimmer rounded mb-6" />
-                <div className="w-1/3 h-8 skeleton-shimmer rounded-xl" />
-              </div>
-            ))}
-          </div>
-        )}
-
-        {/* ── Tab 1: Research Projects ── */}
-        {!loading && activeTab === "projects" && (
-          <div className="space-y-6">
-            <div className="grid grid-cols-1 gap-5 sm:gap-6 md:grid-cols-2">
-              {projects.map((project) => (
-                  <article
-                    key={project.id}
-                    className="group relative flex flex-col bg-white rounded-2xl border border-slate-200 shadow-card hover:shadow-card-hover hover:border-brand-navy/30 hover:-translate-y-1 transition-all duration-300 overflow-hidden"
-                  >
-                    <div className="h-1.5 bg-brand-navy w-full" />
-                    <div className="p-5 sm:p-7 flex flex-col flex-1">
-                      <div className="flex flex-wrap items-center justify-between gap-2 mb-4">
-                        <span className="badge bg-blue-50 text-brand-navy border-blue-200 uppercase font-bold text-[10px]">
-                          {project.status || "Ongoing"}
-                        </span>
-                        {project.lead_researcher && (
-                          <span className="text-xs text-slate-500 font-semibold truncate max-w-[200px]">
-                            {project.lead_researcher}
-                          </span>
-                        )}
-                      </div>
-
-                      <h3 className="mb-3 font-serif text-lg font-extrabold leading-snug text-slate-900 transition-colors group-hover:text-brand-navy sm:text-xl">
-                        {project.title}
-                      </h3>
-
-                      {project.summary && (
-                        <p className="text-slate-600 text-sm leading-relaxed flex-1">
-                          {project.summary}
-                        </p>
-                      )}
-
-                      <div className="mt-6 pt-5 border-t border-slate-100 flex items-center justify-between">
-                        <Link
-                          href={`/contact?subject=Collaboration Inquiry: ${encodeURIComponent(project.title)}`}
-                          className="text-xs font-bold text-brand-navy hover:text-brand-red transition-colors inline-flex items-center gap-1 group/link"
-                        >
-                          <span>Propose Collaboration</span>
-                          <span className="ml-1 group-hover/link:translate-x-1 transition-transform">→</span>
-                        </Link>
-                        <span className="text-xs text-slate-400 font-medium">GMAC Center</span>
-                      </div>
-                    </div>
-                  </article>
-                ))}
-            </div>
-
-            {projects.length === 0 && (
-              <div className="empty-state">
-                <div className="w-12 h-12 rounded-2xl bg-blue-50 text-brand-navy flex items-center justify-center mb-4 border border-blue-100">
-                  <MicroscopeIcon className="w-6 h-6 text-brand-navy" />
-                </div>
-                <h4 className="font-serif text-base font-bold text-slate-900">
-                  Active Research In Progress
-                </h4>
-                <p className="mt-1 max-w-xs text-xs text-slate-500">
-                  New study working papers are published periodically.
-                </p>
-              </div>
-            )}
-          </div>
-        )}
-
-        {/* ── Tab 2: Publications & Working Papers ── */}
-        {!loading && activeTab === "publications" && (
-          <div className="space-y-4">
-            {publications.map((pub) => (
-                <div
-                  key={pub.id}
-                  className="group flex flex-col gap-4 p-5 sm:p-6 bg-white rounded-2xl border border-slate-200 shadow-card hover:shadow-card-hover hover:border-brand-navy/30 transition-all duration-200 sm:flex-row sm:items-center sm:justify-between"
-                >
-                  <div className="flex min-w-0 items-start gap-3 sm:gap-4">
-                    <div className="w-11 h-11 rounded-xl bg-purple-50 text-purple-700 border border-purple-100 flex items-center justify-center flex-shrink-0 shadow-xs">
-                      <FileTextIcon className="w-5 h-5 text-purple-700" />
-                    </div>
-                    <div className="min-w-0">
-                      <span className="text-[10px] font-bold text-purple-700 uppercase tracking-wider bg-purple-50 px-2 py-0.5 rounded border border-purple-100">
-                        Peer-Reviewed Working Paper
-                      </span>
-                      <h3 className="mt-1 break-words text-base font-extrabold text-slate-900 transition-colors group-hover:text-brand-navy sm:text-lg">
-                        {pub.title}
-                      </h3>
-                      <p className="text-xs text-slate-500 mt-1 font-medium">
-                        Authors: <strong className="text-slate-700">{pub.authors.join(", ")}</strong>
-                      </p>
-                    </div>
-                  </div>
-
-                  <button
-                    onClick={() => setSelectedPublication(pub)}
-                    className="px-4 py-2.5 rounded-xl text-xs font-bold text-white bg-purple-700 hover:bg-purple-800 shadow-xs transition-all shrink-0 text-center cursor-pointer w-full sm:w-auto"
-                  >
-                    Request Full Paper
-                  </button>
-                </div>
-              ))}
-
-            {publications.length === 0 && (
-              <div className="empty-state">
-                <div className="w-12 h-12 rounded-2xl bg-purple-50 text-purple-700 flex items-center justify-center mb-4 border border-purple-100">
-                  <FileTextIcon className="w-6 h-6 text-purple-700" />
-                </div>
-                <h4 className="font-serif text-base font-bold text-slate-900">
-                  Working Papers Under Review
-                </h4>
-                <p className="mt-1 max-w-xs text-xs text-slate-500">
-                  New publications are currently in peer review.
-                </p>
-              </div>
-            )}
-          </div>
-        )}
-
-        {/* ── Tab 3: Faculty & Fellow Network ── */}
-        {!loading && activeTab === "experts" && (
-          <div className="space-y-6">
-            <div className="grid gap-5 sm:gap-6 grid-cols-1 sm:grid-cols-2 xl:grid-cols-3">
-              {experts.map((expert) => {
-                  const photoSrc = expertPhotos[expert.full_name] || "/images/testimonial-mensah.jpg";
-                  return (
-                    <div
-                      key={expert.id}
-                      className="group bg-white rounded-2xl border border-slate-200 shadow-card hover:shadow-card-hover hover:border-brand-navy/30 hover:-translate-y-1 transition-all duration-300 overflow-hidden flex flex-col"
-                    >
-                      <div className="h-1.5 bg-brand-red w-full" />
-                      <div className="p-6 flex flex-col flex-1 items-center text-center">
-                        <div className="relative w-20 h-20 rounded-full overflow-hidden border-2 border-brand-navy shadow-sm mb-4">
-                          <Image
-                            src={photoSrc}
-                            alt={expert.full_name}
-                            fill
-                            className="object-cover"
-                          />
-                        </div>
-                        <h3 className="font-extrabold text-slate-900 text-lg group-hover:text-brand-navy transition-colors">
-                          {expert.full_name}
-                        </h3>
-                        <span className="text-[11px] font-bold text-brand-red uppercase tracking-wider mt-1">
-                          Research Fellow & Advisor
-                        </span>
-                        <div className="mt-4 pt-3 border-t border-slate-100 w-full flex flex-wrap justify-center gap-1.5">
-                          {expert.expertise_areas.map((area) => (
-                            <span
-                              key={area}
-                              className="text-[10px] font-semibold bg-slate-100 text-slate-700 px-2.5 py-1 rounded-md"
-                            >
-                              {area}
-                            </span>
-                          ))}
-                        </div>
-                      </div>
-                    </div>
-                  );
-                })}
-            </div>
-
-            {experts.length === 0 && (
-              <div className="empty-state">
-                <div className="w-12 h-12 rounded-2xl bg-red-50 text-brand-red flex items-center justify-center mb-4 border border-red-100">
-                  <AcademicCapIcon className="w-6 h-6 text-brand-red" />
-                </div>
-                <h4 className="font-serif text-base font-bold text-slate-900">
-                  Global Researcher Network
-                </h4>
-                <p className="mt-1 max-w-xs text-xs text-slate-500">
-                  Join our fellowship of affiliated economists and policy scholars.
-                </p>
-                <Link href="/register" className="btn-primary mt-4 text-xs">
-                  Apply as Fellow →
-                </Link>
-              </div>
-            )}
-          </div>
-        )}
-
-        {/* ── Research Collaboration Callout ── */}
-        <div className="flex flex-col items-center justify-between gap-5 rounded-3xl border border-slate-200 bg-white p-5 shadow-card sm:p-8 md:flex-row lg:p-10">
-          <div className="space-y-2 text-center md:text-left">
-            <span className="section-label text-brand-red block">ACADEMIC & INSTITUTIONAL PARTNERSHIP</span>
-            <h3 className="text-xl sm:text-2xl font-extrabold text-slate-900 font-serif">
-              Co-Publish or Commission Applied Research
-            </h3>
-            <p className="text-slate-600 text-xs sm:text-sm max-w-xl">
-              We partner with university faculties, international think tanks, and foundations on empirical labor assessments and policy briefs.
+    <>
+      <header className="border-b border-rule">
+        <div className="wrap pb-14 pt-14 sm:pt-20 lg:pb-20 lg:pt-24">
+          <nav aria-label="Breadcrumb" className="text-sm text-ink-400">
+            <Link href="/" className="hover:text-ink">Home</Link>
+            <span className="mx-2" aria-hidden="true">/</span>
+            <span className="text-ink">Research</span>
+          </nav>
+          <div className="mt-8 grid grid-cols-1 gap-10 lg:grid-cols-12">
+            <h1 className="display-xl lg:col-span-8">
+              Evidence produced <em className="font-light italic text-ink-500">inside the markets it describes.</em>
+            </h1>
+            <p className="lede self-end lg:col-span-4">
+              Our research practice is led by doctoral researchers with quantitative and policy expertise, working from the
+              countries they study.
             </p>
           </div>
-          <div className="w-full shrink-0 md:w-auto">
-            <Link href="/contact?subject=Research Partnership Proposal" className="btn-primary w-full px-6 py-3 text-xs sm:text-sm md:w-auto">
-              Submit Research Proposal →
+        </div>
+      </header>
+
+      {/* What we produce */}
+      <section aria-labelledby="produce-title" className="site-section">
+        <div className="wrap grid grid-cols-1 gap-12 lg:grid-cols-12">
+          <div className="lg:col-span-4">
+            <p className="eyebrow"><span className="eyebrow-num">01</span> What we produce</p>
+            <h2 id="produce-title" className="display-md mt-6">{practice.promise}</h2>
+            <Link href={`/expertise/${practice.slug}`} className="link-arrow mt-8">
+              The research practice in full
+              <Arrow />
+            </Link>
+          </div>
+          <div className="lg:col-span-7 lg:col-start-6">
+            <p className="text-[17px] leading-relaxed text-ink-600">{practice.whatItIs}</p>
+            <ul className="mt-10 grid grid-cols-1 border-t border-ink sm:grid-cols-2">
+              {practice.deliverables.map((d) => (
+                <li key={d} className="border-b border-rule py-4 pr-6 text-[15px] text-ink">
+                  {d}
+                </li>
+              ))}
+            </ul>
+          </div>
+        </div>
+      </section>
+
+      {/* Method */}
+      <section aria-labelledby="method-title" className="site-section border-y border-rule bg-stone">
+        <div className="wrap">
+          <p className="eyebrow"><span className="eyebrow-num">02</span> How a study runs</p>
+          <h2 id="method-title" className="display-lg mt-6 max-w-[22ch]">Five stages, each one written down.</h2>
+          <ol className="mt-12 grid grid-cols-1 border-t border-ink sm:grid-cols-2 lg:grid-cols-5">
+            {METHOD.map((m, i) => (
+              <li key={m.step} className={`border-b border-rule py-7 sm:pr-6 lg:border-b-0 ${i > 0 ? "lg:border-l lg:pl-6" : ""} ${i % 2 === 1 ? "sm:border-l sm:pl-6" : ""}`}>
+                <p className="font-display text-4xl font-light tabular-nums text-accent">{String(i + 1).padStart(2, "0")}</p>
+                <h3 className="mt-4 font-display text-xl">{m.step}</h3>
+                <p className="mt-2 text-[15px] leading-relaxed text-ink-500">{m.body}</p>
+              </li>
+            ))}
+          </ol>
+        </div>
+      </section>
+
+      {/* Publications */}
+      <section aria-labelledby="pubs-title" className="site-section">
+        <div className="wrap grid grid-cols-1 gap-12 lg:grid-cols-12">
+          <div className="lg:col-span-4">
+            <p className="eyebrow"><span className="eyebrow-num">03</span> Publications</p>
+            <h2 id="pubs-title" className="display-md mt-6">Reports, briefs and working papers.</h2>
+            <p className="mt-5 text-[15px] leading-relaxed text-ink-500">
+              Commissioned work belongs to the client and is published only with their agreement.
+            </p>
+          </div>
+          <div className="lg:col-span-7 lg:col-start-6">
+            {publications.length === 0 ? (
+              <div className="border-t border-ink pt-8">
+                <p className="font-display text-2xl leading-snug">Public outputs will be listed here as they are released.</p>
+                <p className="mt-4 max-w-[56ch] text-[15px] leading-relaxed text-ink-500">
+                  If you are looking for evidence on a specific market or question, write to us. We can tell you what exists and
+                  whether a short study would answer it.
+                </p>
+                <Link href="/contact?topic=institution&subject=Research%20enquiry" className="link-arrow mt-6">
+                  Ask the research team
+                  <Arrow />
+                </Link>
+              </div>
+            ) : (
+              <ol className="border-t border-ink">
+                {publications.map((p) => (
+                  <li key={p.id} className="border-b border-rule py-7">
+                    <p className="text-[12px] font-medium uppercase tracking-label text-clay">
+                      {PUB_TYPE[p.type] || "Publication"}
+                      {p.published_at && (
+                        <span className="ml-3 tabular-nums text-ink-400">
+                          {new Date(p.published_at).toLocaleDateString("en-GB", { month: "long", year: "numeric" })}
+                        </span>
+                      )}
+                    </p>
+                    <h3 className="mt-3 font-display text-2xl leading-snug">
+                      {p.url ? (
+                        <a href={p.url} target="_blank" rel="noopener noreferrer" className="hover:text-accent">
+                          {p.title}
+                        </a>
+                      ) : (
+                        p.title
+                      )}
+                    </h3>
+                    {p.authors.length > 0 && <p className="mt-2 text-sm text-ink-500">{p.authors.join(", ")}</p>}
+                    {p.summary && <p className="mt-3 max-w-[62ch] text-[15px] leading-relaxed text-ink-600">{p.summary}</p>}
+                    {p.url && (
+                      <a href={p.url} target="_blank" rel="noopener noreferrer" className="link-arrow mt-4">
+                        Read
+                        <span className="sr-only"> {p.title}</span>
+                        <Arrow />
+                      </a>
+                    )}
+                  </li>
+                ))}
+              </ol>
+            )}
+          </div>
+        </div>
+      </section>
+
+      {/* People */}
+      {researchers.length > 0 && (
+        <section aria-labelledby="people-title" className="site-section border-t border-rule">
+          <div className="wrap">
+            <div className="flex flex-col justify-between gap-6 sm:flex-row sm:items-end">
+              <div>
+                <p className="eyebrow"><span className="eyebrow-num">04</span> The research team</p>
+                <h2 id="people-title" className="display-md mt-6">Who does the work.</h2>
+              </div>
+              <Link href="/team" className="link-arrow">
+                Full team
+                <Arrow />
+              </Link>
+            </div>
+            <ul className="mt-12 grid grid-cols-2 gap-x-6 gap-y-10 sm:grid-cols-3 lg:grid-cols-6">
+              {researchers.map((m) => (
+                <li key={m.id} className="group">
+                  <Portrait name={m.name} src={m.photo_url} className="aspect-[4/5] w-full" sizes="(max-width: 640px) 45vw, 16vw" />
+                  <p className="mt-3 font-medium leading-snug text-ink">{m.name}</p>
+                  <p className="mt-1 text-[13px] leading-snug text-ink-500">{m.position}</p>
+                  <p className="mt-1 text-[13px] text-ink-400">{m.country}</p>
+                </li>
+              ))}
+            </ul>
+          </div>
+        </section>
+      )}
+
+      <section className="bg-ink text-white">
+        <div className="wrap grid grid-cols-1 gap-10 py-16 lg:grid-cols-12 lg:py-20">
+          <div className="lg:col-span-6">
+            <h2 className="font-display text-4xl leading-tight text-white sm:text-5xl">Commission a study.</h2>
+            <p className="mt-5 max-w-[48ch] text-[15px] leading-relaxed text-white/70">
+              Tell us the decision and the deadline. We reply with a written scope, a method and a price band.
+            </p>
+            <Link href="/contact?topic=institution" className="btn-primary mt-8">
+              Start a conversation
+              <Arrow />
+            </Link>
+          </div>
+          <div className="border-t border-white/20 pt-6 lg:col-span-5 lg:col-start-8 lg:border-l lg:border-t-0 lg:pl-10 lg:pt-0">
+            <h2 className="font-display text-2xl text-white">Researchers</h2>
+            <p className="mt-3 text-[15px] leading-relaxed text-white/70">
+              Doctoral and early career researchers working on African labour markets, policy or investment can write to us about
+              joining projects.
+            </p>
+            <Link href="/contact?topic=careers&subject=Research%20network" className="mt-5 inline-flex items-center gap-2 text-[15px] text-white underline-offset-4 hover:underline">
+              Express interest
+              <Arrow />
             </Link>
           </div>
         </div>
-
       </section>
-
-      {/* Paper Request Modal */}
-      <PaperRequestModal
-        publication={selectedPublication}
-        isOpen={Boolean(selectedPublication)}
-        onClose={() => setSelectedPublication(null)}
-      />
-    </div>
+    </>
   );
 }

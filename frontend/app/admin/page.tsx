@@ -117,6 +117,7 @@ interface CatalogueProgramme {
   start_date?: string;
   end_date?: string;
   offers: CatalogueOffer[];
+  is_published?: boolean;
 }
 
 interface CatalogueOpportunity {
@@ -128,6 +129,7 @@ interface CatalogueOpportunity {
   description?: string;
   deadline?: string;
   offers: CatalogueOffer[];
+  is_published?: boolean;
 }
 
 type CatalogueMode = "programmes" | "opportunities";
@@ -274,6 +276,26 @@ export default function AdminPage() {
   // Application / Document Review Modal State
   const [selectedApplication, setSelectedApplication] = useState<Application | null>(null);
   const [previewTab, setPreviewTab] = useState<"document" | "statement">("document");
+  // CVs live in private storage; the API hands out a link that expires after five minutes.
+  const [docLink, setDocLink] = useState<{ url: string; internal: boolean } | null>(null);
+  const [docError, setDocError] = useState<string | null>(null);
+  useEffect(() => {
+    setDocLink(null);
+    setDocError(null);
+    if (!selectedApplication?.resume_url) return;
+    let cancelled = false;
+    apiClient
+      .get<{ document_url: string; is_internal: boolean }>(`/uploads/admin/applications/${selectedApplication.id}/document`)
+      .then((res) => {
+        if (!cancelled) setDocLink({ url: res.document_url, internal: res.is_internal });
+      })
+      .catch((err) => {
+        if (!cancelled) setDocError(err instanceof Error ? err.message : "Could not open the document");
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [selectedApplication?.id, selectedApplication?.resume_url]);
 
   const API_BASE = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000/api/v1";
 
@@ -291,8 +313,8 @@ export default function AdminPage() {
     setCatalogueError(null);
     try {
       const [progs, opps] = await Promise.all([
-        apiClient.get<CatalogueProgramme[]>("/programmes"),
-        apiClient.get<CatalogueOpportunity[]>("/opportunities"),
+        apiClient.get<CatalogueProgramme[]>("/admin/catalogue/programmes"),
+        apiClient.get<CatalogueOpportunity[]>("/admin/catalogue/opportunities"),
       ]);
       setProgrammes(progs);
       setOpportunities(opps);
@@ -435,15 +457,15 @@ export default function AdminPage() {
       description: progDesc || undefined,
       start_date: progStartDate ? new Date(progStartDate).toISOString() : undefined,
       end_date: progEndDate ? new Date(progEndDate).toISOString() : undefined,
-      offers: [],
     };
     try {
       if (catalogueFormAction === "create") {
         const created = await apiClient.post<CatalogueProgramme>("/admin/programmes", body);
-        setProgrammes((prev) => [created, ...prev]);
+        setProgrammes((prev) => [{ ...created, is_published: false }, ...prev]);
       } else if (editingProgramme) {
         const updated = await apiClient.put<CatalogueProgramme>(`/admin/programmes/${editingProgramme.id}`, body);
-        setProgrammes((prev) => prev.map((p) => (p.id === editingProgramme.id ? updated : p)));
+        setProgrammes((prev) => prev.map((p) => (p.id === editingProgramme.id ? { ...updated, is_published: p.is_published } : p)));
+        refreshPublicCatalogue();
       }
       setShowCatalogueForm(false);
     } catch (err) {
@@ -463,15 +485,15 @@ export default function AdminPage() {
       location: oppLocation || undefined,
       description: oppDesc || undefined,
       deadline: oppDeadline ? new Date(oppDeadline).toISOString() : undefined,
-      offers: [],
     };
     try {
       if (catalogueFormAction === "create") {
         const created = await apiClient.post<CatalogueOpportunity>("/admin/opportunities", body);
-        setOpportunities((prev) => [created, ...prev]);
+        setOpportunities((prev) => [{ ...created, is_published: false }, ...prev]);
       } else if (editingOpportunity) {
         const updated = await apiClient.put<CatalogueOpportunity>(`/admin/opportunities/${editingOpportunity.id}`, body);
-        setOpportunities((prev) => prev.map((o) => (o.id === editingOpportunity.id ? updated : o)));
+        setOpportunities((prev) => prev.map((o) => (o.id === editingOpportunity.id ? { ...updated, is_published: o.is_published } : o)));
+        refreshPublicCatalogue();
       }
       setShowCatalogueForm(false);
     } catch (err) {
@@ -481,10 +503,36 @@ export default function AdminPage() {
     }
   }
 
+  /** Ask the website to refresh the public Programmes and Careers pages straight away. */
+  function refreshPublicCatalogue() {
+    let token: string | null = null;
+    try {
+      token = localStorage.getItem("gmac_auth_token");
+    } catch {}
+    if (!token) return;
+    fetch("/api/revalidate", {
+      method: "POST",
+      headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
+      body: JSON.stringify({ tag: "catalogue" }),
+    }).catch(() => undefined);
+  }
+
+  async function togglePublished(collection: "programmes" | "opportunities", id: string, next: boolean) {
+    try {
+      await apiClient.patch(`/admin/catalogue/${collection}/${id}`, { is_published: next });
+      if (collection === "programmes") setProgrammes((prev) => prev.map((p) => (p.id === id ? { ...p, is_published: next } : p)));
+      else setOpportunities((prev) => prev.map((o) => (o.id === id ? { ...o, is_published: next } : o)));
+      refreshPublicCatalogue();
+    } catch (err) {
+      setCatalogueError(err instanceof Error ? err.message : "Could not change publish state");
+    }
+  }
+
   async function deleteProgramme(id: string) {
     try {
       await apiClient.delete(`/admin/programmes/${id}`);
       setProgrammes((prev) => prev.filter((p) => p.id !== id));
+      refreshPublicCatalogue();
     } catch (err) {
       setCatalogueError(err instanceof Error ? err.message : "Delete failed");
     } finally {
@@ -496,6 +544,7 @@ export default function AdminPage() {
     try {
       await apiClient.delete(`/admin/opportunities/${id}`);
       setOpportunities((prev) => prev.filter((o) => o.id !== id));
+      refreshPublicCatalogue();
     } catch (err) {
       setCatalogueError(err instanceof Error ? err.message : "Delete failed");
     } finally {
@@ -912,6 +961,9 @@ export default function AdminPage() {
                       <div className="space-y-1.5">
                         <div className="flex flex-wrap items-center gap-2">
                           <h2 className="font-bold text-slate-900 font-serif">{prog.title}</h2>
+                          <span className={`rounded-md px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider border ${prog.is_published ? "bg-emerald-50 text-emerald-700 border-emerald-200" : "bg-amber-50 text-amber-800 border-amber-200"}`}>
+                            {prog.is_published ? "Live" : "Draft"}
+                          </span>
                           <span className="rounded-md bg-indigo-50 text-indigo-700 border border-indigo-100 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider">
                             {prog.category.replace("_", " ")}
                           </span>
@@ -925,6 +977,12 @@ export default function AdminPage() {
                         </div>
                       </div>
                       <div className="flex items-center gap-2 shrink-0">
+                        <button
+                          onClick={() => togglePublished("programmes", prog.id, !prog.is_published)}
+                          className="px-3 py-1.5 rounded-xl text-xs font-bold text-white bg-brand-navy hover:bg-brand-navyDark transition-colors"
+                        >
+                          {prog.is_published ? "Unpublish" : "Publish"}
+                        </button>
                         <button
                           onClick={() => openEditProgramme(prog)}
                           className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold text-slate-700 bg-slate-100 hover:bg-slate-200 transition-colors"
@@ -963,6 +1021,9 @@ export default function AdminPage() {
                       <div className="space-y-1.5">
                         <div className="flex flex-wrap items-center gap-2">
                           <h2 className="font-bold text-slate-900 font-serif">{opp.title}</h2>
+                          <span className={`rounded-md px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider border ${opp.is_published ? "bg-emerald-50 text-emerald-700 border-emerald-200" : "bg-amber-50 text-amber-800 border-amber-200"}`}>
+                            {opp.is_published ? "Live" : "Draft"}
+                          </span>
                           <span className="rounded-md bg-emerald-50 text-emerald-700 border border-emerald-100 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider">
                             {opp.type}
                           </span>
@@ -977,6 +1038,12 @@ export default function AdminPage() {
                         )}
                       </div>
                       <div className="flex items-center gap-2 shrink-0">
+                        <button
+                          onClick={() => togglePublished("opportunities", opp.id, !opp.is_published)}
+                          className="px-3 py-1.5 rounded-xl text-xs font-bold text-white bg-brand-navy hover:bg-brand-navyDark transition-colors"
+                        >
+                          {opp.is_published ? "Unpublish" : "Publish"}
+                        </button>
                         <button
                           onClick={() => openEditOpportunity(opp)}
                           className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold text-slate-700 bg-slate-100 hover:bg-slate-200 transition-colors"
@@ -1278,19 +1345,21 @@ export default function AdminPage() {
                       </div>
                       <div>
                         <p className="text-xs font-bold text-slate-900 truncate max-w-xs sm:max-w-md">
-                          {selectedApplication.resume_url.split("/").pop() || "Candidate Document"}
+                          {decodeURIComponent(selectedApplication.resume_url.split("?")[0].split("/").pop() || "") || "Candidate Document"}
                         </p>
                         <p className="text-[10px] text-slate-500 font-medium">
-                          {selectedApplication.resume_url.startsWith("/api/v1/uploads/")
-                            ? "Verified Local/Cloud Upload"
-                            : "External Cloud Link"}
+                          {docError
+                            ? docError
+                            : docLink?.internal
+                              ? "Private upload. Link expires in 5 minutes"
+                              : "External link provided by the applicant"}
                         </p>
                       </div>
                     </div>
 
                     <div className="flex items-center gap-2">
                       <a
-                        href={getFullFileUrl(selectedApplication.resume_url)}
+                        href={getFullFileUrl(docLink?.url)}
                         target="_blank"
                         rel="noopener noreferrer"
                         className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold text-brand-navy bg-blue-50 hover:bg-blue-100 border border-blue-200 transition-colors"
@@ -1299,7 +1368,7 @@ export default function AdminPage() {
                         <span>Open in New Tab</span>
                       </a>
                       <a
-                        href={getFullFileUrl(selectedApplication.resume_url)}
+                        href={getFullFileUrl(docLink?.url)}
                         download
                         className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold text-slate-700 bg-slate-100 hover:bg-slate-200 transition-colors"
                       >
@@ -1310,11 +1379,10 @@ export default function AdminPage() {
                   </div>
 
                   {/* Embedded PDF Viewer */}
-                  {selectedApplication.resume_url.toLowerCase().endsWith(".pdf") ||
-                  selectedApplication.resume_url.includes("/uploads/") ? (
+                  {docLink?.internal && /\.pdf($|\?)/i.test(selectedApplication.resume_url.split("?")[0]) ? (
                     <div className="relative w-full h-[520px] rounded-2xl bg-white border border-slate-200 shadow-card overflow-hidden">
                       <iframe
-                        src={`${getFullFileUrl(selectedApplication.resume_url)}#toolbar=1`}
+                        src={docLink ? `${getFullFileUrl(docLink.url)}#toolbar=1` : "about:blank"}
                         className="w-full h-full"
                         title="Resume Document Preview"
                       />
@@ -1327,7 +1395,7 @@ export default function AdminPage() {
                         This applicant provided an external URL for their portfolio or CV:
                       </p>
                       <a
-                        href={selectedApplication.resume_url}
+                        href={docLink?.url || "#"}
                         target="_blank"
                         rel="noopener noreferrer"
                         className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl text-xs font-bold text-white bg-brand-navy hover:bg-brand-navyDark shadow-sm"

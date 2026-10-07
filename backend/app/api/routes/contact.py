@@ -16,7 +16,6 @@ from app.schemas.contact import (
     NewsletterSubscribe,
     NewsletterResponse,
 )
-from app.data import NEWSLETTER_SUBSCRIBERS
 from app.models.newsletter import NewsletterSubscriber
 from app.services.notifications import notification_service
 from app.core.ratelimit import rate_limit

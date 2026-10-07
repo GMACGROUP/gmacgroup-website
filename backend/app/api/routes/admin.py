@@ -215,157 +215,97 @@ def payments(
 
 
 # ---------------------------------------------------------------------------
-# Dynamic Catalog Management (Programmes & Opportunities)
+# Catalogue management (programmes, opportunities, publications), stored in the database
 # ---------------------------------------------------------------------------
 
-from uuid import uuid4
-import re
-from app.data import PROGRAMMES, OPPORTUNITIES
-from app.schemas.programme import ProgrammeCreate, ProgrammeOut, ProgrammeUpdate
+from pydantic import BaseModel
+
 from app.schemas.opportunity import OpportunityCreate, OpportunityOut, OpportunityUpdate
+from app.schemas.programme import ProgrammeCreate, ProgrammeOut, ProgrammeUpdate
+from app.schemas.research import PublicationCreate, PublicationOut, PublicationUpdate
+from app.services import catalogue
+
+DEFAULT_FREE_OFFER = [{"type": "free", "label": "Free", "amount": 0, "currency": "GHS"}]
+KIND_BY_PATH = {"programmes": "programme", "opportunities": "opportunity", "publications": "publication"}
 
 
-def _slugify(text: str) -> str:
-    clean = re.sub(r"[^a-zA-Z0-9\s-]", "", text).strip().lower()
-    return re.sub(r"[\s-]+", "-", clean)
+class PublishUpdate(BaseModel):
+    is_published: bool
+
+
+def _kind(collection: str) -> str:
+    kind = KIND_BY_PATH.get(collection)
+    if kind is None:
+        raise HTTPException(status_code=404, detail="Unknown catalogue")
+    return kind
+
+
+@router.get("/catalogue/{collection}")
+def list_catalogue(collection: str, _: dict = Depends(admin_only), db: Session = Depends(get_db)):
+    """All items in a catalogue, drafts included, with their publish state."""
+    kind = _kind(collection)
+    return [catalogue.to_public(i, include_status=True) for i in catalogue.list_items(db, kind, published_only=False)]
+
+
+@router.patch("/catalogue/{collection}/{item_id}")
+def publish_catalogue_item(
+    collection: str, item_id: str, payload: PublishUpdate, _: dict = Depends(admin_only), db: Session = Depends(get_db)
+):
+    """Publish or unpublish a catalogue item."""
+    item = catalogue.get_item(db, _kind(collection), item_id, published_only=False)
+    return catalogue.to_public(catalogue.update_item(db, item, {}, is_published=payload.is_published), include_status=True)
+
+
+@router.delete("/catalogue/{collection}/{item_id}")
+def delete_catalogue_item(collection: str, item_id: str, _: dict = Depends(admin_only), db: Session = Depends(get_db)):
+    item = catalogue.get_item(db, _kind(collection), item_id, published_only=False)
+    title = (item.data or {}).get("title")
+    catalogue.delete_item(db, item)
+    return {"status": "deleted", "id": item_id, "title": title}
 
 
 @router.post("/programmes", response_model=ProgrammeOut, status_code=status.HTTP_201_CREATED)
-async def create_programme(payload: ProgrammeCreate, _: dict = Depends(admin_only)):
-    """Create a new cohort programme."""
-    slug = f"programme-{_slugify(payload.title)[:30]}-{uuid4().hex[:6]}"
-    category_val = payload.category.value if hasattr(payload.category, "value") else str(payload.category)
-    
-    new_item = {
-        "id": slug,
-        "title": payload.title,
-        "category": category_val,
-        "description": payload.description,
-        "start_date": payload.start_date.isoformat() if payload.start_date else None,
-        "end_date": payload.end_date.isoformat() if payload.end_date else None,
-        "offers": [
-            {
-                "type": o.type.value if hasattr(o.type, "value") else str(o.type),
-                "label": o.label,
-                "amount": o.amount,
-                "currency": o.currency,
-            }
-            for o in payload.offers
-        ] if payload.offers else [
-            {"type": "free", "label": "Free", "amount": 0, "currency": "GHS"}
-        ],
-    }
-    PROGRAMMES.insert(0, new_item)
-    return new_item
+def create_programme(payload: ProgrammeCreate, _: dict = Depends(admin_only), db: Session = Depends(get_db)):
+    """Create a programme. New items start as drafts until published."""
+    data = payload.model_dump(mode="json")
+    data["offers"] = data.get("offers") or DEFAULT_FREE_OFFER
+    return catalogue.to_public(catalogue.create_item(db, "programme", data))
 
 
 @router.put("/programmes/{programme_id}", response_model=ProgrammeOut)
-async def update_programme(programme_id: str, payload: ProgrammeUpdate, _: dict = Depends(admin_only)):
-    """Update an existing cohort programme."""
-    prog = next((item for item in PROGRAMMES if item["id"] == programme_id), None)
-    if prog is None:
-        raise HTTPException(status_code=404, detail="Programme not found")
-
-    if payload.title is not None:
-        prog["title"] = payload.title
-    if payload.category is not None:
-        prog["category"] = payload.category.value if hasattr(payload.category, "value") else str(payload.category)
-    if payload.description is not None:
-        prog["description"] = payload.description
-    if payload.start_date is not None:
-        prog["start_date"] = payload.start_date.isoformat()
-    if payload.end_date is not None:
-        prog["end_date"] = payload.end_date.isoformat()
-    if payload.offers is not None:
-        prog["offers"] = [
-            {
-                "type": o.type.value if hasattr(o.type, "value") else str(o.type),
-                "label": o.label,
-                "amount": o.amount,
-                "currency": o.currency,
-            }
-            for o in payload.offers
-        ]
-    return prog
+def update_programme(programme_id: str, payload: ProgrammeUpdate, _: dict = Depends(admin_only), db: Session = Depends(get_db)):
+    item = catalogue.get_item(db, "programme", programme_id, published_only=False)
+    return catalogue.to_public(catalogue.update_item(db, item, payload.model_dump(mode="json", exclude_unset=True)))
 
 
 @router.delete("/programmes/{programme_id}", status_code=status.HTTP_200_OK)
-async def delete_programme(programme_id: str, _: dict = Depends(admin_only)):
-    """Remove a cohort programme from active catalogue."""
-    index = next((i for i, item in enumerate(PROGRAMMES) if item["id"] == programme_id), None)
-    if index is None:
-        raise HTTPException(status_code=404, detail="Programme not found")
-    removed = PROGRAMMES.pop(index)
-    return {"status": "deleted", "id": programme_id, "title": removed["title"]}
+def delete_programme(programme_id: str, _: dict = Depends(admin_only), db: Session = Depends(get_db)):
+    return delete_catalogue_item("programmes", programme_id, _, db)
 
 
 @router.post("/opportunities", response_model=OpportunityOut, status_code=status.HTTP_201_CREATED)
-async def create_opportunity(payload: OpportunityCreate, _: dict = Depends(admin_only)):
-    """Create a new job, internship, or fellowship opportunity."""
-    slug = f"opportunity-{_slugify(payload.title)[:30]}-{uuid4().hex[:6]}"
-    type_val = payload.type.value if hasattr(payload.type, "value") else str(payload.type)
-
-    new_item = {
-        "id": slug,
-        "title": payload.title,
-        "type": type_val,
-        "organization": payload.organization or "GMAC GROUP",
-        "location": payload.location or "Accra / Hybrid",
-        "description": payload.description,
-        "deadline": payload.deadline.isoformat() if payload.deadline else None,
-        "offers": [
-            {
-                "type": o.type.value if hasattr(o.type, "value") else str(o.type),
-                "label": o.label,
-                "amount": o.amount,
-                "currency": o.currency,
-            }
-            for o in payload.offers
-        ] if payload.offers else [
-            {"type": "free", "label": "Free Application", "amount": 0, "currency": "GHS"}
-        ],
-    }
-    OPPORTUNITIES.insert(0, new_item)
-    return new_item
+def create_opportunity(payload: OpportunityCreate, _: dict = Depends(admin_only), db: Session = Depends(get_db)):
+    """Create an opportunity. New items start as drafts until published."""
+    return catalogue.to_public(catalogue.create_item(db, "opportunity", payload.model_dump(mode="json")))
 
 
 @router.put("/opportunities/{opportunity_id}", response_model=OpportunityOut)
-async def update_opportunity(opportunity_id: str, payload: OpportunityUpdate, _: dict = Depends(admin_only)):
-    """Update an existing opportunity."""
-    opp = next((item for item in OPPORTUNITIES if item["id"] == opportunity_id), None)
-    if opp is None:
-        raise HTTPException(status_code=404, detail="Opportunity not found")
-
-    if payload.title is not None:
-        opp["title"] = payload.title
-    if payload.type is not None:
-        opp["type"] = payload.type.value if hasattr(payload.type, "value") else str(payload.type)
-    if payload.organization is not None:
-        opp["organization"] = payload.organization
-    if payload.location is not None:
-        opp["location"] = payload.location
-    if payload.description is not None:
-        opp["description"] = payload.description
-    if payload.deadline is not None:
-        opp["deadline"] = payload.deadline.isoformat()
-    if payload.offers is not None:
-        opp["offers"] = [
-            {
-                "type": o.type.value if hasattr(o.type, "value") else str(o.type),
-                "label": o.label,
-                "amount": o.amount,
-                "currency": o.currency,
-            }
-            for o in payload.offers
-        ]
-    return opp
+def update_opportunity(opportunity_id: str, payload: OpportunityUpdate, _: dict = Depends(admin_only), db: Session = Depends(get_db)):
+    item = catalogue.get_item(db, "opportunity", opportunity_id, published_only=False)
+    return catalogue.to_public(catalogue.update_item(db, item, payload.model_dump(mode="json", exclude_unset=True)))
 
 
 @router.delete("/opportunities/{opportunity_id}", status_code=status.HTTP_200_OK)
-async def delete_opportunity(opportunity_id: str, _: dict = Depends(admin_only)):
-    """Remove an opportunity from active catalogue."""
-    index = next((i for i, item in enumerate(OPPORTUNITIES) if item["id"] == opportunity_id), None)
-    if index is None:
-        raise HTTPException(status_code=404, detail="Opportunity not found")
-    removed = OPPORTUNITIES.pop(index)
-    return {"status": "deleted", "id": opportunity_id, "title": removed["title"]}
+def delete_opportunity(opportunity_id: str, _: dict = Depends(admin_only), db: Session = Depends(get_db)):
+    return delete_catalogue_item("opportunities", opportunity_id, _, db)
+
+
+@router.post("/publications", response_model=PublicationOut, status_code=status.HTTP_201_CREATED)
+def create_publication(payload: PublicationCreate, _: dict = Depends(admin_only), db: Session = Depends(get_db)):
+    return catalogue.to_public(catalogue.create_item(db, "publication", payload.model_dump(mode="json")))
+
+
+@router.put("/publications/{publication_id}", response_model=PublicationOut)
+def update_publication(publication_id: str, payload: PublicationUpdate, _: dict = Depends(admin_only), db: Session = Depends(get_db)):
+    item = catalogue.get_item(db, "publication", publication_id, published_only=False)
+    return catalogue.to_public(catalogue.update_item(db, item, payload.model_dump(mode="json", exclude_unset=True)))

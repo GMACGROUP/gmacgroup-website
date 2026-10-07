@@ -38,7 +38,7 @@ export function Navbar() {
     { href: "/events", label: "Events" },
     { href: "/about", label: "About" },
     { href: "/team", label: "Team" },
-    { href: "/opportunities", label: "Careers" },
+    { href: "/careers", label: "Careers" },
   ];
 
   const isActive = (href: string) => (href === "/" ? safePathname === "/" : safePathname.startsWith(href));

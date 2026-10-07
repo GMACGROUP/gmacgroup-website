@@ -72,7 +72,7 @@ export function Footer() {
         { href: "/research", label: "Research" },
         { href: "/events", label: "Events" },
         { href: "/programmes", label: "Programmes" },
-        { href: "/opportunities", label: "Careers" },
+        { href: "/careers", label: "Careers" },
         { href: "/contact", label: "Contact" },
       ],
     },

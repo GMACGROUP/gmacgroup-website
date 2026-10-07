@@ -167,7 +167,7 @@ class StorageService:
         target_file.write_bytes(content)
 
         # URL path served by the uploads router
-        file_url = f"/api/v1/uploads/files/{file_id}/{safe_filename}"
+        file_url = f"/api/v1/uploads/files/{file_id}/{safe_filename}?folder={folder}"
 
         return {
             "file_id": file_id,
@@ -209,8 +209,9 @@ class StorageService:
                     logger.warning("Supabase upload failed, falling back to local: %s", res.text)
                     return await self._save_to_local(content, content_type, size, folder, file_id, safe_filename, original_filename)
 
-            # Public or signed URL
-            file_url = f"{supabase_url}/storage/v1/object/public/{bucket}/{storage_path}"
+            # The bucket is private. Store an API reference, never a public URL;
+            # admins get a short-lived signed link via signed_document_url().
+            file_url = f"/api/v1/uploads/files/{file_id}/{safe_filename}?folder={folder}"
 
             return {
                 "file_id": file_id,
@@ -315,6 +316,76 @@ class StorageService:
         if file_path.exists() and file_path.is_file():
             return file_path
         return None
+
+
+    async def signed_document_url(self, reference: str, expires_in: int = 300) -> str | None:
+        """Turn a stored document reference into a short-lived link an admin can open.
+
+        Accepts the API reference saved at upload time (/api/v1/uploads/files/...)
+        and older public Supabase URLs from before the bucket was made private.
+        Returns None for anything that is not one of our stored documents.
+        """
+        from datetime import datetime, timedelta, timezone
+        from urllib.parse import parse_qs, urlparse
+
+        from jose import jwt
+
+        parsed = urlparse(reference)
+        supabase_url = self.settings.SUPABASE_URL.rstrip("/")
+        storage_path: str | None = None
+        match = re.fullmatch(r"/api/v1/uploads/files/([0-9a-f-]{36})/([^/]+)", parsed.path)
+        if match:
+            folder = parse_qs(parsed.query).get("folder", ["resumes"])[0]
+            try:
+                folder = self._validate_folder(folder)
+            except HTTPException:
+                return None
+            file_id, filename = match.groups()
+            if self.get_local_file_path(file_id, filename, folder=folder):
+                token = jwt.encode(
+                    {
+                        "typ": "doc",
+                        "f": folder,
+                        "i": file_id,
+                        "n": filename,
+                        "exp": datetime.now(timezone.utc) + timedelta(seconds=expires_in),
+                    },
+                    self.settings.JWT_SECRET,
+                    algorithm=self.settings.JWT_ALGORITHM,
+                )
+                return f"/api/v1/uploads/signed/{token}"
+            storage_path = f"{folder}/{file_id}/{filename}"
+        elif supabase_url and reference.startswith(f"{supabase_url}/storage/v1/object/public/{self.settings.STORAGE_BUCKET}/"):
+            storage_path = reference.split(f"/object/public/{self.settings.STORAGE_BUCKET}/", 1)[1]
+
+        if not storage_path or not (supabase_url and self.settings.SUPABASE_SERVICE_ROLE_KEY):
+            return None
+        try:
+            async with httpx.AsyncClient(timeout=15) as client:
+                res = await client.post(
+                    f"{supabase_url}/storage/v1/object/sign/{self.settings.STORAGE_BUCKET}/{storage_path}",
+                    json={"expiresIn": expires_in},
+                    headers={"Authorization": f"Bearer {self.settings.SUPABASE_SERVICE_ROLE_KEY}"},
+                )
+            if res.status_code >= 400:
+                logger.warning("Could not sign document link: %s", res.text)
+                return None
+            signed = res.json().get("signedURL") or res.json().get("signedUrl")
+            return f"{supabase_url}/storage/v1{signed}" if signed else None
+        except Exception:
+            logger.exception("Error signing document link")
+            return None
+
+    def read_signed_token(self, token: str) -> Path | None:
+        from jose import JWTError, jwt
+
+        try:
+            claims = jwt.decode(token, self.settings.JWT_SECRET, algorithms=[self.settings.JWT_ALGORITHM])
+        except JWTError:
+            return None
+        if claims.get("typ") != "doc":
+            return None
+        return self.get_local_file_path(claims.get("i", ""), claims.get("n", ""), folder=claims.get("f", "resumes"))
 
 
 storage_service = StorageService()
