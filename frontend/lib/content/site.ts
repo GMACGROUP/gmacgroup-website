@@ -291,7 +291,7 @@ export type EventItem = {
 export const EVENTS: EventItem[] = [
   {
     tier: "Flagship",
-    title: "Leadership 2050 Conference",
+    title: "Leadership 2050 Summit",
     summary: "A multi day hybrid convening on leadership, policy and the future of Africa. Our anchor sponsorship property, and the largest room we convene each year.",
     cadence: "Annual",
     format: "Multi day, hybrid",

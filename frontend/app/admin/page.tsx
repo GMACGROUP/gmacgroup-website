@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useAuth } from "@/hooks/useAuth";
 import { apiClient } from "@/lib/api/client";
 import { TeamManager } from "@/components/admin/TeamManager";
+import { EventsManager } from "@/components/admin/EventsManager";
 import {
   DocumentIcon,
   EyeIcon,
@@ -91,8 +92,8 @@ interface AdminPage<T> {
   items: T[];
 }
 
-type Queue = "applications" | "enrolments" | "members" | "contacts" | "payments" | "catalogue" | "team";
-type AdminQueue = Exclude<Queue, "catalogue" | "team">;
+type Queue = "applications" | "enrolments" | "members" | "contacts" | "payments" | "catalogue" | "team" | "events";
+type AdminQueue = Exclude<Queue, "catalogue" | "team" | "events">;
 
 interface PaginationState {
   page: number;
@@ -587,7 +588,7 @@ export default function AdminPage() {
         </div>
 
         <nav className="flex gap-2 overflow-x-auto border-b border-slate-200 pb-2">
-          {(["applications", "enrolments", "members", "contacts", "payments", "catalogue", "team"] as Queue[]).map((item) => (
+          {(["applications", "enrolments", "members", "contacts", "payments", "catalogue", "team", "events"] as Queue[]).map((item) => (
             <button
               key={item}
               onClick={() => {
@@ -846,6 +847,7 @@ export default function AdminPage() {
 
         {/* ── Team directory ── */}
         {queue === "team" && <TeamManager />}
+        {queue === "events" && <EventsManager />}
 
         {/* ── Catalogue Management ── */}
         {queue === "catalogue" && (

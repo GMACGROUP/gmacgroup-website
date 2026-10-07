@@ -1,8 +1,9 @@
 import Link from "next/link";
 import { Arrow } from "@/components/ui/Arrow";
 import { EVENTS } from "@/lib/content/site";
+import { FORMAT_LABEL, dateLine, type GmacEvent } from "@/lib/events";
 
-export function EventsPreview() {
+export function EventsPreview({ next }: { next?: GmacEvent | null }) {
   const flagships = EVENTS.filter((e) => e.tier === "Flagship");
   return (
     <section className="site-section border-t border-rule bg-stone">
@@ -16,6 +17,22 @@ export function EventsPreview() {
           </div>
           <p className="lede max-w-[44ch] lg:text-right">The expertise underneath them is what clients hire.</p>
         </div>
+
+        {next && (
+          <Link href={`/events/${next.slug}`} className="group mt-14 flex flex-col gap-4 border-y border-ink py-6 sm:flex-row sm:items-center sm:justify-between">
+            <p className="flex flex-wrap items-baseline gap-x-4 gap-y-1">
+              <span className="text-[12px] font-medium uppercase tracking-label text-clay">Next up</span>
+              <span className="font-display text-2xl text-ink group-hover:text-accent">{next.title}</span>
+              <span className="text-sm text-ink-500">
+                {dateLine(next)} · {FORMAT_LABEL[next.format] ?? next.format}
+              </span>
+            </p>
+            <span className="link-arrow shrink-0">
+              Details
+              <Arrow />
+            </span>
+          </Link>
+        )}
 
         <div className="mt-16 grid gap-px bg-ink/15 md:grid-cols-3">
           {flagships.map((e, k) => (

@@ -4,6 +4,8 @@ import { notFound } from "next/navigation";
 import { Arrow } from "@/components/ui/Arrow";
 import { PRACTICE_AREAS, ENGAGEMENT_EXAMPLES, FOCUS_MARKETS } from "@/lib/content/site";
 
+export const dynamicParams = false;
+
 export function generateStaticParams() {
   return PRACTICE_AREAS.map((p) => ({ slug: p.slug }));
 }

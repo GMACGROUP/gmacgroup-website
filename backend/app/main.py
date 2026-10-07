@@ -18,6 +18,7 @@ from app.api.routes import (
     admin,
     uploads,
     team,
+    events,
 )
 
 logger = logging.getLogger(__name__)
@@ -52,6 +53,8 @@ app.include_router(payments.router, prefix=f"{API_PREFIX}/payments", tags=["Paym
 app.include_router(admin.router, prefix=f"{API_PREFIX}/admin", tags=["Admin Operations"])
 app.include_router(team.router, prefix=f"{API_PREFIX}/team", tags=["Team"])
 app.include_router(team.admin_router, prefix=f"{API_PREFIX}/admin/team", tags=["Admin Operations"])
+app.include_router(events.router, prefix=f"{API_PREFIX}/events", tags=["Events"])
+app.include_router(events.admin_router, prefix=f"{API_PREFIX}/admin/events", tags=["Admin Operations"])
 app.include_router(uploads.router, prefix=f"{API_PREFIX}/uploads", tags=["Document Uploads"])
 
 

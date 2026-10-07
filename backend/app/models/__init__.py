@@ -1,6 +1,7 @@
 """Import all ORM models so SQLAlchemy registers their tables."""
 
 from app.models.contact import ContactRequest
+from app.models.event import Event
 from app.models.newsletter import NewsletterSubscriber
 from app.models.opportunity import Application, ApplicationEvent, Opportunity
 from app.models.payment import Payment
@@ -13,6 +14,7 @@ __all__ = [
 	"Application",
 	"ApplicationEvent",
 	"ContactRequest",
+	"Event",
 	"NewsletterSubscriber",
 	"Opportunity",
 	"Payment",
