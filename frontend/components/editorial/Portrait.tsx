@@ -21,7 +21,7 @@ export function Portrait({ name, src, className = "", sizes = "200px" }: Props) 
           alt={`Portrait of ${name}`}
           fill
           sizes={sizes}
-          className="object-cover grayscale transition-[filter] duration-500 group-hover:grayscale-0"
+          className="object-cover transition-transform duration-700 group-hover:scale-[1.04]"
         />
       ) : (
         <div className="flex h-full w-full items-center justify-center" aria-hidden="true">

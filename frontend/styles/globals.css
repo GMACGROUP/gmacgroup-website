@@ -373,3 +373,16 @@ html {
   background-size: 200% 100%;
   animation: shimmer 1.5s infinite;
 }
+
+/* Deep blue gradient band, used for the featured event. */
+@layer components {
+  .band-blue {
+    background-color: #0A2A5E;
+    background-image:
+      radial-gradient(1200px 500px at 85% -10%, rgba(59, 130, 196, 0.45), transparent 60%),
+      radial-gradient(900px 400px at -10% 110%, rgba(11, 92, 173, 0.5), transparent 60%);
+  }
+  .band-blue .btn-primary {
+    @apply bg-white text-ink hover:bg-accent-light;
+  }
+}

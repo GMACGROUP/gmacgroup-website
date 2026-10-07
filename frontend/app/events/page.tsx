@@ -55,7 +55,7 @@ export default async function EventsPage() {
 
       {/* Featured upcoming */}
       {featured && (
-        <section aria-labelledby="featured-title" className="bg-ink text-white">
+        <section aria-labelledby="featured-title" className="band-blue text-white">
           <div className="wrap grid grid-cols-1 gap-10 py-16 sm:py-20 lg:grid-cols-12">
             <div className="lg:col-span-3">
               <p className="text-[12px] font-medium uppercase tracking-label text-accent-soft">Next flagship</p>
