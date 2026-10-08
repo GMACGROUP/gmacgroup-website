@@ -28,6 +28,14 @@ MAGIC_BYTES = {
 }
 ALLOWED_STORAGE_FOLDERS = {"resumes"}
 
+# Public website images (team portraits, event photos)
+IMAGE_SIGNATURES = {
+    "image/jpeg": (".jpg", lambda b: b[:3] == b"\xff\xd8\xff"),
+    "image/png": (".png", lambda b: b[:8] == b"\x89PNG\r\n\x1a\n"),
+    "image/webp": (".webp", lambda b: b[:4] == b"RIFF" and b[8:12] == b"WEBP"),
+}
+ALLOWED_MEDIA_FOLDERS = {"team", "events", "insights"}
+
 
 def sanitize_filename(filename: str) -> str:
     """Sanitize filename to prevent directory traversal and illegal characters."""
@@ -159,7 +167,7 @@ class StorageService:
         target_file.write_bytes(content)
 
         # URL path served by the uploads router
-        file_url = f"/api/v1/uploads/files/{file_id}/{safe_filename}"
+        file_url = f"/api/v1/uploads/files/{file_id}/{safe_filename}?folder={folder}"
 
         return {
             "file_id": file_id,
@@ -201,8 +209,9 @@ class StorageService:
                     logger.warning("Supabase upload failed, falling back to local: %s", res.text)
                     return await self._save_to_local(content, content_type, size, folder, file_id, safe_filename, original_filename)
 
-            # Public or signed URL
-            file_url = f"{supabase_url}/storage/v1/object/public/{bucket}/{storage_path}"
+            # The bucket is private. Store an API reference, never a public URL;
+            # admins get a short-lived signed link via signed_document_url().
+            file_url = f"/api/v1/uploads/files/{file_id}/{safe_filename}?folder={folder}"
 
             return {
                 "file_id": file_id,
@@ -218,6 +227,84 @@ class StorageService:
             logger.exception("Error uploading to Supabase Storage, using local fallback.")
             return await self._save_to_local(content, content_type, size, folder, file_id, safe_filename, original_filename)
 
+    async def save_image(self, file: UploadFile, folder: str) -> dict:
+        """Validate and store a public website image. Returns {"file_url": ...}.
+
+        The type is decided from the file's own bytes, not its name or the
+        browser supplied header, so a renamed script cannot pass as a photo.
+        """
+        folder = folder.strip().lower()
+        if folder not in ALLOWED_MEDIA_FOLDERS:
+            raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Unsupported image folder.")
+
+        max_bytes = self.settings.MAX_IMAGE_SIZE_MB * 1024 * 1024
+        content = await file.read(max_bytes + 1)
+        if not content:
+            raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Uploaded image is empty.")
+        if len(content) > max_bytes:
+            raise HTTPException(
+                status_code=status.HTTP_413_REQUEST_ENTITY_TOO_LARGE,
+                detail=f"Image exceeds the maximum size of {self.settings.MAX_IMAGE_SIZE_MB}MB.",
+            )
+
+        content_type, ext = None, None
+        for mime, (extension, check) in IMAGE_SIGNATURES.items():
+            if check(content):
+                content_type, ext = mime, extension
+                break
+        if content_type is None:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="Please upload a JPG, PNG or WebP image.",
+            )
+
+        file_id = str(uuid4())
+        filename = f"{file_id}{ext}"
+        provider = self.settings.STORAGE_PROVIDER.lower()
+
+        if provider == "supabase" and self.settings.SUPABASE_URL and self.settings.SUPABASE_SERVICE_ROLE_KEY:
+            supabase_url = self.settings.SUPABASE_URL.rstrip("/")
+            path = f"{folder}/{filename}"
+            try:
+                async with httpx.AsyncClient(timeout=20) as client:
+                    res = await client.post(
+                        f"{supabase_url}/storage/v1/object/{self.settings.MEDIA_BUCKET}/{path}",
+                        content=content,
+                        headers={
+                            "Authorization": f"Bearer {self.settings.SUPABASE_SERVICE_ROLE_KEY}",
+                            "Content-Type": content_type,
+                            "Cache-Control": "public, max-age=31536000, immutable",
+                        },
+                    )
+                if res.status_code >= 400:
+                    logger.error("Supabase image upload failed: %s", res.text)
+                    raise HTTPException(status_code=status.HTTP_502_BAD_GATEWAY, detail="Image storage is unavailable.")
+            except httpx.HTTPError:
+                logger.exception("Supabase image upload error")
+                raise HTTPException(status_code=status.HTTP_502_BAD_GATEWAY, detail="Image storage is unavailable.")
+            return {
+                "file_url": f"{supabase_url}/storage/v1/object/public/{self.settings.MEDIA_BUCKET}/{path}",
+                "content_type": content_type,
+                "size_bytes": len(content),
+            }
+
+        target_dir = self._get_upload_base_dir() / "media" / folder
+        target_dir.mkdir(parents=True, exist_ok=True)
+        (target_dir / filename).write_bytes(content)
+        return {
+            "file_url": f"{self.settings.PUBLIC_API_URL.rstrip('/')}/api/v1/uploads/media/{folder}/{filename}",
+            "content_type": content_type,
+            "size_bytes": len(content),
+        }
+
+    def get_local_media_path(self, folder: str, filename: str) -> Path | None:
+        if folder not in ALLOWED_MEDIA_FOLDERS:
+            return None
+        if not re.fullmatch(r"[0-9a-f-]{36}\.(jpg|png|webp)", filename):
+            return None
+        path = self._get_upload_base_dir() / "media" / folder / filename
+        return path if path.is_file() else None
+
     def get_local_file_path(self, file_id: str, filename: str, folder: str = "resumes") -> Path | None:
         """Retrieve local file path if it exists."""
         try:
@@ -229,6 +316,77 @@ class StorageService:
         if file_path.exists() and file_path.is_file():
             return file_path
         return None
+
+
+    async def signed_document_url(self, reference: str, expires_in: int = 300) -> str | None:
+        """Turn a stored document reference into a short-lived link an admin can open.
+
+        Accepts the API reference saved at upload time (/api/v1/uploads/files/...)
+        and older public Supabase URLs from before the bucket was made private.
+        Returns None for anything that is not one of our stored documents.
+        """
+        from datetime import datetime, timedelta, timezone
+        from urllib.parse import parse_qs, urlparse
+
+        import jwt
+
+        parsed = urlparse(reference)
+        supabase_url = self.settings.SUPABASE_URL.rstrip("/")
+        storage_path: str | None = None
+        match = re.fullmatch(r"/api/v1/uploads/files/([0-9a-f-]{36})/([^/]+)", parsed.path)
+        if match:
+            folder = parse_qs(parsed.query).get("folder", ["resumes"])[0]
+            try:
+                folder = self._validate_folder(folder)
+            except HTTPException:
+                return None
+            file_id, filename = match.groups()
+            if self.get_local_file_path(file_id, filename, folder=folder):
+                token = jwt.encode(
+                    {
+                        "typ": "doc",
+                        "f": folder,
+                        "i": file_id,
+                        "n": filename,
+                        "exp": datetime.now(timezone.utc) + timedelta(seconds=expires_in),
+                    },
+                    self.settings.JWT_SECRET,
+                    algorithm=self.settings.JWT_ALGORITHM,
+                )
+                return f"/api/v1/uploads/signed/{token}"
+            storage_path = f"{folder}/{file_id}/{filename}"
+        elif supabase_url and reference.startswith(f"{supabase_url}/storage/v1/object/public/{self.settings.STORAGE_BUCKET}/"):
+            storage_path = reference.split(f"/object/public/{self.settings.STORAGE_BUCKET}/", 1)[1]
+
+        if not storage_path or not (supabase_url and self.settings.SUPABASE_SERVICE_ROLE_KEY):
+            return None
+        try:
+            async with httpx.AsyncClient(timeout=15) as client:
+                res = await client.post(
+                    f"{supabase_url}/storage/v1/object/sign/{self.settings.STORAGE_BUCKET}/{storage_path}",
+                    json={"expiresIn": expires_in},
+                    headers={"Authorization": f"Bearer {self.settings.SUPABASE_SERVICE_ROLE_KEY}"},
+                )
+            if res.status_code >= 400:
+                logger.warning("Could not sign document link: %s", res.text)
+                return None
+            signed = res.json().get("signedURL") or res.json().get("signedUrl")
+            return f"{supabase_url}/storage/v1{signed}" if signed else None
+        except Exception:
+            logger.exception("Error signing document link")
+            return None
+
+    def read_signed_token(self, token: str) -> Path | None:
+        import jwt
+        from jwt import PyJWTError as JWTError
+
+        try:
+            claims = jwt.decode(token, self.settings.JWT_SECRET, algorithms=[self.settings.JWT_ALGORITHM])
+        except JWTError:
+            return None
+        if claims.get("typ") != "doc":
+            return None
+        return self.get_local_file_path(claims.get("i", ""), claims.get("n", ""), folder=claims.get("f", "resumes"))
 
 
 storage_service = StorageService()

@@ -1,17 +1,30 @@
-import { Hero } from "@/sections/hero/Hero";
-import { ValuePropSection } from "@/sections/value-prop/ValuePropSection";
-import { ProgrammesSection } from "@/sections/programmes/ProgrammesSection";
-import { EcosystemSection } from "@/sections/ecosystem/EcosystemSection";
-import { TestimonialsSection } from "@/sections/testimonials/TestimonialsSection";
+import { HomeHero } from "@/sections/home/HomeHero";
+import { Figures } from "@/sections/home/Figures";
+import { TwoDoors } from "@/sections/home/TwoDoors";
+import { ExpertiseIndex } from "@/sections/home/ExpertiseIndex";
+import { FounderNote } from "@/sections/home/FounderNote";
+import { EngagementFile } from "@/sections/home/EngagementFile";
+import { EventsPreview } from "@/sections/home/EventsPreview";
+import { TeamPreview } from "@/sections/home/TeamPreview";
+import { ClosingInvitation } from "@/sections/home/ClosingInvitation";
+import { getEvents, getTeam } from "@/lib/api/server";
 
-export default function HomePage() {
+export const revalidate = 300;
+
+export default async function HomePage() {
+  const [team, upcoming] = await Promise.all([getTeam(), getEvents("upcoming")]);
+  const next = upcoming.find((e) => e.start_at) ?? upcoming[0] ?? null;
   return (
     <>
-      <Hero />
-      <ValuePropSection />
-      <ProgrammesSection />
-      <EcosystemSection />
-      <TestimonialsSection />
+      <HomeHero />
+      <Figures team={team} />
+      <TwoDoors />
+      <ExpertiseIndex />
+      <FounderNote />
+      <EngagementFile />
+      <EventsPreview next={next} />
+      <TeamPreview team={team} />
+      <ClosingInvitation />
     </>
   );
 }

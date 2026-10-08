@@ -97,7 +97,7 @@ export function NavigationProgressBar() {
       className="fixed top-0 left-0 right-0 z-[99999] h-[3px] pointer-events-none overflow-hidden"
     >
       <div
-        className="h-full bg-gradient-to-r from-brand-red via-brand-cyan to-brand-navy shadow-[0_0_12px_rgba(229,25,36,0.8),0_0_6px_rgba(0,196,255,0.8)]"
+        className="h-full bg-accent"
         style={{
           width: `${progress}%`,
           opacity: visible ? 1 : 0,

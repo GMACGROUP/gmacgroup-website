@@ -4,7 +4,7 @@ from datetime import datetime
 from enum import Enum
 from typing import Optional
 from uuid import UUID
-from pydantic import BaseModel, ConfigDict, EmailStr
+from pydantic import BaseModel, ConfigDict, EmailStr, Field
 
 
 class ProgrammeCategory(str, Enum):
@@ -58,11 +58,11 @@ class ProgrammeUpdate(BaseModel):
 
 
 class EnrolmentCreate(BaseModel):
-    full_name: Optional[str] = None
+    full_name: Optional[str] = Field(default=None, max_length=120)
     email: Optional[EmailStr] = None
-    phone: Optional[str] = None
-    organization: Optional[str] = None
-    notes: Optional[str] = None
+    phone: Optional[str] = Field(default=None, max_length=40)
+    organization: Optional[str] = Field(default=None, max_length=160)
+    notes: Optional[str] = Field(default=None, max_length=2000)
     offer_type: OfferType = OfferType.FREE
 
 

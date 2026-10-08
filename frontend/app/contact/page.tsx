@@ -1,131 +1,106 @@
-import Image from "next/image";
+import type { Metadata } from "next";
+import Link from "next/link";
+import { Suspense } from "react";
 import { ContactForm } from "@/components/forms/ContactForm";
-import { PageHeader } from "@/components/common/PageHeader";
-import { MapPinIcon, MailIcon, ClockIcon, SparklesIcon, ShieldCheckIcon } from "@/components/common/Icons";
+import { ENGAGEMENT_MODELS, SITE } from "@/lib/content/site";
 
-const contactDetails = [
-  {
-    icon: MapPinIcon,
-    color: "bg-blue-50 text-brand-navy border-blue-200",
-    label: "Headquarters & Research Center",
-    value: "Accra, Ghana • Pan-African & Global Advisory",
-  },
-  {
-    icon: MailIcon,
-    color: "bg-red-50 text-brand-red border-red-200",
-    label: "General Enquiries",
-    value: "info@gmac-group.com",
-  },
-  {
-    icon: ClockIcon,
-    color: "bg-emerald-50 text-emerald-700 border-emerald-200",
-    label: "Phone",
-    value: "+233 20 215 4828 • +234 814 498 8398",
-  },
-];
+export const metadata: Metadata = {
+  title: "Contact",
+  description:
+    "Begin a conversation with Gmac Group about research, workforce, investment facilitation, programmes or sponsorship.",
+  alternates: { canonical: "/contact" },
+};
 
 export default function ContactPage() {
   return (
-    <div className="bg-slate-50 min-h-screen">
-      <PageHeader
-        badge="Begin a conversation"
-        title="Contact Gmac Group"
-        subtitle="Whether you are commissioning research, building a workforce, sponsoring a convening, or looking for investable projects, the first step is the same: a short conversation to establish fit and scope."
-      />
+    <>
+      <header className="border-b border-rule">
+        <div className="wrap pb-14 pt-14 sm:pt-20 lg:pb-20 lg:pt-24">
+          <nav aria-label="Breadcrumb" className="text-sm text-ink-400">
+            <Link href="/" className="hover:text-ink">Home</Link>
+            <span className="mx-2" aria-hidden="true">/</span>
+            <span className="text-ink">Contact</span>
+          </nav>
+          <div className="mt-8 grid grid-cols-1 gap-10 lg:grid-cols-12">
+            <h1 className="display-xl lg:col-span-8">
+              Begin a conversation. <em className="font-light italic text-ink-500">The first step is the same for everyone.</em>
+            </h1>
+            <p className="lede self-end lg:col-span-4">
+              Whether you are commissioning research, building a workforce, sponsoring a convening or looking for
+              investable projects, we start with a short conversation to establish fit and scope.
+            </p>
+          </div>
+        </div>
+      </header>
 
-      {/* Main Content Area */}
-      <section className="container mx-auto px-4 sm:px-6 py-8 sm:py-12 max-w-6xl">
-        <div className="grid gap-6 lg:grid-cols-5 lg:gap-8 items-start">
+      <section className="wrap grid grid-cols-1 gap-16 py-16 lg:grid-cols-12 lg:py-24">
+        <div className="lg:col-span-7">
+          <Suspense fallback={null}>
+            <ContactForm />
+          </Suspense>
+        </div>
 
-          {/* ── Left Column: Contact Info ─────────────────────── */}
-          <div className="lg:col-span-2 space-y-6">
-
-            {/* Section label */}
-            <div>
-              <span className="section-label bg-red-50 border border-red-200/80 text-brand-red mb-3">
-                <span className="h-1.5 w-1.5 rounded-full bg-brand-red animate-pulse" />
-                Direct Contact
-              </span>
-              <h2 className="text-2xl sm:text-3xl font-extrabold text-slate-900 font-serif">
-                We&apos;re Here to Help
-              </h2>
-              <p className="mt-2 text-slate-600 text-sm leading-relaxed">
-                Our strategic advisory team responds to all inquiries within 24–48 business hours.
+        <aside className="lg:col-span-4 lg:col-start-9">
+          <div className="space-y-10 lg:sticky lg:top-28">
+            <div className="border-t border-ink pt-5">
+              <p className="text-[11px] font-medium uppercase tracking-label text-ink-400">General enquiries</p>
+              <a href={`mailto:${SITE.email}`} className="mt-2 block font-display text-2xl text-ink hover:text-accent">
+                {SITE.email}
+              </a>
+              <p className="mt-2 text-sm leading-relaxed text-ink-500">
+                Institutional enquiries, scoping conversations, sponsorship and partnerships.
               </p>
             </div>
 
-            {/* Advisory Hub Photo */}
-            <div className="relative h-44 w-full rounded-2xl overflow-hidden border border-slate-200 shadow-md group">
-              <Image
-                src="/images/service-workforce-consulting.jpg"
-                alt="GMAC Advisory Office in Accra"
-                fill
-                className="object-cover group-hover:scale-105 transition-transform duration-500"
-              />
-              <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent" />
-              <div className="absolute bottom-3 left-4 right-4 text-white">
-                <p className="text-xs font-bold text-brand-cyan">GMAC Executive Advisory Center</p>
-                <p className="text-[11px] text-slate-300">Accra Financial & Innovation District</p>
-              </div>
+            <div className="border-t border-rule pt-5">
+              <p className="text-[11px] font-medium uppercase tracking-label text-ink-400">Telephone</p>
+              <ul className="mt-2 space-y-1">
+                {SITE.phones.map((p) => (
+                  <li key={p}>
+                    <a href={`tel:${p.replace(/\s/g, "")}`} className="text-[17px] text-ink hover:text-accent">{p}</a>
+                  </li>
+                ))}
+              </ul>
             </div>
 
-            {/* Contact Detail Cards */}
-            <div className="space-y-3">
-              {contactDetails.map((item) => {
-                const Icon = item.icon;
-                return (
-                  <div
-                    key={item.label}
-                    className="flex items-start gap-3 sm:gap-4 p-4 bg-white rounded-2xl border border-slate-200/90 shadow-card hover:shadow-card-hover hover:border-brand-navy/30 hover:-translate-y-0.5 transition-all duration-300"
-                  >
-                    <div className={`w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0 border ${item.color}`}>
-                      <Icon className="w-5 h-5" />
-                    </div>
-                    <div>
-                      <h4 className="font-bold text-slate-900 text-sm">{item.label}</h4>
-                      <p className="text-slate-600 text-xs mt-0.5 leading-relaxed font-medium">{item.value}</p>
-                    </div>
-                  </div>
-                );
-              })}
+            <div className="border-t border-rule pt-5">
+              <p className="text-[11px] font-medium uppercase tracking-label text-ink-400">How we work</p>
+              <p className="mt-2 text-[15px] leading-relaxed text-ink-600">
+                Remote by design. Our team works from ten countries and assembles around each brief.
+              </p>
             </div>
 
-            {/* Fellowship Note */}
-            <div className="relative bg-brand-navy rounded-2xl p-5 text-white overflow-hidden border border-brand-navyLight/20 shadow-md">
-              <div className="absolute -top-8 -right-8 w-32 h-32 bg-brand-cyan/20 rounded-full blur-2xl pointer-events-none" />
-              <div className="relative z-10 flex items-start gap-3">
-                <div className="w-8 h-8 rounded-lg bg-white/10 flex items-center justify-center shrink-0">
-                  <SparklesIcon className="w-4 h-4 text-brand-cyan" />
-                </div>
-                <div>
-                  <h5 className="font-bold text-xs uppercase tracking-wider text-brand-cyan mb-1">
-                    Fellowship & Internship Inquiries
-                  </h5>
-                  <p className="text-xs text-slate-200 leading-relaxed">
-                    Applying to open fellowship cohorts or research internships? Please specify the role title in your message subject.
-                  </p>
-                </div>
-              </div>
+            <div className="border-t border-rule pt-5">
+              <p className="text-[11px] font-medium uppercase tracking-label text-ink-400">Follow</p>
+              <ul className="mt-2 flex flex-wrap gap-x-5 gap-y-1 text-[15px]">
+                <li><a href={SITE.social.linkedin} target="_blank" rel="noreferrer" className="text-ink hover:text-accent">LinkedIn</a></li>
+                <li><a href={SITE.social.instagram} target="_blank" rel="noreferrer" className="text-ink hover:text-accent">Instagram</a></li>
+                <li><a href={SITE.social.x} target="_blank" rel="noreferrer" className="text-ink hover:text-accent">X</a></li>
+                <li><a href={SITE.social.facebook} target="_blank" rel="noreferrer" className="text-ink hover:text-accent">Facebook</a></li>
+              </ul>
             </div>
           </div>
+        </aside>
+      </section>
 
-          {/* ── Right Column: Form ────────────────────────────── */}
-          <div className="lg:col-span-3">
-            <div className="bg-white rounded-3xl border border-slate-200 shadow-card-featured p-5 sm:p-8 lg:p-10">
-              <div className="mb-6">
-                <span className="section-label text-brand-red block mb-1">Send a Message</span>
-                <h3 className="text-xl sm:text-2xl font-extrabold text-slate-900 font-serif">
-                  Start a Conversation
-                </h3>
-                <p className="text-slate-500 text-sm mt-1">
-                  Fill in the form below and our team will get back to you promptly.
-                </p>
-              </div>
-              <ContactForm />
-            </div>
+      <section className="border-t border-rule bg-stone">
+        <div className="wrap grid grid-cols-1 gap-10 py-16 lg:grid-cols-12">
+          <div className="lg:col-span-4">
+            <p className="eyebrow">For institutions</p>
+            <h2 className="mt-5 font-display text-3xl">Five ways to work with us.</h2>
+            <Link href="/how-we-engage" className="link-arrow mt-6">How we engage</Link>
           </div>
+          <ol className="grid gap-x-10 sm:grid-cols-2 lg:col-span-8">
+            {ENGAGEMENT_MODELS.map((m, i) => (
+              <li key={m.title} className="border-t border-ink/15 py-5">
+                <p className="text-sm tabular-nums text-accent">{String(i + 1).padStart(2, "0")}</p>
+                <p className="mt-1 font-medium text-ink">{m.title}</p>
+                <p className="mt-1 text-sm leading-relaxed text-ink-500">{m.body}</p>
+              </li>
+            ))}
+          </ol>
         </div>
       </section>
-    </div>
+    </>
   );
 }

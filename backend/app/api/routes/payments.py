@@ -11,7 +11,9 @@ from sqlalchemy.orm import Session
 from app.api.dependencies import get_optional_user
 from app.core.config import get_settings
 from app.core.database import get_db
-from app.data import OPPORTUNITIES, PROGRAMMES
+from app.core.ratelimit import rate_limit
+import hmac
+from app.services import catalogue
 from app.models.opportunity import Application
 from app.models.payment import Payment
 from app.models.programme import ProgrammeEnrolment
@@ -22,13 +24,14 @@ router = APIRouter()
 settings = get_settings()
 
 
-def _find_target(payload: PaymentInitialize) -> tuple[dict, dict]:
-    collection = PROGRAMMES if payload.target_type == "programme" else OPPORTUNITIES
-    target = next((item for item in collection if item["id"] == payload.target_id), None)
-    if target is None:
+def _find_target(db: Session, payload: PaymentInitialize) -> tuple[dict, dict]:
+    kind = "programme" if payload.target_type == "programme" else "opportunity"
+    try:
+        item = catalogue.get_item(db, kind, payload.target_id)
+    except HTTPException:
         raise HTTPException(status_code=404, detail="Programme or opportunity not found")
-    closing_date = target.get("deadline") if payload.target_type == "opportunity" else target.get("end_date")
-    if closing_date and datetime.fromisoformat(closing_date.replace("Z", "+00:00")) < datetime.now(timezone.utc):
+    target = catalogue.to_public(item)
+    if catalogue.is_closed(item):
         raise HTTPException(status_code=410, detail="This event or opportunity is closed")
     offer = next((item for item in target.get("offers", []) if item["type"] == payload.offer_type), None)
     if offer is None:
@@ -132,8 +135,9 @@ async def initialize_payment(
     request: Request,
     current_user: dict | None = Depends(get_optional_user),
     db: Session = Depends(get_db),
+    _: None = Depends(rate_limit("pay-init", limit=10, window_seconds=600)),
 ):
-    target, offer = _find_target(payload)
+    target, offer = _find_target(db, payload)
     if offer["amount"] <= 0:
         return PaymentInitializeOut(status="free", amount=0, currency=offer["currency"])
     if not settings.FLW_SECRET_KEY:
@@ -165,7 +169,7 @@ async def initialize_payment(
         "currency": offer["currency"],
         "redirect_url": f"{settings.FRONTEND_URL.rstrip('/')}/payment/callback",
         "customer": {"email": str(payload.email), "name": payload.full_name or str(payload.email)},
-        "customizations": {"title": "GMACGROUP", "description": f"{offer['label']} - {target['title']}"},
+        "customizations": {"title": "Gmac Group", "description": f"{offer['label']} - {target['title']}"},
         "meta": {"target_type": payload.target_type, "target_id": payload.target_id, "offer_type": payload.offer_type},
     }
     async with httpx.AsyncClient(timeout=20) as client:
@@ -217,6 +221,7 @@ async def verify_payment(
     transaction_id: str,
     background_tasks: BackgroundTasks,
     db: Session = Depends(get_db),
+    _: None = Depends(rate_limit("pay-verify", limit=20, window_seconds=600)),
 ):
     return await _verify(reference, transaction_id, db, background_tasks)
 
@@ -228,11 +233,15 @@ async def payment_webhook(
     verif_hash: str | None = Header(default=None, alias="verif-hash"),
     db: Session = Depends(get_db),
 ):
-    if settings.FLW_WEBHOOK_SECRET_HASH and verif_hash != settings.FLW_WEBHOOK_SECRET_HASH:
+    expected = settings.FLW_WEBHOOK_SECRET_HASH
+    if not expected:
+        # Without the shared secret we cannot tell Flutterwave from anyone else.
+        raise HTTPException(status_code=503, detail="Webhook not configured")
+    if not verif_hash or not hmac.compare_digest(verif_hash, expected):
         raise HTTPException(status_code=401, detail="Invalid webhook signature")
     body = await request.json()
     data = body.get("data", {})
     reference = data.get("tx_ref")
     if reference and data.get("id"):
         await _verify(reference, str(data["id"]), db, background_tasks)
-    return {"received": True}
+    return {"received": True}

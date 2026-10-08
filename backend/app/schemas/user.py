@@ -4,7 +4,7 @@ from datetime import datetime
 from enum import Enum
 from typing import Optional
 from uuid import UUID
-from pydantic import BaseModel, ConfigDict, EmailStr
+from pydantic import BaseModel, ConfigDict, EmailStr, Field
 
 
 class UserRole(str, Enum):
@@ -33,10 +33,10 @@ class UserLogin(BaseModel):
 
 
 class UserUpdate(BaseModel):
-    full_name: Optional[str] = None
-    bio: Optional[str] = None
-    organization: Optional[str] = None
-    phone: Optional[str] = None
+    full_name: Optional[str] = Field(default=None, max_length=120)
+    bio: Optional[str] = Field(default=None, max_length=2000)
+    organization: Optional[str] = Field(default=None, max_length=160)
+    phone: Optional[str] = Field(default=None, max_length=40)
 
 
 class UserOut(UserBase):

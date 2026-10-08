@@ -104,9 +104,9 @@ class AdminOverview(BaseModel):
 
 class AdminEmailTestRequest(BaseModel):
     to: EmailStr | None = None
-    subject: str = Field(default="GMAC GROUP email delivery test", min_length=1, max_length=160)
+    subject: str = Field(default="Gmac Group email delivery test", min_length=1, max_length=160)
     message: str = Field(
-        default="This is a live email delivery test from the GMAC GROUP backend.",
+        default="This is a live email delivery test from the Gmac Group website.",
         min_length=1,
         max_length=5000,
     )
