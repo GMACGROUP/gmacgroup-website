@@ -3,6 +3,8 @@ import Link from "next/link";
 import { Arrow } from "@/components/ui/Arrow";
 import { EventRow } from "@/components/events/EventRow";
 import { PastEvents } from "@/components/events/PastEvents";
+import { PastSpeakers } from "@/components/events/PastSpeakers";
+import { PAST_SPEAKERS } from "@/lib/content/speakers";
 import { EVENTS } from "@/lib/content/site";
 import { getEvents } from "@/lib/api/server";
 import { FORMAT_LABEL, dateBlock, dateLine, timeLine } from "@/lib/events";
@@ -134,6 +136,27 @@ export default async function EventsPage() {
             <Count n={past.length} />
           </h2>
           <PastEvents events={past} />
+        </div>
+      </section>
+
+      {/* Past speakers */}
+      <section id="speakers" aria-labelledby="speakers-title" className="site-section border-t border-rule scroll-mt-24">
+        <div className="wrap">
+          <div className="grid grid-cols-1 gap-8 lg:grid-cols-12">
+            <div className="lg:col-span-4">
+              <p className="eyebrow">Who has spoken</p>
+            </div>
+            <div className="lg:col-span-8">
+              <h2 id="speakers-title" className="display-lg max-w-[22ch]">Past speakers.</h2>
+              <p className="lede mt-6 max-w-[60ch]">
+                Ambassadors, chief executives, economists and founders who have spoken across the NIS Webinar Series and the
+                Leadership 2050 Summit since 2021.
+              </p>
+            </div>
+          </div>
+          <div className="mt-14">
+            <PastSpeakers speakers={PAST_SPEAKERS} />
+          </div>
         </div>
       </section>
 
