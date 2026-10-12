@@ -34,7 +34,7 @@ const raw: [string, string, string, string, boolean?][] = [
   ["Maranatha Okeley Odai", "Graphic & Web Designer", "Ghana", "Graphic Design and Web"],
   ["Wendy Gerrar Otu", "Graphic & Web Design Intern", "Ghana", "Graphic Design and Web"],
   ["Ramadhani Athumani Mbiaji", "Operations & Program Manager", "Tanzania", "Operations and Programmes", true],
-  ["Apollo Samantha Dorcas", "Operations & Program Manager", "Nigeria", "Operations and Programmes"],
+  ["Apollo Samantha Dorcas, Esq.", "Operations & Program Manager", "Nigeria", "Operations and Programmes"],
   ["Edwin Camichael Ngyfo Teno", "Operations & Program Manager", "Cameroon", "Operations and Programmes"],
   ["Delasi Kumapley", "Operations & Program Intern", "Ghana", "Operations and Programmes"],
   ["Faustino Albert", "Operations & Program Intern", "Burkina Faso", "Operations and Programmes"],
@@ -43,8 +43,11 @@ const raw: [string, string, string, string, boolean?][] = [
   ["Emmanuel Nyamekye", "Operations & Program Intern", "Ghana", "Operations and Programmes"],
 ];
 
-const slug = (n: string) => n.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
-const PHOTOS = new Set(["addai-kojo-richmond", "apollo-samantha-dorcas", "atigsimah-richard-akamboe", "atta-gyasi-domson", "christian-agyapong", "delasi-kumapley", "emmanuel-nyamekye", "evans-essene-dzidzienyo", "faustino-albert", "favour-ohiemi", "ismail-saani", "jude-van-tagoe", "maranatha-okeley-odai", "maureen-mushwimba", "mphoyame-thole", "oluwatosin-temitope-ogungbade", "richard-klutse", "silas-bivamwijuru", "victoria-dzifa-atisoe", "wendy-gerrar-otu", "yolanda-chibaya"]);
+const slug = (n: string) => n.replace(/,?\s*Esq\.?$/i, "").toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
+const PHOTOS = new Set(["addai-kojo-richmond", "apollo-samantha-dorcas", "atigsimah-richard-akamboe", "atta-gyasi-domson", "christian-agyapong", "delasi-kumapley", "edwin-camichael-ngyfo-teno", "emmanuel-nyamekye", "evans-essene-dzidzienyo", "faustino-albert", "favour-ohiemi", "ismail-saani", "jude-van-tagoe", "maranatha-okeley-odai", "maureen-mushwimba", "mphoyame-thole", "oluwatosin-temitope-ogungbade", "ramadhani-athumani-mbiaji", "richard-klutse", "silas-bivamwijuru", "victoria-dzifa-atisoe", "wendy-gerrar-otu", "yolanda-chibaya"]);
+
+// Replaced photos get a new file name so browsers and image caches pick them up.
+const PHOTO_FILE: Record<string, string> = { "faustino-albert": "faustino-albert-v2" };
 
 export const TEAM_SEED: TeamMember[] = raw.map(([name, position, country, team, is_lead], i) => ({
   id: `seed-${i + 1}`,
@@ -54,5 +57,5 @@ export const TEAM_SEED: TeamMember[] = raw.map(([name, position, country, team, 
   team,
   is_lead: Boolean(is_lead),
   sort_order: i + 1,
-  photo_url: PHOTOS.has(slug(name)) ? `/images/people/${slug(name)}.jpg` : null,
+  photo_url: PHOTOS.has(slug(name)) ? `/images/people/${PHOTO_FILE[slug(name)] ?? slug(name)}.jpg` : null,
 }));
