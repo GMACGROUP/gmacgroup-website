@@ -18,7 +18,7 @@ export function Logo({
 }: LogoProps) {
   // logo-tight.png for light backgrounds (navbar), logo-transparent.png for dark (footer/login)
   const isDark = variant === "dark";
-  const logoSrc = isDark ? "/images/logo-transparent.png" : "/images/logo-tight.png";
+  const logoSrc = "/images/logo-gmac.png";
 
   // Size classes — logo aspect ratio is roughly 4:3
   const sizeClass = {

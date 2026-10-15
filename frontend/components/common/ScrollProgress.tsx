@@ -61,7 +61,7 @@ export function ScrollProgress() {
       onClick={scrollToTop}
       aria-label={`Back to top (${Math.round(progress * 100)}% scrolled)`}
       title="Back to top"
-      className={`fixed z-40 flex items-center justify-center rounded-full bg-[#07111F]/90 text-white backdrop-blur-md shadow-lg border border-white/20 transition-all duration-300 hover:scale-108 hover:bg-[#07111F] hover:border-cyan-400/50 focus:outline-none focus-visible:ring-2 focus-visible:ring-cyan-400 ${
+      className={`fixed z-40 flex items-center justify-center rounded-full bg-[#07111F]/90 text-white backdrop-blur-md shadow-lg border border-white/20 transition-all duration-300 hover:scale-108 hover:bg-[#07111F] hover:border-white/40 focus:outline-none focus-visible:ring-2 focus-visible:ring-accent ${
         /* Mobile: right-5, bottom-20 (above AI widget). Desktop: right-8, bottom-24 */
         "bottom-[74px] right-5 sm:bottom-[82px] sm:right-8 h-11 w-11 sm:h-12 sm:w-12"
       } ${
@@ -89,7 +89,7 @@ export function ScrollProgress() {
           cy="22"
           r={CIRCLE_RADIUS}
           fill="none"
-          stroke="#2A8C8C"
+          stroke="#0B5CAD"
           strokeLinecap="round"
           strokeWidth="2.5"
           strokeDasharray={CIRCLE_CIRCUMFERENCE}

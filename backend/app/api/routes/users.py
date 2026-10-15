@@ -39,8 +39,16 @@ def update_my_profile(
 
 
 @router.get("/{user_id}", response_model=UserOut)
-async def get_user(user_id: str, current_user: dict = Depends(get_current_user)):
-    """Look up a user profile."""
-    if user_id != current_user["id"] and current_user.get("role") != "admin":
+def get_user(user_id: str, current_user: dict = Depends(get_current_user), db: Session = Depends(get_db)):
+    """Look up a user profile (your own, or anyone's for admins)."""
+    if str(user_id) == str(current_user["id"]):
+        return current_user
+    if current_user.get("role") != "admin":
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Profile access denied")
-    return current_user
+    try:
+        user = db.get(User, user_id)
+    except Exception:
+        user = None
+    if user is None:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Profile not found")
+    return user

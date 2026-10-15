@@ -23,6 +23,8 @@ def _send_smtp_plain(
     to_addr: str,
     subject: str,
     body: str,
+    from_addr: str = "",
+    from_name: str = "Gmac Group",
 ) -> None:
     """
     Send PLAIN-TEXT-ONLY email via SMTP.
@@ -35,9 +37,12 @@ def _send_smtp_plain(
     clean_user = user.strip() if user else ""
     clean_password = password.replace(" ", "").strip() if password else ""
     clean_to = to_addr.strip()
-    sender_domain = "gmail.com" if "gmail.com" in clean_user else "gmacgroup.org"
+    # Send from the company address (EMAIL_FROM) when set; the SMTP account must be
+    # allowed to send as it (true for Google Workspace or Zoho mailboxes on gmac-group.com).
+    sender = (from_addr or clean_user).strip()
+    sender_domain = sender.split("@")[-1] if "@" in sender else "gmac-group.com"
 
-    from_formatted = email.utils.formataddr(("GMAC GROUP", clean_user)) if clean_user else clean_user
+    from_formatted = email.utils.formataddr((from_name or "Gmac Group", sender)) if sender else sender
 
     msg = EmailMessage()
     msg["Subject"] = subject
@@ -102,10 +107,10 @@ class NotificationService:
             sender_name = sender_name.strip().strip('"\'')
             sender_email = sender_email.split(">", 1)[0].strip()
         elif not sender_email or "@" not in sender_email:
-            sender_email = settings.OPERATIONS_EMAIL or "noreply@gmacgroup.org"
+            sender_email = settings.OPERATIONS_EMAIL or "info@gmac-group.com"
 
         payload = {
-            "sender": {"name": sender_name or "GMACGROUP", "email": sender_email},
+            "sender": {"name": sender_name or "Gmac Group", "email": sender_email},
             "to": [{"email": to}],
             "subject": subject,
             "textContent": body,
@@ -204,6 +209,8 @@ class NotificationService:
                     to,
                     subject,
                     body,
+                    settings.EMAIL_FROM if "@" in (settings.EMAIL_FROM or "") else "",
+                    settings.EMAIL_FROM_NAME,
                 )
                 logger.info(
                     "SMTP delivery succeeded: provider=smtp host=%s port=%s recipient=%s",
@@ -226,7 +233,9 @@ class NotificationService:
         elif provider == "resend" and settings.RESEND_API_KEY:
             try:
                 payload: dict = {
-                    "from": settings.EMAIL_FROM,
+                    "from": email.utils.formataddr((settings.EMAIL_FROM_NAME or "Gmac Group", settings.EMAIL_FROM))
+                    if "<" not in settings.EMAIL_FROM
+                    else settings.EMAIL_FROM,
                     "to": [to],
                     "subject": subject,
                     "text": body,
@@ -259,33 +268,44 @@ class NotificationService:
         self._print_dev_fallback("DEV - NO EMAIL PROVIDER CONFIGURED", to, subject, body)
         return True
 
-    async def notify_contact_request(self, name: str, email: str, subject: str, message: str):
+    async def notify_error_alert(self, subject: str, body: str) -> bool:
+        """Email the technical contact about an API failure."""
+        settings = get_settings()
+        to = settings.ALERT_EMAIL or settings.OPERATIONS_EMAIL
+        if not to:
+            return False
+        return await self.send_email(to, f"[Website alert] {subject}", body)
+
+    async def notify_contact_request(
+        self, name: str, email: str, subject: str, message: str, organization: str | None = None
+    ):
         settings = get_settings()
         deliveries = []
         if settings.OPERATIONS_EMAIL:
             deliveries.append(
                 self.send_email(
                     settings.OPERATIONS_EMAIL,
-                    f"[GMAC GROUP FEEDBACK] {subject}",
-                    f"GMAC GROUP FEEDBACK SUBMISSION\n\n"
+                    f"[Website enquiry] {subject}",
+                    f"New enquiry from the website\n\n"
                     f"From: {name} <{email}>\n"
+                    f"Organisation: {organization or 'Not given'}\n"
                     f"Subject: {subject}\n\n"
                     f"Message:\n{message}",
                     reply_to=email,
                 )
             )
 
+        # The acknowledgement deliberately does not repeat the visitor's message,
+        # so the form cannot be used to send arbitrary text to arbitrary addresses.
         deliveries.append(
             self.send_email(
                 email,
-                f"[GMAC GROUP] Feedback received",
-                f"GMAC GROUP FEEDBACK CONFIRMATION\n\n"
-                f"Hi {name},\n\n"
-                "Thank you for contacting GMAC GROUP. We have received your message "
-                "and a member of our team will get back to you.\n\n"
-                f"Feedback subject: {subject}\n"
-                f"Your message:\n{message}\n\n"
-                "Best,\nThe GMAC GROUP Team",
+                "We have received your message",
+                f"Hello {name},\n\n"
+                "Thank you for contacting Gmac Group. We have received your message "
+                "and the right member of our team will reply to you.\n\n"
+                "Gmac Group\n"
+                "info@gmac-group.com",
             )
         )
         await asyncio.gather(*deliveries)
@@ -298,7 +318,7 @@ class NotificationService:
 
     async def notify_member_registration(self, email: str, name: str, role: str):
         await self.notify_operations(
-            "New GMAC GROUP member registration",
+            "New Gmac Group member registration",
             f"Name: {name}\nEmail: {email}\nRole: {role}",
         )
 
@@ -323,11 +343,11 @@ class NotificationService:
         support_email = settings.OPERATIONS_EMAIL or "info@gmac-group.com"
         first_name = name.split()[0] if name else "there"
 
-        subject = f"Hi {first_name}, you are in - GMAC GROUP"
+        subject = f"Hi {first_name}, you are in - Gmac Group"
 
         plain_text = (
             f"Hi {first_name},\n\n"
-            f"Your GMAC GROUP account is ready.\n\n"
+            f"Your Gmac Group account is ready.\n\n"
             f"Account details:\n"
             f"  Name:   {name}\n"
             f"  Email:  {email}\n"
@@ -339,8 +359,8 @@ class NotificationService:
             f"  Research:            {research_url}\n\n"
             f"Questions? Just reply to this email or write to {support_email}.\n\n"
             f"Best,\n"
-            f"The GMAC GROUP Team\n"
-            f"Accra, Ghana"
+            f"The Gmac Group Team\n"
+            f"gmac-group.com"
         )
 
         await self.send_email(email, subject, plain_text)
@@ -361,7 +381,7 @@ class NotificationService:
             f"Track the status from your member dashboard:\n"
             f"{settings.FRONTEND_URL.rstrip('/')}/dashboard\n\n"
             f"Best,\n"
-            f"The GMAC GROUP Team"
+            f"The Gmac Group Team"
         )
         await self.send_email(email, subject, plain_text)
         await self.notify_operations(
@@ -385,7 +405,7 @@ class NotificationService:
             f"Check your cohort schedule in your portal dashboard:\n"
             f"{settings.FRONTEND_URL.rstrip('/')}/dashboard\n\n"
             f"Best,\n"
-            f"The GMAC GROUP Team"
+            f"The Gmac Group Team"
         )
         await self.send_email(email, subject, plain_text)
         await self.notify_operations(
@@ -407,8 +427,7 @@ class NotificationService:
                 "Thank you for subscribing to GMAC Insights. You will receive our "
                 "periodic briefings on workforce trends, research, and fellowship cohorts.\n\n"
                 "Best,\n"
-                "The GMAC GROUP Team\n"
-                "Accra, Ghana"
+                "Gmac Group"
             ),
         )
 
@@ -421,14 +440,14 @@ class NotificationService:
             f"Hi {first_name},\n\n"
             f"The status of your application for '{title}' has been updated to: {status_label}.\n\n"
             f"Best,\n"
-            f"The GMAC GROUP Team"
+            f"The Gmac Group Team"
         )
         deliveries = [self.send_email(email, subject, plain_text)]
         if settings.OPERATIONS_EMAIL and settings.OPERATIONS_EMAIL.lower() != email.lower():
             deliveries.append(
                 self.send_email(
                     settings.OPERATIONS_EMAIL,
-                    f"[GMAC GROUP] Application status updated: {title}",
+                    f"[Gmac Group] Application status updated: {title}",
                     f"APPLICATION STATUS UPDATE\n\n"
                     f"Applicant: {name} <{email}>\n"
                     f"Opportunity: {title}\n"
@@ -452,12 +471,12 @@ class NotificationService:
             f"Update on your programme enrolment for {title}",
             f"Hi {first_name},\n\n"
             f"The status of your enrolment for '{title}' has been updated to: {status_label}.\n\n"
-            "Best,\nThe GMAC GROUP Team",
+            "Best,\nThe Gmac Group Team",
         )
         if settings.OPERATIONS_EMAIL and settings.OPERATIONS_EMAIL.lower() != email.lower():
             await self.send_email(
                 settings.OPERATIONS_EMAIL,
-                f"[GMAC GROUP] Programme enrolment status updated: {title}",
+                f"[Gmac Group] Programme enrolment status updated: {title}",
                 f"PROGRAMME ENROLMENT STATUS UPDATE\n\n"
                 f"Member: {name} <{email}>\n"
                 f"Programme: {title}\n"
@@ -470,17 +489,17 @@ class NotificationService:
         reset_link = f"{settings.FRONTEND_URL.rstrip('/')}/reset-password?token={reset_token}"
         first_name = name.split()[0] if name else "there"
 
-        subject = "Here is your GMAC GROUP password reset link"
+        subject = "Here is your Gmac Group password reset link"
 
         plain_text = (
             f"Hi {first_name},\n\n"
-            f"We got a request to reset the password on your GMAC GROUP account ({email}).\n\n"
+            f"We got a request to reset the password on your Gmac Group account ({email}).\n\n"
             f"Click the link below to choose a new password. It expires in 15 minutes:\n\n"
             f"{reset_link}\n\n"
             f"If you did not ask for this, just ignore this email. Your account is safe.\n\n"
             f"Best,\n"
-            f"The GMAC GROUP Team\n"
-            f"Accra, Ghana"
+            f"The Gmac Group Team\n"
+            f"gmac-group.com"
         )
 
         await self.send_email(email, subject, plain_text)

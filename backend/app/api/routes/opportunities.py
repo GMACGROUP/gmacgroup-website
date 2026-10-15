@@ -10,6 +10,7 @@ from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session
 from app.api.dependencies import get_current_user, get_optional_user
 from app.core.database import get_db
+from app.core.ratelimit import rate_limit
 from app.models.opportunity import Application
 from app.models.user import User
 from app.services.notifications import notification_service
@@ -18,15 +19,16 @@ from app.schemas.opportunity import (
     ApplicationCreate,
     ApplicationOut,
 )
-from app.data import OPPORTUNITIES
+from app.services import catalogue
 
 router = APIRouter()
 
 
 @router.get("/", response_model=List[OpportunityOut])
-async def list_opportunities(type: str | None = Query(default=None)):
-    """List opportunities, optionally filtered by type."""
-    return [item for item in OPPORTUNITIES if type is None or item["type"] == type]
+def list_opportunities(type: str | None = Query(default=None), db: Session = Depends(get_db)):
+    """List published opportunities, optionally filtered by type."""
+    items = [catalogue.to_public(i) for i in catalogue.list_items(db, "opportunity")]
+    return [item for item in items if type is None or item.get("type") == type]
 
 
 @router.get("/my-applications", response_model=List[ApplicationOut])
@@ -45,12 +47,9 @@ def list_my_applications(
 
 
 @router.get("/{opportunity_id}", response_model=OpportunityOut)
-async def get_opportunity(opportunity_id: str):
-    """Get a single opportunity by id."""
-    opportunity = next((item for item in OPPORTUNITIES if item["id"] == opportunity_id), None)
-    if opportunity is None:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Opportunity not found")
-    return opportunity
+def get_opportunity(opportunity_id: str, db: Session = Depends(get_db)):
+    """Get a single published opportunity by id."""
+    return catalogue.to_public(catalogue.get_item(db, "opportunity", opportunity_id))
 
 
 @router.post("/{opportunity_id}/apply", response_model=ApplicationOut)
@@ -59,12 +58,12 @@ async def apply_to_opportunity(
     payload: ApplicationCreate,
     current_user: Optional[dict] = Depends(get_optional_user),
     db: Session = Depends(get_db),
+    _: None = Depends(rate_limit("apply", limit=10, window_seconds=600)),
 ):
     """Submit an application for an authenticated user or guest applicant."""
-    opportunity = next((item for item in OPPORTUNITIES if item["id"] == opportunity_id), None)
-    if opportunity is None:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Opportunity not found")
-    if opportunity.get("deadline") and datetime.fromisoformat(opportunity["deadline"].replace("Z", "+00:00")) < datetime.now(timezone.utc):
+    item = catalogue.get_item(db, "opportunity", opportunity_id)
+    opportunity = catalogue.to_public(item)
+    if catalogue.is_closed(item):
         raise HTTPException(status_code=status.HTTP_410_GONE, detail="This opportunity is closed")
     offers = opportunity.get("offers", [])
     offer = next((item for item in offers if item["type"] == payload.offer_type.value), None)

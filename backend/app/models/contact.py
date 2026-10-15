@@ -19,6 +19,8 @@ class ContactRequest(Base):
     )
     name: Mapped[str] = mapped_column(String)
     email: Mapped[str] = mapped_column(String)
+    organization: Mapped[str | None] = mapped_column(String, nullable=True)
+    topic: Mapped[str | None] = mapped_column(String, nullable=True)
     subject: Mapped[str] = mapped_column(String)
     message: Mapped[str] = mapped_column(String)
     status: Mapped[str] = mapped_column(String, default="received")

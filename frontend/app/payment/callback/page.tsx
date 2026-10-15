@@ -36,21 +36,26 @@ export default function PaymentCallbackPage() {
   }, []);
 
   return (
-    <main className="min-h-[70vh] bg-slate-50 flex items-center justify-center px-4 py-16">
-      <section className="w-full max-w-lg bg-white border border-slate-200 rounded-3xl shadow-card p-8 text-center">
-        <div className={`mx-auto mb-5 w-14 h-14 rounded-full flex items-center justify-center text-2xl ${success === true ? "bg-emerald-50 text-emerald-700" : success === false ? "bg-red-50 text-brand-red" : "bg-slate-100 text-slate-500"}`}>
-          {success === true ? "✓" : success === false ? "!" : "…"}
-        </div>
-        <h1 className="text-2xl font-bold text-slate-900 font-serif">
-          {success === true ? "Payment confirmed" : success === false ? "Payment not confirmed" : "Checking payment"}
+    <section className="border-b border-rule">
+      <div className="wrap min-h-[55vh] py-20 sm:py-28">
+        <p className="text-[12px] font-medium uppercase tracking-label text-clay">Payment</p>
+        <h1 className="display-lg mt-4" role="status">
+          {success === true ? "Payment confirmed." : success === false ? "Payment not confirmed." : "Checking your payment..."}
         </h1>
-        <p className="mt-3 text-sm text-slate-600">{message}</p>
+        <p className="mt-5 max-w-[56ch] text-[17px] leading-relaxed text-ink-600">{message}</p>
+        {success === false && (
+          <p className="mt-3 max-w-[56ch] text-[15px] text-ink-500">
+            If money left your account, keep your Flutterwave receipt and{" "}
+            <Link href="/contact?topic=programmes&subject=Payment%20query" className="text-accent underline underline-offset-4">contact us</Link>; we will
+            sort it out.
+          </p>
+        )}
         {success !== null && (
-          <Link href={success ? "/dashboard" : "/programmes"} className="inline-block mt-6 px-5 py-3 rounded-xl bg-brand-navy text-white text-sm font-bold">
-            {success ? "Open dashboard" : "Return to programmes"}
+          <Link href={success ? "/dashboard" : "/programmes"} className="btn-primary mt-10">
+            {success ? "Go to your account" : "Back to programmes"}
           </Link>
         )}
-      </section>
-    </main>
+      </div>
+    </section>
   );
 }

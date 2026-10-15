@@ -15,137 +15,112 @@ export interface UserProfile {
 }
 
 interface AuthResponse {
-  access_token: string;
-  token_type: string;
   user: UserProfile;
 }
 
-const TOKEN_KEY = "gmac_auth_token";
+// The session itself is an httpOnly cookie set by the API. Only the (non-secret)
+// profile is cached in the browser, so the navbar can show the name instantly.
 const USER_KEY = "gmac_auth_user";
+const LEGACY_TOKEN_KEY = "gmac_auth_token";
 const AUTH_CHANGED_EVENT = "gmac-auth-changed";
+
+function cache(user: UserProfile | null) {
+  try {
+    if (user) localStorage.setItem(USER_KEY, JSON.stringify(user));
+    else localStorage.removeItem(USER_KEY);
+    localStorage.removeItem(LEGACY_TOKEN_KEY);
+  } catch {}
+}
 
 function useAuthState() {
   // Keep the initial render identical on the server and in the browser.
-  // Browser storage is restored after hydration in the effect below.
   const [user, setUser] = useState<UserProfile | null>(null);
-  const [token, setToken] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
 
   const refreshUser = useCallback(async (): Promise<UserProfile | null> => {
     try {
       const freshUser = await apiClient.get<UserProfile>("/auth/me");
       setUser(freshUser);
-      localStorage.setItem(USER_KEY, JSON.stringify(freshUser));
+      cache(freshUser);
       return freshUser;
     } catch {
+      setUser(null);
+      cache(null);
       return null;
     }
   }, []);
 
-  // On mount: restore and silently verify the stored session.
+  // On mount: show the cached profile, then confirm the session with the API.
   useEffect(() => {
-    const storedToken = localStorage.getItem(TOKEN_KEY);
-    const storedUser = localStorage.getItem(USER_KEY);
-
-    if (!storedToken || !storedUser) {
-      setLoading(false);
-      return;
-    }
-
     try {
-      setUser(JSON.parse(storedUser) as UserProfile);
-      setToken(storedToken);
-    } catch {
-      localStorage.removeItem(TOKEN_KEY);
-      localStorage.removeItem(USER_KEY);
-      setLoading(false);
-      return;
-    }
-
+      const stored = localStorage.getItem(USER_KEY);
+      if (stored) setUser(JSON.parse(stored) as UserProfile);
+    } catch {}
     refreshUser().finally(() => setLoading(false));
   }, [refreshUser]);
 
   useEffect(() => {
-    const clearAuthState = () => {
-      setUser(null);
-      setToken(null);
+    const onChange = () => {
+      try {
+        const stored = localStorage.getItem(USER_KEY);
+        setUser(stored ? (JSON.parse(stored) as UserProfile) : null);
+      } catch {
+        setUser(null);
+      }
       setLoading(false);
     };
-
-    const handleStorageChange = (event: StorageEvent) => {
-      if (event.key === TOKEN_KEY || event.key === USER_KEY) {
-        if (!localStorage.getItem(TOKEN_KEY) || !localStorage.getItem(USER_KEY)) {
-          clearAuthState();
-        }
-      }
+    const onStorage = (event: StorageEvent) => {
+      if (event.key === USER_KEY) onChange();
     };
-
-    window.addEventListener(AUTH_CHANGED_EVENT, clearAuthState);
-    window.addEventListener("storage", handleStorageChange);
+    window.addEventListener(AUTH_CHANGED_EVENT, onChange);
+    window.addEventListener("storage", onStorage);
     return () => {
-      window.removeEventListener(AUTH_CHANGED_EVENT, clearAuthState);
-      window.removeEventListener("storage", handleStorageChange);
+      window.removeEventListener(AUTH_CHANGED_EVENT, onChange);
+      window.removeEventListener("storage", onStorage);
     };
   }, []);
 
   const login = useCallback(async (email: string, password: string): Promise<UserProfile> => {
-    // Don't set loading=true here — it hides the user avatar in the navbar
-    // on redirect. The credential exchange is fast enough.
     const res = await apiClient.post<AuthResponse>("/auth/login", {
       email: email.trim().toLowerCase(),
       password,
     });
-
-    localStorage.setItem(TOKEN_KEY, res.access_token);
-    localStorage.setItem(USER_KEY, JSON.stringify(res.user));
     setUser(res.user);
-    setToken(res.access_token);
+    cache(res.user);
     setLoading(false);
     return res.user;
   }, []);
 
   const register = useCallback(
-    async (payload: {
-      full_name: string;
-      email: string;
-      password: string;
-      role?: string;
-    }): Promise<UserProfile> => {
+    async (payload: { full_name: string; email: string; password: string; role?: string }): Promise<UserProfile> => {
       const res = await apiClient.post<AuthResponse>("/auth/register", {
         full_name: payload.full_name,
         email: payload.email.trim().toLowerCase(),
         password: payload.password,
         role: payload.role || "student",
       });
-
-      localStorage.setItem(TOKEN_KEY, res.access_token);
-      localStorage.setItem(USER_KEY, JSON.stringify(res.user));
       setUser(res.user);
-      setToken(res.access_token);
+      cache(res.user);
       setLoading(false);
       return res.user;
     },
     []
   );
 
-  const logout = useCallback(() => {
-    localStorage.removeItem(TOKEN_KEY);
-    localStorage.removeItem(USER_KEY);
+  const logout = useCallback(async () => {
+    try {
+      await apiClient.post("/auth/logout");
+    } catch {}
     setUser(null);
-    setToken(null);
+    cache(null);
     window.dispatchEvent(new Event(AUTH_CHANGED_EVENT));
   }, []);
 
   const updateProfile = useCallback(
-    async (data: {
-      full_name?: string;
-      bio?: string;
-      organization?: string;
-      phone?: string;
-    }): Promise<UserProfile> => {
+    async (data: { full_name?: string; bio?: string; organization?: string; phone?: string }): Promise<UserProfile> => {
       const updated = await apiClient.put<UserProfile>("/users/me", data);
       setUser(updated);
-      localStorage.setItem(USER_KEY, JSON.stringify(updated));
+      cache(updated);
       return updated;
     },
     []
@@ -153,7 +128,6 @@ function useAuthState() {
 
   return {
     user,
-    token,
     loading,
     login,
     register,

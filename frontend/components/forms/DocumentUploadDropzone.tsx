@@ -1,14 +1,6 @@
 "use client";
 
-import React, { useState, useRef } from "react";
-import {
-  CloudArrowUpIcon,
-  CheckCircleIcon,
-  XMarkIcon,
-  FileTextIcon,
-  EyeIcon,
-  DocumentIcon,
-} from "@/components/common/Icons";
+import { useRef, useState } from "react";
 
 interface DocumentUploadDropzoneProps {
   label?: string;
@@ -18,289 +10,141 @@ interface DocumentUploadDropzoneProps {
   folder?: string;
 }
 
-const MAX_SIZE_BYTES = 10 * 1024 * 1024; // 10MB
+const MAX_SIZE_BYTES = 10 * 1024 * 1024;
 const ALLOWED_EXTENSIONS = [".pdf", ".docx", ".doc"];
+const API_BASE = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000/api/v1";
 
+/**
+ * CV upload. Files go to private storage and are only visible to Gmac's
+ * reviewers, so the applicant sees a confirmation rather than a preview link.
+ * Applicants can paste an https link instead (for example a portfolio).
+ */
 export function DocumentUploadDropzone({
-  label = "Curriculum Vitae / Resume",
+  label = "CV or résumé",
   required = false,
   value = "",
   onChange,
   folder = "resumes",
 }: DocumentUploadDropzoneProps) {
-  const [isDragging, setIsDragging] = useState(false);
+  const input = useRef<HTMLInputElement>(null);
+  const [dragging, setDragging] = useState(false);
   const [uploading, setUploading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [uploadedFile, setUploadedFile] = useState<{
-    name: string;
-    sizeFormatted: string;
-    url: string;
-    isInternal: boolean;
-  } | null>(() => {
-    if (value) {
-      return {
-        name: value.split("/").pop() || "Document",
-        sizeFormatted: "Uploaded",
-        url: value,
-        isInternal: value.startsWith("/api/v1/uploads/"),
-      };
-    }
-    return null;
-  });
+  const [fileName, setFileName] = useState<string | null>(
+    value && value.startsWith("/api/v1/uploads/") ? decodeURIComponent(value.split("?")[0].split("/").pop() || "") : null,
+  );
+  const [mode, setMode] = useState<"file" | "url">(value && value.startsWith("https://") ? "url" : "file");
+  const [link, setLink] = useState(value.startsWith("https://") ? value : "");
 
-  const [mode, setMode] = useState<"file" | "url">("file");
-  const [manualUrl, setManualUrl] = useState(value || "");
-  const fileInputRef = useRef<HTMLInputElement>(null);
-
-  const API_BASE = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000/api/v1";
-
-  const getFullFileUrl = (url: string) => {
-    if (url.startsWith("http://") || url.startsWith("https://")) {
-      return url;
-    }
-    // Relative API route
-    const base = API_BASE.replace(/\/api\/v1$/, "");
-    return `${base}${url}`;
-  };
-
-  const handleFile = async (file: File) => {
+  async function handleFile(file: File) {
     setError(null);
-
-    // Validate size
-    if (file.size > MAX_SIZE_BYTES) {
-      setError("File is too large. Maximum file size allowed is 10MB.");
-      return;
-    }
-
-    // Validate format
-    const ext = "." + file.name.split(".").pop()?.toLowerCase();
-    if (!ALLOWED_EXTENSIONS.includes(ext)) {
-      setError("Unsupported format. Please upload a PDF (.pdf) or Word document (.docx, .doc).");
-      return;
-    }
-
+    if (file.size > MAX_SIZE_BYTES) return setError("That file is larger than 10 MB. Please upload a smaller copy.");
+    const ext = "." + (file.name.split(".").pop() || "").toLowerCase();
+    if (!ALLOWED_EXTENSIONS.includes(ext)) return setError("Please upload a PDF or Word document (.pdf, .docx, .doc).");
     setUploading(true);
-
     try {
-      const formData = new FormData();
-      formData.append("file", file);
-      formData.append("folder", folder);
-
-      const res = await fetch(`${API_BASE}/uploads/document`, {
-        method: "POST",
-        body: formData,
-      });
-
-      if (!res.ok) {
-        const errorData = await res.json().catch(() => null);
-        throw new Error(errorData?.detail || `Upload failed with status ${res.status}`);
-      }
-
-      const data = await res.json();
-      const relativeUrl = data.file_url;
-
-      setUploadedFile({
-        name: data.filename || file.name,
-        sizeFormatted: data.size_formatted || `${(file.size / (1024 * 1024)).toFixed(1)} MB`,
-        url: relativeUrl,
-        isInternal: true,
-      });
-
-      onChange(relativeUrl);
+      const body = new FormData();
+      body.append("file", file);
+      body.append("folder", folder);
+      const res = await fetch(`${API_BASE}/uploads/document`, { method: "POST", body });
+      const data = await res.json().catch(() => null);
+      if (!res.ok) throw new Error(data?.detail || "Upload failed. Please try again.");
+      setFileName(data.filename || file.name);
+      onChange(data.file_url);
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Document upload failed. Please try again.");
+      setError(err instanceof Error ? err.message : "Upload failed. Please try again.");
     } finally {
       setUploading(false);
     }
-  };
+  }
 
-  const onDragOver = (e: React.DragEvent) => {
-    e.preventDefault();
-    setIsDragging(true);
-  };
-
-  const onDragLeave = (e: React.DragEvent) => {
-    e.preventDefault();
-    setIsDragging(false);
-  };
-
-  const onDrop = (e: React.DragEvent) => {
-    e.preventDefault();
-    setIsDragging(false);
-    if (e.dataTransfer.files && e.dataTransfer.files.length > 0) {
-      handleFile(e.dataTransfer.files[0]);
-    }
-  };
-
-  const handleManualUrlSubmit = (url: string) => {
-    setManualUrl(url);
-    onChange(url);
-    if (url.trim()) {
-      setUploadedFile({
-        name: url.length > 40 ? url.substring(0, 37) + "..." : url,
-        sizeFormatted: "External Link",
-        url: url.trim(),
-        isInternal: false,
-      });
-    } else {
-      setUploadedFile(null);
-    }
-  };
-
-  const handleRemove = () => {
-    setUploadedFile(null);
-    setManualUrl("");
+  function clear() {
+    setFileName(null);
     onChange("");
-    if (fileInputRef.current) {
-      fileInputRef.current.value = "";
-    }
-  };
+    if (input.current) input.current.value = "";
+  }
 
   return (
-    <div className="space-y-2">
-      <div className="flex items-center justify-between">
-        <label className="block text-xs font-bold text-slate-800 uppercase tracking-wider">
-          {label} {required && <span className="text-brand-red">*</span>}
-        </label>
-        <div className="flex items-center gap-1 bg-slate-100 p-0.5 rounded-lg text-[10px] font-semibold">
-          <button
-            type="button"
-            onClick={() => setMode("file")}
-            className={`px-2 py-0.5 rounded-md transition-all ${
-              mode === "file"
-                ? "bg-white text-brand-navy shadow-xs font-bold"
-                : "text-slate-500 hover:text-slate-900"
-            }`}
-          >
-            Direct Upload
-          </button>
-          <button
-            type="button"
-            onClick={() => setMode("url")}
-            className={`px-2 py-0.5 rounded-md transition-all ${
-              mode === "url"
-                ? "bg-white text-brand-navy shadow-xs font-bold"
-                : "text-slate-500 hover:text-slate-900"
-            }`}
-          >
-            Cloud Link
-          </button>
-        </div>
+    <div>
+      <div className="flex items-baseline justify-between gap-4">
+        <span className="field-label">
+          {label} {required ? "*" : <span className="font-normal text-ink-400">(optional)</span>}
+        </span>
+        <button
+          type="button"
+          onClick={() => {
+            setMode(mode === "file" ? "url" : "file");
+            setError(null);
+          }}
+          className="text-sm text-accent underline-offset-4 hover:underline"
+        >
+          {mode === "file" ? "Paste a link instead" : "Upload a file instead"}
+        </button>
       </div>
 
-      {mode === "file" ? (
-        <div>
-          <input
-            ref={fileInputRef}
-            type="file"
-            accept=".pdf,.docx,.doc,application/pdf,application/vnd.openxmlformats-officedocument.wordprocessingml.document,application/msword"
-            onChange={(e) => {
-              if (e.target.files && e.target.files.length > 0) {
-                handleFile(e.target.files[0]);
-              }
-            }}
-            className="hidden"
-          />
-
-          {!uploadedFile && !uploading && (
-            <div
-              onDragOver={onDragOver}
-              onDragLeave={onDragLeave}
-              onDrop={onDrop}
-              onClick={() => fileInputRef.current?.click()}
-              className={`group relative cursor-pointer rounded-2xl border-2 border-dashed p-5 text-center transition-all duration-200 ${
-                isDragging
-                  ? "border-brand-navy bg-blue-50/70 scale-[1.01]"
-                  : "border-slate-300 bg-slate-50/80 hover:border-brand-navy/60 hover:bg-white"
-              }`}
-            >
-              <div className="mx-auto flex h-11 w-11 items-center justify-center rounded-xl bg-white text-brand-navy shadow-xs border border-slate-200 group-hover:scale-105 transition-transform">
-                <CloudArrowUpIcon className="h-6 w-6 text-brand-navy" />
-              </div>
-              <p className="mt-2.5 text-xs font-bold text-slate-800">
-                <span className="text-brand-navy group-hover:underline">Click to upload</span> or drag and drop
-              </p>
-              <p className="text-[11px] text-slate-500 mt-0.5 font-medium">
-                PDF, DOCX, or DOC (Maximum file size: 10MB)
-              </p>
-              <div className="mt-3 flex items-center justify-center gap-1.5">
-                <span className="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-bold bg-red-50 text-brand-red border border-red-200">
-                  PDF
-                </span>
-                <span className="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-bold bg-blue-50 text-brand-navy border border-blue-200">
-                  DOCX
-                </span>
-                <span className="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200">
-                  Secure Storage
-                </span>
-              </div>
-            </div>
-          )}
-
-          {uploading && (
-            <div className="rounded-2xl border border-blue-200 bg-blue-50/50 p-6 text-center space-y-3">
-              <div className="mx-auto h-8 w-8 animate-spin rounded-full border-2 border-brand-navy border-t-transparent" />
-              <p className="text-xs font-bold text-slate-900">Uploading and securing document...</p>
-              <div className="mx-auto h-1.5 w-48 overflow-hidden rounded-full bg-slate-200">
-                <div className="h-full w-2/3 animate-pulse rounded-full bg-brand-navy" />
-              </div>
-            </div>
-          )}
-
-          {uploadedFile && !uploading && (
-            <div className="flex items-center justify-between rounded-2xl border border-emerald-200 bg-emerald-50/40 p-3.5 shadow-xs">
-              <div className="flex items-center gap-3 overflow-hidden">
-                <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-emerald-100 text-emerald-700 border border-emerald-200">
-                  <DocumentIcon className="h-5 w-5 text-emerald-700" />
-                </div>
-                <div className="min-w-0 flex-1">
-                  <div className="flex items-center gap-1.5">
-                    <p className="truncate text-xs font-bold text-slate-900">{uploadedFile.name}</p>
-                    <CheckCircleIcon className="h-4 w-4 shrink-0 text-emerald-600" />
-                  </div>
-                  <p className="text-[11px] text-slate-500 font-medium">{uploadedFile.sizeFormatted} • Ready</p>
-                </div>
-              </div>
-
-              <div className="flex items-center gap-2 shrink-0">
-                <a
-                  href={getFullFileUrl(uploadedFile.url)}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="flex items-center gap-1 rounded-lg border border-slate-200 bg-white px-2.5 py-1.5 text-[11px] font-bold text-brand-navy hover:bg-slate-50 shadow-2xs transition-colors"
-                >
-                  <EyeIcon className="h-3.5 w-3.5 text-brand-navy" />
-                  <span>Preview</span>
-                </a>
-                <button
-                  type="button"
-                  onClick={handleRemove}
-                  className="rounded-lg p-1.5 text-slate-400 hover:bg-white hover:text-red-600 transition-colors"
-                  aria-label="Remove document"
-                >
-                  <XMarkIcon className="h-4 w-4" />
-                </button>
-              </div>
-            </div>
-          )}
+      {mode === "url" ? (
+        <input
+          type="url"
+          inputMode="url"
+          placeholder="https://"
+          className="field"
+          value={link}
+          onChange={(e) => {
+            setLink(e.target.value);
+            onChange(e.target.value.startsWith("https://") ? e.target.value : "");
+          }}
+          aria-describedby="cv-help"
+        />
+      ) : fileName ? (
+        <div className="mt-1 flex items-center justify-between gap-4 border border-ink/20 bg-white px-4 py-3">
+          <p className="min-w-0 truncate text-sm text-ink">
+            <span className="mr-2 text-success" aria-hidden="true">✓</span>
+            {fileName}
+          </p>
+          <button type="button" onClick={clear} className="shrink-0 text-sm text-ink-500 hover:text-danger">
+            Remove
+          </button>
         </div>
       ) : (
-        <div className="space-y-2">
+        <label
+          onDragOver={(e) => {
+            e.preventDefault();
+            setDragging(true);
+          }}
+          onDragLeave={() => setDragging(false)}
+          onDrop={(e) => {
+            e.preventDefault();
+            setDragging(false);
+            const f = e.dataTransfer.files?.[0];
+            if (f) handleFile(f);
+          }}
+          className={`mt-1 flex cursor-pointer flex-col items-center justify-center border border-dashed px-4 py-7 text-center transition-colors ${
+            dragging ? "border-accent bg-accent/5" : "border-ink/25 bg-white hover:border-ink/50"
+          }`}
+        >
           <input
-            type="url"
-            value={manualUrl}
-            onChange={(e) => handleManualUrlSubmit(e.target.value)}
-            placeholder="https://drive.google.com/... or https://dropbox.com/..."
-            className="w-full px-3.5 py-2.5 text-xs sm:text-sm rounded-xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-brand-navy/30 focus:border-brand-navy bg-slate-50 focus:bg-white transition-all text-slate-900"
+            ref={input}
+            type="file"
+            accept=".pdf,.doc,.docx,application/pdf,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+            className="sr-only"
+            onChange={(e) => {
+              const f = e.target.files?.[0];
+              if (f) handleFile(f);
+            }}
+            aria-describedby="cv-help"
           />
-          <p className="text-[11px] text-slate-500">
-            Please ensure link sharing permissions are set to &quot;Anyone with the link can view&quot;.
-          </p>
-        </div>
+          <span className="text-sm font-medium text-ink">{uploading ? "Uploading..." : "Choose a file or drop it here"}</span>
+          <span className="mt-1 text-[13px] text-ink-400">PDF or Word, up to 10 MB</span>
+        </label>
       )}
 
+      <p id="cv-help" className="mt-1.5 text-[13px] text-ink-400">
+        {mode === "url"
+          ? "A link to your CV or portfolio. It must start with https://"
+          : "Stored privately. Only the people reviewing your application can open it."}
+      </p>
       {error && (
-        <p className="rounded-xl border border-red-200 bg-red-50 p-2.5 text-xs font-semibold text-brand-red text-center">
+        <p role="alert" className="mt-1.5 text-sm text-danger">
           {error}
         </p>
       )}

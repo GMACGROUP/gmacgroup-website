@@ -54,91 +54,51 @@ def test_get_service_not_found():
 # Programmes
 # ---------------------------------------------------------------------------
 
-def test_list_programmes():
+def test_list_programmes_hides_drafts():
     response = client.get("/api/v1/programmes/")
     assert response.status_code == 200
     data = response.json()
     assert isinstance(data, list)
-    assert len(data) >= 2
+    # Seeded placeholder programmes are drafts until an admin publishes them.
+    assert all(item["id"] != "programme-career-readiness" for item in data)
 
 
 def test_filter_programmes_by_category():
     response = client.get("/api/v1/programmes/?category=student")
     assert response.status_code == 200
-    data = response.json()
-    assert all(item["category"] == "student" for item in data)
+    assert all(item["category"] == "student" for item in response.json())
 
 
-def test_get_programme_by_id():
-    response = client.get("/api/v1/programmes/programme-career-readiness")
-    assert response.status_code == 200
-    data = response.json()
-    assert data["id"] == "programme-career-readiness"
-    assert data["category"] == "student"
+def test_draft_programme_not_found_publicly():
+    assert client.get("/api/v1/programmes/programme-career-readiness").status_code == 404
+    assert client.get("/api/v1/programmes/non-existent-id").status_code == 404
 
 
-def test_get_programme_not_found():
-    response = client.get("/api/v1/programmes/non-existent-id")
-    assert response.status_code == 404
-
-
-# ---------------------------------------------------------------------------
-# Opportunities
-# ---------------------------------------------------------------------------
-
-def test_list_opportunities():
+def test_list_opportunities_hides_drafts():
     response = client.get("/api/v1/opportunities/")
     assert response.status_code == 200
-    data = response.json()
-    assert isinstance(data, list)
-    assert len(data) >= 1
+    assert all(item["id"] != "opportunity-research-internship" for item in response.json())
 
 
 def test_filter_opportunities_by_type():
     response = client.get("/api/v1/opportunities/?type=internship")
     assert response.status_code == 200
-    data = response.json()
-    assert all(item["type"] == "internship" for item in data)
+    assert all(item["type"] == "internship" for item in response.json())
 
 
-def test_get_opportunity_by_id():
-    response = client.get("/api/v1/opportunities/opportunity-research-internship")
-    assert response.status_code == 200
-    data = response.json()
-    assert data["id"] == "opportunity-research-internship"
-    assert data["type"] == "internship"
-
-
-def test_get_opportunity_not_found():
-    response = client.get("/api/v1/opportunities/non-existent-id")
-    assert response.status_code == 404
-
-
-# ---------------------------------------------------------------------------
-# Research
-# ---------------------------------------------------------------------------
-
-def test_list_research_projects():
-    response = client.get("/api/v1/research/projects")
-    assert response.status_code == 200
-    data = response.json()
-    assert isinstance(data, list)
-    assert len(data) >= 1
-    assert "title" in data[0]
+def test_draft_opportunity_not_found_publicly():
+    assert client.get("/api/v1/opportunities/opportunity-research-internship").status_code == 404
 
 
 def test_list_research_publications():
     response = client.get("/api/v1/research/publications")
     assert response.status_code == 200
-    data = response.json()
-    assert isinstance(data, list)
+    assert isinstance(response.json(), list)
 
 
-def test_list_research_experts():
-    response = client.get("/api/v1/research/experts")
-    assert response.status_code == 200
-    data = response.json()
-    assert isinstance(data, list)
+def test_invented_research_endpoints_removed():
+    assert client.get("/api/v1/research/experts").status_code == 404
+    assert client.get("/api/v1/research/projects").status_code == 404
 
 
 # ---------------------------------------------------------------------------
@@ -314,9 +274,16 @@ def test_admin_programme_and_opportunity_crud():
     prog_id = created_prog["id"]
     assert "AI in Evidence" in created_prog["title"]
 
-    # Verify programme appears in public list
-    list_res = client.get("/api/v1/programmes/")
-    assert any(p["id"] == prog_id for p in list_res.json())
+    # New programmes start as drafts: hidden publicly, visible to admins
+    assert all(p["id"] != prog_id for p in client.get("/api/v1/programmes/").json())
+    drafts = client.get("/api/v1/admin/catalogue/programmes", headers=headers).json()
+    assert any(p["id"] == prog_id and p["is_published"] is False for p in drafts)
+
+    # Publish it, then it appears publicly
+    pub = client.patch(f"/api/v1/admin/catalogue/programmes/{prog_id}", headers=headers, json={"is_published": True})
+    assert pub.status_code == 200 and pub.json()["is_published"] is True
+    assert any(p["id"] == prog_id for p in client.get("/api/v1/programmes/").json())
+    assert client.get(f"/api/v1/programmes/{prog_id}").status_code == 200
 
     # 2. Update programme
     update_res = client.put(
@@ -349,8 +316,129 @@ def test_admin_programme_and_opportunity_crud():
     created_opp = opp_res.json()
     opp_id = created_opp["id"]
 
+    # Edits persist in the database
+    upd = client.put(f"/api/v1/admin/opportunities/{opp_id}", headers=headers, json={"location": "Remote"})
+    assert upd.json()["location"] == "Remote" and upd.json()["title"] == "Senior Econometrics Research Fellow"
+
+    # Publications: create, validate https links, publish
+    bad = client.post("/api/v1/admin/publications", headers=headers, json={"title": "Test brief", "url": "http://x.org"})
+    assert bad.status_code == 422
+    pub_res = client.post(
+        "/api/v1/admin/publications",
+        headers=headers,
+        json={"title": "Test brief", "type": "policy_brief", "authors": ["Gmac Group"], "published_at": "2026-09-01", "url": "https://example.org/brief.pdf"},
+    )
+    assert pub_res.status_code == 201
+    pub_id = pub_res.json()["id"]
+    client.patch(f"/api/v1/admin/catalogue/publications/{pub_id}", headers=headers, json={"is_published": True})
+    assert any(p["id"] == pub_id for p in client.get("/api/v1/research/publications").json())
+    assert client.delete(f"/api/v1/admin/catalogue/publications/{pub_id}", headers=headers).status_code == 200
+
+    # Non-admins cannot list drafts
+    client.cookies.clear()
+    assert client.get("/api/v1/admin/catalogue/programmes").status_code in (401, 403)
+
     # 5. Delete opportunity
     del_opp_res = client.delete(f"/api/v1/admin/opportunities/{opp_id}", headers=headers)
     assert del_opp_res.status_code == 200
 
 
+
+
+def test_admin_gets_short_lived_signed_document_link():
+    import asyncio
+
+    from app.services.storage.service import storage_service
+
+    pdf = b"%PDF-1.4\n%%EOF"
+    up = client.post("/api/v1/uploads/document", files={"file": ("cv.pdf", pdf, "application/pdf")}).json()
+    signed = asyncio.run(storage_service.signed_document_url(up["file_url"]))
+    assert signed and signed.startswith("/api/v1/uploads/signed/")
+    res = client.get(signed)
+    assert res.status_code == 200 and res.content == pdf
+    assert client.get("/api/v1/uploads/signed/not-a-token").status_code == 404
+    # Links to anything that is not one of our stored documents are never signed
+    assert asyncio.run(storage_service.signed_document_url("/etc/passwd")) is None
+    assert asyncio.run(storage_service.signed_document_url("/api/v1/uploads/files/../../x")) is None
+
+
+def test_cannot_self_register_as_admin():
+    from app.core import ratelimit
+
+    ratelimit._hits.clear()
+    res = client.post(
+        "/api/v1/auth/register",
+        json={"email": "would-be-admin@example.com", "password": "longenough123", "role": "admin"},
+    )
+    assert res.status_code in (201, 400)
+    login = client.post("/api/v1/auth/login", json={"email": "would-be-admin@example.com", "password": "longenough123"})
+    token = login.json()["access_token"]
+    me = client.get("/api/v1/auth/me", headers={"Authorization": f"Bearer {token}"}).json()
+    assert me["role"] != "admin"
+    assert client.get("/api/v1/admin/catalogue/programmes", headers={"Authorization": f"Bearer {token}"}).status_code == 403
+
+
+def test_login_is_rate_limited():
+    from app.core import ratelimit
+
+    ratelimit._hits.clear()
+    codes = [client.post("/api/v1/auth/login", json={"email": "nobody@example.com", "password": "wrongpass1"}).status_code for _ in range(11)]
+    assert codes[-1] == 429
+    ratelimit._hits.clear()
+
+
+
+def test_session_cookie_login_logout_and_password_change():
+    from app.core import ratelimit
+
+    ratelimit._hits.clear()
+    c = TestClient(app)
+    email = "cookie-test@example.com"
+    from app.core.database import SessionLocal as _S
+    from app.models.user import User as _U
+
+    with _S() as db:
+        db.query(_U).filter(_U.email == email).delete()
+        db.commit()
+    c.post("/api/v1/auth/register", json={"email": email, "password": "firstpass123"})
+    res = c.post("/api/v1/auth/login", json={"email": email, "password": "firstpass123"})
+    cookie = res.headers.get("set-cookie", "")
+    assert "gmac_session=" in cookie and "HttpOnly" in cookie
+    assert c.get("/api/v1/auth/me").status_code == 200  # cookie alone is enough
+    old_token = res.json()["access_token"]
+
+    # A reset link works once, and changing the password ends old sessions
+    from app.api.dependencies import create_password_reset_token
+    from app.core.database import SessionLocal
+    from app.models.user import User
+
+    with SessionLocal() as db:
+        user = db.query(User).filter(User.email == email).first()
+        link = create_password_reset_token(email, user.password_hash)
+    assert c.post("/api/v1/auth/reset-password", json={"token": link, "new_password": "secondpass123"}).status_code == 200
+    assert c.post("/api/v1/auth/reset-password", json={"token": link, "new_password": "thirdpass123"}).status_code == 400
+    assert c.get("/api/v1/auth/me", headers={"Authorization": f"Bearer {old_token}"}).status_code == 401
+
+    # Sign out clears the cookie
+    c.post("/api/v1/auth/login", json={"email": email, "password": "secondpass123"})
+    assert c.post("/api/v1/auth/logout").status_code == 204
+    c.cookies.clear()
+    assert c.get("/api/v1/auth/me").status_code == 401
+    ratelimit._hits.clear()
+
+
+def test_reset_token_is_not_a_session():
+    from app.api.dependencies import create_password_reset_token
+
+    token = create_password_reset_token("someone@example.com")
+    assert client.get("/api/v1/auth/me", headers={"Authorization": f"Bearer {token}"}).status_code == 401
+
+
+def test_action_token_for_admins_only():
+    from app.api.dependencies import create_action_token
+
+    good = create_action_token({"id": "x", "role": "admin"}, "revalidate")
+    bad = create_action_token({"id": "x", "role": "student"}, "revalidate")
+    assert client.post("/api/v1/auth/action-token/verify", json={"token": good}).status_code == 200
+    assert client.post("/api/v1/auth/action-token/verify", json={"token": bad}).status_code == 401
+    assert client.post("/api/v1/auth/action-token/verify", json={"token": "nonsense"}).status_code == 401
