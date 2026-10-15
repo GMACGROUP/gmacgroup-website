@@ -3,6 +3,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { notFound } from "next/navigation";
 import { Arrow } from "@/components/ui/Arrow";
+import { BreadcrumbJsonLd } from "@/components/seo/BreadcrumbJsonLd";
 import { getEvent } from "@/lib/api/server";
 import { FORMAT_LABEL, dateLine, isPast, timeLine } from "@/lib/events";
 import { SITE } from "@/lib/content/site";
@@ -49,6 +50,13 @@ export default async function EventPage({ params }: Props) {
 
   return (
     <article>
+      <BreadcrumbJsonLd
+        items={[
+          { name: "Home", href: SITE.url },
+          { name: "Events", href: `${SITE.url}/events` },
+          { name: e.title, href: `${SITE.url}/events/${e.slug}` },
+        ]}
+      />
       {e.start_at && <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />}
 
       <header className="border-b border-rule">
