@@ -2,7 +2,8 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { Arrow } from "@/components/ui/Arrow";
-import { PRACTICE_AREAS, ENGAGEMENT_EXAMPLES, FOCUS_MARKETS } from "@/lib/content/site";
+import { BreadcrumbJsonLd } from "@/components/seo/BreadcrumbJsonLd";
+import { PRACTICE_AREAS, ENGAGEMENT_EXAMPLES, FOCUS_MARKETS, SITE } from "@/lib/content/site";
 
 export const dynamicParams = false;
 
@@ -33,6 +34,13 @@ export default async function PracticeAreaPage({ params }: Props) {
 
   return (
     <article>
+      <BreadcrumbJsonLd
+        items={[
+          { name: "Home", href: SITE.url },
+          { name: "Expertise", href: `${SITE.url}/expertise` },
+          { name: p.title, href: `${SITE.url}/expertise/${p.slug}` },
+        ]}
+      />
       <header className="border-b border-rule">
         <div className="wrap pb-16 pt-14 sm:pt-20 lg:pb-20 lg:pt-24">
           <nav aria-label="Breadcrumb" className="text-sm text-ink-400">
