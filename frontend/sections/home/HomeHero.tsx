@@ -10,7 +10,7 @@ export function HomeHero({ team }: { team: TeamMember[] }) {
   const HERO_ORDER = [
     "raphael-sochima-ajana", "victoria-dzifa-atisoe", "richard-klutse", "maureen-mushwimba",
     "favour-ohiemi", "ismail-saani", "apollo-samantha-dorcas", "jude-van-tagoe",
-    "atta-gyasi-domson", "yolanda-chibaya", "evans-essene-dzidzienyo", "delasi-kumapley",
+    "ramadhani-athumani-mbiaji", "yolanda-chibaya", "christian-agyapong", "delasi-kumapley",
   ];
   const all = [
     ...(FOUNDER.photo ? [{ name: FOUNDER.name, photo: FOUNDER.photo, country: FOUNDER.country }] : []),
