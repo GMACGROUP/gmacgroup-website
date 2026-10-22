@@ -28,7 +28,7 @@ export function AuthShell({
           <div className="mt-10">{children}</div>
         </div>
         <aside className="hidden lg:col-span-5 lg:col-start-8 lg:block">
-          <div className="border-t-4 border-ink bg-stone p-10">
+          <div className="border-t-4 border-ink bg-sand p-10">
             <p className="font-display text-2xl leading-snug">Your Gmac Group account</p>
             <ul className="mt-6 border-t border-ink/15">
               {POINTS.map((p, i) => (

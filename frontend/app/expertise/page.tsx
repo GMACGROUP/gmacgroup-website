@@ -65,13 +65,13 @@ export default function ExpertisePage() {
         </ol>
       </section>
 
-      <section className="site-section border-t border-rule bg-stone">
+      <section className="site-section border-t border-rule bg-sand">
         <div className="wrap">
           <p className="eyebrow">Our philosophy</p>
           <h2 className="display-lg mt-6 max-w-[20ch]">Six commitments that hold across every practice area.</h2>
           <div className="mt-14 grid grid-cols-1 gap-px bg-ink/15 sm:grid-cols-2 lg:grid-cols-3">
             {PRINCIPLES.map((p, i) => (
-              <div key={p.title} className="bg-stone p-8">
+              <div key={p.title} className="bg-sand p-8">
                 <span className="text-sm tabular-nums text-accent">{String(i + 1).padStart(2, "0")}</span>
                 <h3 className="mt-4 font-display text-2xl">{p.title}</h3>
                 <p className="mt-3 text-[15px] leading-relaxed text-ink-500">{p.body}</p>

@@ -10,7 +10,7 @@ export function ExpertiseIndex() {
   const area = PRACTICE_AREAS[active];
 
   return (
-    <section className="site-section border-y border-rule bg-stone">
+    <section className="site-section border-y border-rule bg-sand">
       <div className="wrap">
         <div className="grid grid-cols-1 gap-8 lg:grid-cols-12">
           <div className="lg:col-span-4">

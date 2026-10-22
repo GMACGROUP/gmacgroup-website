@@ -2,7 +2,8 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { Arrow } from "@/components/ui/Arrow";
-import { PRACTICE_AREAS, ENGAGEMENT_EXAMPLES, FOCUS_MARKETS } from "@/lib/content/site";
+import { BreadcrumbJsonLd } from "@/components/seo/BreadcrumbJsonLd";
+import { PRACTICE_AREAS, ENGAGEMENT_EXAMPLES, FOCUS_MARKETS, SITE } from "@/lib/content/site";
 
 export const dynamicParams = false;
 
@@ -33,6 +34,13 @@ export default async function PracticeAreaPage({ params }: Props) {
 
   return (
     <article>
+      <BreadcrumbJsonLd
+        items={[
+          { name: "Home", href: SITE.url },
+          { name: "Expertise", href: `${SITE.url}/expertise` },
+          { name: p.title, href: `${SITE.url}/expertise/${p.slug}` },
+        ]}
+      />
       <header className="border-b border-rule">
         <div className="wrap pb-16 pt-14 sm:pt-20 lg:pb-20 lg:pt-24">
           <nav aria-label="Breadcrumb" className="text-sm text-ink-400">
@@ -79,7 +87,7 @@ export default async function PracticeAreaPage({ params }: Props) {
           )}
 
           {example && (
-            <section className="mt-16 bg-stone p-8 sm:p-10">
+            <section className="mt-16 bg-sand p-8 sm:p-10">
               <p className="text-[12px] font-medium uppercase tracking-label text-ink-400">Illustrative engagement, not a client case study</p>
               <h2 className="mt-3 font-display text-2xl">{example.title}</h2>
               <dl className="mt-6 grid grid-cols-1 gap-6 sm:grid-cols-3">
@@ -123,10 +131,10 @@ export default async function PracticeAreaPage({ params }: Props) {
         </aside>
       </div>
 
-      <Link href={`/expertise/${next.slug}`} className="group block border-t border-rule bg-ink text-white">
+      <Link href={`/expertise/${next.slug}`} className="group block border-t border-rule bg-navy text-white">
         <div className="wrap flex items-center justify-between gap-6 py-12">
           <div>
-            <p className="text-[12px] font-medium uppercase tracking-label text-white/50">Next practice area</p>
+            <p className="text-[12px] font-medium uppercase tracking-label text-white/75">Next practice area</p>
             <p className="mt-2 font-display text-3xl text-white sm:text-4xl">{next.title}</p>
           </div>
           <Arrow className="h-8 w-8 transition-transform group-hover:translate-x-2" />

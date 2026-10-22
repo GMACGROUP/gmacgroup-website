@@ -14,7 +14,7 @@ type Props = { name: string; src?: string | null; className?: string; sizes?: st
 /** Team portrait: black and white until hovered, focused or tapped; monogram when no photo is on file. */
 export function Portrait({ name, src, className = "", sizes = "200px" }: Props) {
   return (
-    <div className={`relative overflow-hidden bg-stone ${className}`}>
+    <div className={`relative overflow-hidden bg-sand ${className}`}>
       {src ? (
         <Image
           src={src}
