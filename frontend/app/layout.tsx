@@ -4,7 +4,6 @@ import localFont from "next/font/local";
 import "../styles/globals.css";
 import { Navbar } from "@/components/navigation/Navbar";
 import { Footer } from "@/components/footer/Footer";
-import { ScrollProgress } from "@/components/common/ScrollProgress";
 import { AIChatWidget } from "@/components/common/AIChatWidget";
 import { NavigationProgressBar } from "@/components/common/NavigationProgressBar";
 import { AuthProvider } from "@/hooks/useAuth";
@@ -59,8 +58,8 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en-GB" className={`${franklin.variable} ${newsreader.variable}`}>
-      <body className="min-h-screen flex flex-col font-sans">
+    <html lang="en-GB" className={`${franklin.variable} ${newsreader.variable} overflow-x-hidden`}>
+      <body className="min-h-screen flex flex-col font-sans overflow-x-hidden">
         <AuthProvider>
           <Suspense fallback={null}>
             <NavigationProgressBar />
@@ -68,7 +67,6 @@ export default function RootLayout({
           <Navbar />
           <main className="flex-1 pt-[72px]">{children}</main>
           <Footer />
-          <ScrollProgress />
           <AIChatWidget />
           <Reveal />
           <Analytics />

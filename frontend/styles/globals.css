@@ -3,6 +3,12 @@
 @tailwind utilities;
 
 @layer base {
+  html {
+    scroll-behavior: smooth;
+    scroll-padding-top: 5rem;
+    -webkit-overflow-scrolling: touch;
+  }
+
   body {
     @apply bg-paper text-ink antialiased font-sans selection:bg-accent selection:text-white;
     overflow-x: hidden;
@@ -11,10 +17,34 @@
     font-feature-settings: "kern" 1, "liga" 1;
   }
 
+  /* Custom sleek scrollbar */
+  ::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+  }
+  ::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  ::-webkit-scrollbar-thumb {
+    background: rgba(14, 26, 43, 0.22);
+    border-radius: 9999px;
+    border: 2px solid transparent;
+    background-clip: padding-box;
+    transition: background-color 200ms ease;
+  }
+  ::-webkit-scrollbar-thumb:hover {
+    background: rgba(11, 92, 173, 0.65);
+  }
+  * {
+    scrollbar-width: thin;
+    scrollbar-color: rgba(14, 26, 43, 0.25) transparent;
+  }
+
   h1, h2, h3, h4 {
     @apply font-display text-ink font-normal;
     letter-spacing: -0.015em;
     font-optical-sizing: auto;
+    text-wrap: balance;
   }
   h5, h6 {
     @apply font-sans text-ink;
@@ -51,14 +81,15 @@
   /* Type scale */
   .display-xl {
     @apply font-display text-[2.75rem] leading-[1.02] sm:text-[4rem] lg:text-[5.5rem];
-    letter-spacing: -0.025em;
+    letter-spacing: -0.028em;
   }
   .display-lg {
     @apply font-display text-[2.25rem] leading-[1.06] sm:text-5xl lg:text-[3.75rem];
-    letter-spacing: -0.02em;
+    letter-spacing: -0.022em;
   }
   .display-md {
     @apply font-display text-3xl leading-[1.1] sm:text-4xl lg:text-[2.75rem];
+    letter-spacing: -0.018em;
   }
   .lede {
     @apply text-lg leading-relaxed text-ink-500 sm:text-xl;
@@ -145,13 +176,16 @@
 
   /* Buttons */
   .btn-primary {
-    @apply inline-flex items-center justify-center gap-2.5 px-6 py-3.5 font-medium text-[15px] text-white bg-accent hover:bg-accent-dark transition-colors duration-200;
+    @apply inline-flex items-center justify-center gap-2.5 px-6 py-3.5 font-medium text-[15px] text-white bg-accent hover:bg-accent-dark active:scale-[0.98] transition-all duration-200;
+    letter-spacing: 0.005em;
   }
   .btn-secondary {
-    @apply inline-flex items-center justify-center gap-2.5 px-6 py-3.5 font-medium text-[15px] text-ink bg-transparent border border-ink/30 hover:border-ink transition-colors duration-200;
+    @apply inline-flex items-center justify-center gap-2.5 px-6 py-3.5 font-medium text-[15px] text-ink bg-transparent border border-ink/30 hover:border-ink active:scale-[0.98] transition-all duration-200;
+    letter-spacing: 0.005em;
   }
   .btn-dark {
-    @apply inline-flex items-center justify-center gap-2.5 px-6 py-3.5 font-medium text-[15px] text-white bg-ink hover:bg-ink-700 transition-colors duration-200;
+    @apply inline-flex items-center justify-center gap-2.5 px-6 py-3.5 font-medium text-[15px] text-white bg-ink hover:bg-ink-700 active:scale-[0.98] transition-all duration-200;
+    letter-spacing: 0.005em;
   }
   .btn-ghost {
     @apply inline-flex items-center gap-2 py-2 font-medium text-[15px] text-ink hover:text-accent transition-colors duration-200;
@@ -188,15 +222,88 @@
     @apply mb-2 block text-sm font-medium text-ink;
   }
 
-  /* Scroll reveal (progressive: content is visible without JS) */
-  .js .reveal {
-    opacity: 0;
-    transform: translateY(14px);
-    transition: opacity 700ms cubic-bezier(0.2, 0.7, 0.2, 1), transform 700ms cubic-bezier(0.2, 0.7, 0.2, 1);
-  }
+  /* Content is always fully visible — no automatic scroll pop-in or delayed visibility */
+  .reveal,
+  .js .reveal,
   .js .reveal.is-visible {
-    opacity: 1;
-    transform: none;
+    opacity: 1 !important;
+    transform: none !important;
+  }
+
+  /* ─── Breadcrumb ─────────────────────────────────────── */
+  .breadcrumb {
+    @apply flex items-center gap-1.5 text-[13px] text-ink-400;
+  }
+  .breadcrumb a {
+    @apply transition-colors duration-150 hover:text-ink;
+  }
+  .breadcrumb-sep {
+    @apply text-ink-300 select-none mx-1;
+  }
+  .breadcrumb-current {
+    @apply text-ink font-medium;
+  }
+
+  /* ─── Pull Quote ─────────────────────────────────────── */
+  .pull-quote {
+    @apply font-display font-light leading-[1.15] text-ink;
+    font-size: clamp(1.75rem, 4vw, 3rem);
+    letter-spacing: -0.02em;
+  }
+  .pull-quote-dark {
+    @apply pull-quote text-white;
+  }
+
+  /* ─── Inline text emphasis ───────────────────────────── */
+  .text-highlight {
+    @apply text-accent font-medium;
+  }
+  .heading-aside {
+    @apply font-light italic text-ink-500;
+  }
+
+  /* ─── Accent Line Decorator ──────────────────────────── */
+  .accent-line {
+    @apply block h-px w-10 bg-accent mb-5;
+  }
+
+  /* ─── Inline prose links ─────────────────────────────── */
+  .prose-link {
+    @apply text-accent underline underline-offset-[3px] decoration-accent/40 hover:decoration-accent transition-all;
+  }
+
+  /* ─── Feature Row (numbered list item) ───────────────── */
+  .feature-row {
+    @apply grid grid-cols-[2.5rem_1fr] gap-x-5 gap-y-1 border-b border-rule py-6 sm:grid-cols-[3rem_14rem_1fr] sm:gap-x-6;
+  }
+  .feature-row-num {
+    @apply font-display text-2xl font-light tabular-nums text-accent;
+  }
+  .feature-row-title {
+    @apply font-display text-xl leading-snug text-ink;
+  }
+  .feature-row-body {
+    @apply col-span-2 text-[15px] leading-relaxed text-ink-500 sm:col-span-1;
+  }
+
+  /* ─── Stat Grid Item ─────────────────────────────────── */
+  .stat-card-value {
+    @apply font-display text-4xl text-ink;
+    letter-spacing: -0.03em;
+  }
+  .stat-card-label {
+    @apply mt-1 text-sm leading-snug text-ink-500;
+  }
+
+  /* ─── Section intro (eyebrow + heading two-column) ────── */
+  .section-intro {
+    @apply grid grid-cols-1 gap-8 lg:grid-cols-12;
+  }
+  .section-intro-label {
+    @apply lg:col-span-4;
+  }
+  .section-intro-heading {
+    @apply lg:col-span-8;
   }
 }
 
@@ -277,6 +384,20 @@
 
   .link-underline:hover::after {
     @apply w-full;
+  }
+
+  /* ─── Hide scrollbar (horizontal scroll containers) ─────── */
+  .scrollbar-none {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+  .scrollbar-none::-webkit-scrollbar {
+    display: none;
+  }
+
+  /* ─── Safe area inset (notched phones) ─────────────────── */
+  .safe-pb {
+    padding-bottom: max(1.5rem, env(safe-area-inset-bottom, 1.5rem));
   }
 }
 
@@ -386,5 +507,50 @@ html {
   }
   .band-blue .btn-primary {
     @apply bg-white text-ink hover:bg-accent-light;
+  }
+}
+
+/* ─── Infinite Marquee Ticker ────────────────────────── */
+@keyframes marqueeScroll {
+  0% {
+    transform: translateX(0%);
+  }
+  100% {
+    transform: translateX(-50%);
+  }
+}
+
+.marquee-mask {
+  mask-image: linear-gradient(
+    to right,
+    transparent 0%,
+    black 4%,
+    black 96%,
+    transparent 100%
+  );
+  -webkit-mask-image: linear-gradient(
+    to right,
+    transparent 0%,
+    black 4%,
+    black 96%,
+    transparent 100%
+  );
+}
+
+.animate-marquee-track {
+  display: flex;
+  width: max-content;
+  animation: marqueeScroll 26s linear infinite;
+  will-change: transform;
+}
+
+.animate-marquee-track:hover {
+  animation-play-state: paused;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .animate-marquee-track {
+    animation: none;
+    overflow-x: auto;
   }
 }

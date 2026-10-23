@@ -20,15 +20,15 @@ export default async function CareersPage() {
   return (
     <>
       <header className="border-b border-rule">
-        <div className="wrap pb-14 pt-14 sm:pt-20 lg:pb-20 lg:pt-24">
-          <nav aria-label="Breadcrumb" className="text-sm text-ink-400">
-            <Link href="/" className="hover:text-ink">Home</Link>
-            <span className="mx-2" aria-hidden="true">/</span>
-            <span className="text-ink">Careers</span>
+        <div className="wrap pb-16 pt-14 sm:pt-20 lg:pb-24 lg:pt-24">
+          <nav aria-label="Breadcrumb" className="breadcrumb">
+            <Link href="/">Home</Link>
+            <span className="breadcrumb-sep" aria-hidden="true">/</span>
+            <span className="breadcrumb-current">Careers</span>
           </nav>
           <div className="mt-8 grid grid-cols-1 gap-10 lg:grid-cols-12">
             <h1 className="display-xl lg:col-span-8">
-              Work on the evidence <em className="font-light italic text-ink-500">and the people, at the same time.</em>
+              Work on the evidence <em className="heading-aside">and the people, at the same time.</em>
             </h1>
             <dl className="grid grid-cols-2 gap-6 self-end lg:col-span-4">
               {[people, countries].map((f) => (

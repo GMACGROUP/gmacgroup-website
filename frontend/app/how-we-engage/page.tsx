@@ -21,15 +21,15 @@ export default function HowWeEngagePage() {
   return (
     <>
       <header className="border-b border-rule">
-        <div className="wrap pb-14 pt-14 sm:pt-20 lg:pb-20 lg:pt-24">
-          <nav aria-label="Breadcrumb" className="text-sm text-ink-400">
-            <Link href="/" className="hover:text-ink">Home</Link>
-            <span className="mx-2" aria-hidden="true">/</span>
-            <span className="text-ink">How we engage</span>
+        <div className="wrap pb-16 pt-14 sm:pt-20 lg:pb-24 lg:pt-24">
+          <nav aria-label="Breadcrumb" className="breadcrumb">
+            <Link href="/">Home</Link>
+            <span className="breadcrumb-sep" aria-hidden="true">/</span>
+            <span className="breadcrumb-current">How we engage</span>
           </nav>
           <div className="mt-8 grid grid-cols-1 gap-10 lg:grid-cols-12">
             <h1 className="display-xl lg:col-span-8">
-              Clear scope, <em className="font-light italic text-ink-500">from the first conversation.</em>
+              Clear scope, <em className="heading-aside">from the first conversation.</em>
             </h1>
             <p className="lede self-end lg:col-span-4">
               Procurement teams can evaluate us without a discovery process. Every route below begins the same way.

@@ -16,14 +16,15 @@ export default function ContactPage() {
     <>
       <header className="border-b border-rule">
         <div className="wrap pb-14 pt-14 sm:pt-20 lg:pb-20 lg:pt-24">
-          <nav aria-label="Breadcrumb" className="text-sm text-ink-400">
-            <Link href="/" className="hover:text-ink">Home</Link>
-            <span className="mx-2" aria-hidden="true">/</span>
-            <span className="text-ink">Contact</span>
+          <nav aria-label="Breadcrumb" className="breadcrumb">
+            <Link href="/" className="">Home</Link>
+            <span className="breadcrumb-sep" aria-hidden="true">/</span>
+            <span className="breadcrumb-current">Contact</span>
           </nav>
           <div className="mt-8 grid grid-cols-1 gap-10 lg:grid-cols-12">
             <h1 className="display-xl lg:col-span-8">
-              Begin a conversation. <em className="font-light italic text-ink-500">The first step is the same for everyone.</em>
+              Begin a conversation.{" "}
+              <em className="heading-aside">The first step is the same for everyone.</em>
             </h1>
             <p className="lede self-end lg:col-span-4">
               Whether you are commissioning research, building a workforce, sponsoring a convening or looking for
@@ -44,20 +45,20 @@ export default function ContactPage() {
           <div className="space-y-10 lg:sticky lg:top-28">
             <div className="border-t border-ink pt-5">
               <p className="text-[11px] font-medium uppercase tracking-label text-ink-400">General enquiries</p>
-              <a href={`mailto:${SITE.email}`} className="mt-2 block font-display text-2xl text-ink hover:text-accent">
+              <a href={`mailto:${SITE.email}`} className="mt-3 block font-display text-[1.6rem] leading-tight text-ink hover:text-accent transition-colors">
                 {SITE.email}
               </a>
-              <p className="mt-2 text-sm leading-relaxed text-ink-500">
+              <p className="mt-2 text-[15px] leading-relaxed text-ink-500">
                 Institutional enquiries, scoping conversations, sponsorship and partnerships.
               </p>
             </div>
 
             <div className="border-t border-rule pt-5">
               <p className="text-[11px] font-medium uppercase tracking-label text-ink-400">Telephone</p>
-              <ul className="mt-2 space-y-1">
+              <ul className="mt-3 space-y-1.5">
                 {SITE.phones.map((p) => (
                   <li key={p}>
-                    <a href={`tel:${p.replace(/\s/g, "")}`} className="text-[17px] text-ink hover:text-accent">{p}</a>
+                    <a href={`tel:${p.replace(/\s/g, "")}`} className="text-[18px] font-medium text-ink hover:text-accent transition-colors">{p}</a>
                   </li>
                 ))}
               </ul>
@@ -87,15 +88,15 @@ export default function ContactPage() {
         <div className="wrap grid grid-cols-1 gap-10 py-16 lg:grid-cols-12">
           <div className="lg:col-span-4">
             <p className="eyebrow">For institutions</p>
-            <h2 className="mt-5 font-display text-3xl">Five ways to work with us.</h2>
-            <Link href="/how-we-engage" className="link-arrow mt-6">How we engage</Link>
+            <h2 className="display-md mt-5">Five ways to work with us.</h2>
+            <Link href="/how-we-engage" className="link-arrow mt-6">How we engage<Arrow /></Link>
           </div>
           <ol className="grid gap-x-10 sm:grid-cols-2 lg:col-span-8">
             {ENGAGEMENT_MODELS.map((m, i) => (
               <li key={m.title} className="border-t border-ink/15 py-5">
-                <p className="text-sm tabular-nums text-accent">{String(i + 1).padStart(2, "0")}</p>
-                <p className="mt-1 font-medium text-ink">{m.title}</p>
-                <p className="mt-1 text-sm leading-relaxed text-ink-500">{m.body}</p>
+                <p className="font-sans text-[11px] font-semibold tabular-nums tracking-label text-accent">{String(i + 1).padStart(2, "0")}</p>
+                <p className="mt-2 font-display text-[1.1rem] leading-snug text-ink">{m.title}</p>
+                <p className="mt-1.5 text-[15px] leading-relaxed text-ink-500">{m.body}</p>
               </li>
             ))}
           </ol>

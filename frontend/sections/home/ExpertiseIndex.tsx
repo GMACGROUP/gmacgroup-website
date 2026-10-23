@@ -41,7 +41,7 @@ export function ExpertiseIndex() {
                     {p.number}
                   </span>
                   <span>
-                    <span className="block font-display text-2xl leading-snug text-ink sm:text-[1.75rem]">{p.title}</span>
+                    <span className="block font-display text-[1.85rem] leading-snug text-ink transition-colors sm:text-[2rem]">{p.title}</span>
                     <span className="mt-2 block max-w-[54ch] text-[15px] leading-relaxed text-ink-500 lg:hidden">{p.short}</span>
                   </span>
                   <Arrow className={`h-5 w-5 transition-all duration-300 ${active === i ? "translate-x-0 text-accent opacity-100" : "-translate-x-2 opacity-0"} group-hover:translate-x-0 group-hover:opacity-100`} />
@@ -53,9 +53,9 @@ export function ExpertiseIndex() {
           <aside className="hidden lg:col-span-5 lg:block" aria-live="polite">
             <div className="sticky top-28">
               <div className="border border-ink/15 bg-paper p-8">
-                <p className="font-display text-[5.5rem] leading-none text-accent" aria-hidden="true">{area.number}</p>
-                <p className="mt-6 font-display text-2xl italic leading-snug text-ink">{area.promise}</p>
-                <ul className="mt-6 space-y-2.5 text-[15px] text-ink-600">
+                <p className="font-display text-[5.5rem] leading-none text-accent/25" aria-hidden="true">{area.number}</p>
+                <p className="mt-5 font-display text-[1.5rem] italic leading-snug text-ink">{area.promise}</p>
+                <ul className="mt-6 space-y-2.5 text-[15.5px] text-ink-600">
                   {area.deliverables.slice(0, 4).map((d) => (
                     <li key={d} className="flex gap-3">
                       <span className="mt-[0.6em] h-px w-3 shrink-0 bg-ink-400" aria-hidden="true" />

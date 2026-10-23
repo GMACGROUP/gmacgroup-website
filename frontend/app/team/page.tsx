@@ -25,13 +25,14 @@ export default async function TeamPage() {
       <section className="border-b border-rule">
         <div className="wrap grid grid-cols-1 gap-14 pb-16 pt-14 sm:pt-20 lg:grid-cols-12 lg:pb-20 lg:pt-24">
           <div className="lg:col-span-7">
-            <nav aria-label="Breadcrumb" className="text-sm text-ink-400">
-              <Link href="/" className="hover:text-ink">Home</Link>
-              <span className="mx-2" aria-hidden="true">/</span>
-              <span className="text-ink">Team</span>
+            <nav aria-label="Breadcrumb" className="breadcrumb">
+              <Link href="/" className="">Home</Link>
+              <span className="breadcrumb-sep" aria-hidden="true">/</span>
+              <span className="breadcrumb-current">Team</span>
             </nav>
             <h1 className="display-xl mt-8">
-              {TEAMS.length} teams. {countries} countries. <em className="font-light italic text-ink-500">One standard.</em>
+              {TEAMS.length} teams. {countries} countries.{" "}
+              <em className="heading-aside">One standard.</em>
             </h1>
             <p className="lede mt-8 max-w-[56ch]">
               {members.length + 1} colleagues working remotely across Africa and beyond. Every engagement is staffed from the
@@ -66,6 +67,12 @@ export default async function TeamPage() {
             <h2 className="mt-3 font-display text-4xl text-white sm:text-5xl">{FOUNDER.name}</h2>
             <p className="mt-6 max-w-[62ch] text-[15px] leading-relaxed text-white/70">{FOUNDER.bio[0]}</p>
             <p className="mt-4 max-w-[62ch] text-[15px] leading-relaxed text-white/70">{FOUNDER.bio[1]}</p>
+            <div className="mt-6">
+              <Link href="/team/raphael-sochima-ajana" className="link-arrow !text-white hover:!text-accent-soft text-[15px] font-medium">
+                Learn More
+                <Arrow />
+              </Link>
+            </div>
           </div>
         </div>
       </section>

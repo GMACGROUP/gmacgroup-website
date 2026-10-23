@@ -40,15 +40,15 @@ export default async function ResearchPage() {
   return (
     <>
       <header className="border-b border-rule">
-        <div className="wrap pb-14 pt-14 sm:pt-20 lg:pb-20 lg:pt-24">
-          <nav aria-label="Breadcrumb" className="text-sm text-ink-400">
-            <Link href="/" className="hover:text-ink">Home</Link>
-            <span className="mx-2" aria-hidden="true">/</span>
-            <span className="text-ink">Research</span>
+        <div className="wrap pb-16 pt-14 sm:pt-20 lg:pb-24 lg:pt-24">
+          <nav aria-label="Breadcrumb" className="breadcrumb">
+            <Link href="/">Home</Link>
+            <span className="breadcrumb-sep" aria-hidden="true">/</span>
+            <span className="breadcrumb-current">Research</span>
           </nav>
           <div className="mt-8 grid grid-cols-1 gap-10 lg:grid-cols-12">
             <h1 className="display-xl lg:col-span-8">
-              Evidence produced <em className="font-light italic text-ink-500">inside the markets it describes.</em>
+              Evidence produced <em className="heading-aside">inside the markets it describes.</em>
             </h1>
             <p className="lede self-end lg:col-span-4">
               Our research practice is led by doctoral researchers with quantitative and policy expertise, working from the
@@ -70,10 +70,10 @@ export default async function ResearchPage() {
             </Link>
           </div>
           <div className="lg:col-span-7 lg:col-start-6">
-            <p className="text-[17px] leading-relaxed text-ink-600">{practice.whatItIs}</p>
+            <p className="text-[17px] leading-relaxed text-ink-600 sm:text-[18px]">{practice.whatItIs}</p>
             <ul className="mt-10 grid grid-cols-1 border-t border-ink sm:grid-cols-2">
               {practice.deliverables.map((d) => (
-                <li key={d} className="border-b border-rule py-4 pr-6 text-[15px] text-ink">
+                <li key={d} className="feature-row border-b border-rule py-4 pr-6 text-[15px] font-medium text-ink">
                   {d}
                 </li>
               ))}
@@ -89,9 +89,9 @@ export default async function ResearchPage() {
           <h2 id="method-title" className="display-lg mt-6 max-w-[22ch]">Five stages, each one written down.</h2>
           <ol className="mt-12 grid grid-cols-1 border-t border-ink sm:grid-cols-2 lg:grid-cols-5">
             {METHOD.map((m, i) => (
-              <li key={m.step} className={`border-b border-rule py-7 sm:pr-6 lg:border-b-0 ${i > 0 ? "lg:border-l lg:pl-6" : ""} ${i % 2 === 1 ? "sm:border-l sm:pl-6" : ""}`}>
+              <li key={m.step} className={`border-b border-rule py-7 transition-colors sm:pr-6 lg:border-b-0 ${i > 0 ? "lg:border-l lg:pl-6" : ""} ${i % 2 === 1 ? "sm:border-l sm:pl-6" : ""}`}>
                 <p className="font-display text-4xl font-light tabular-nums text-accent">{String(i + 1).padStart(2, "0")}</p>
-                <h3 className="mt-4 font-display text-xl">{m.step}</h3>
+                <h3 className="mt-4 font-display text-xl font-normal text-ink">{m.step}</h3>
                 <p className="mt-2 text-[15px] leading-relaxed text-ink-500">{m.body}</p>
               </li>
             ))}

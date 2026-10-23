@@ -120,7 +120,7 @@ export function AIChatWidget() {
           role="dialog"
           aria-modal="false"
           aria-labelledby="ask-title"
-          className="fixed inset-x-0 bottom-0 z-50 flex h-[85dvh] flex-col border-t-4 border-ink bg-paper shadow-[0_-12px_40px_-12px_rgba(14,26,43,0.35)] sm:inset-x-auto sm:bottom-6 sm:right-6 sm:h-[min(600px,calc(100dvh-6rem))] sm:w-[400px] sm:border sm:border-t-4 sm:border-ink/15 sm:border-t-ink modal-panel-in"
+          className="fixed inset-x-0 bottom-0 z-50 flex h-[88dvh] max-h-[88dvh] flex-col border-t-4 border-ink bg-paper shadow-[0_-12px_40px_-12px_rgba(14,26,43,0.35)] pb-[env(safe-area-inset-bottom,0px)] sm:inset-x-auto sm:bottom-6 sm:right-6 sm:h-[min(620px,calc(100dvh-5rem))] sm:max-h-none sm:w-[420px] sm:border sm:border-t-4 sm:border-ink/15 sm:border-t-ink sm:pb-0 sm:shadow-[0_20px_50px_-15px_rgba(14,26,43,0.4)] modal-panel-in"
         >
           <header className="flex items-start justify-between gap-4 border-b border-rule px-5 pb-4 pt-5">
             <div>
@@ -198,7 +198,7 @@ export function AIChatWidget() {
         <button
           type="button"
           onClick={() => setOpen(true)}
-          className="fixed bottom-5 right-5 z-40 flex items-center gap-2.5 border border-ink/15 bg-paper py-2.5 pl-3 pr-4 text-[14px] font-medium text-ink shadow-[0_10px_30px_-12px_rgba(14,26,43,0.45)] transition-colors hover:border-ink sm:bottom-6 sm:right-6"
+          className="fixed bottom-[calc(1.25rem+env(safe-area-inset-bottom,0px))] right-5 z-40 flex items-center gap-2.5 border border-ink/15 bg-paper py-2.5 pl-3 pr-4 text-[14px] font-medium text-ink shadow-[0_10px_30px_-12px_rgba(14,26,43,0.45)] transition-all duration-150 hover:border-ink active:scale-[0.98] sm:bottom-6 sm:right-6"
         >
           <span aria-hidden="true" className="flex h-7 w-7 items-center justify-center bg-ink font-display text-[15px] text-white">G</span>
           Ask Gmac

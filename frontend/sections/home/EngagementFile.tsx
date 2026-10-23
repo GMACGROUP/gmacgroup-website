@@ -28,7 +28,7 @@ export function EngagementFile() {
         </div>
 
         <div className="mt-14 border-t border-ink">
-          <div role="tablist" aria-label="Engagement examples" className="flex flex-wrap border-b border-rule">
+          <div role="tablist" aria-label="Engagement examples" className="flex overflow-x-auto border-b border-rule scrollbar-none" style={{ WebkitOverflowScrolling: 'touch' }}>
             {ENGAGEMENT_EXAMPLES.map((e, k) => (
               <button
                 key={e.sector}
@@ -38,7 +38,7 @@ export function EngagementFile() {
                 aria-selected={i === k}
                 aria-controls="eng-panel"
                 onClick={() => setI(k)}
-                className={`-mb-px border-b-2 px-1 py-4 text-[15px] font-medium transition-colors sm:mr-10 mr-6 ${
+                className={`-mb-px shrink-0 whitespace-nowrap border-b-2 px-1 py-4 text-[15px] font-medium transition-colors mr-6 sm:mr-10 ${
                   i === k ? "border-accent text-ink" : "border-transparent text-ink-400 hover:text-ink"
                 }`}
               >

@@ -31,19 +31,20 @@ export default async function AboutPage() {
       {/* ── Opening ─────────────────────────────────────────── */}
       <header className="border-b border-rule">
         <div className="wrap pb-16 pt-14 sm:pt-20 lg:pb-24 lg:pt-24">
-          <nav aria-label="Breadcrumb" className="text-sm text-ink-400">
-            <Link href="/" className="hover:text-ink">Home</Link>
-            <span className="mx-2" aria-hidden="true">/</span>
-            <span className="text-ink">About</span>
+          <nav aria-label="Breadcrumb" className="breadcrumb">
+            <Link href="/" className="">Home</Link>
+            <span className="breadcrumb-sep" aria-hidden="true">/</span>
+            <span className="breadcrumb-current">About</span>
           </nav>
           <div className="mt-10 grid grid-cols-1 gap-10 lg:grid-cols-12">
             <h1 className="display-xl lg:col-span-9">
-              Build the people. Build the evidence. <em className="font-light italic text-ink-500">At the same time.</em>
+              Build the people. Build the evidence.{" "}
+              <em className="heading-aside">At the same time.</em>
             </h1>
           </div>
           <div className="mt-12 grid grid-cols-1 gap-10 border-t border-ink pt-8 lg:grid-cols-12">
             <p className="text-[12px] font-medium uppercase tracking-label text-ink-400 lg:col-span-3">Who we are</p>
-            <p className="font-display text-2xl leading-snug text-ink sm:text-[1.75rem] lg:col-span-8">{SITE.positioning}</p>
+            <p className="font-display text-[1.6rem] leading-snug text-ink sm:text-[1.9rem] lg:col-span-8">{SITE.positioning}</p>
           </div>
         </div>
       </header>
@@ -86,8 +87,8 @@ export default async function AboutPage() {
                 key={s}
                 className={`relative border-b border-rule py-6 sm:border-b-0 sm:py-8 sm:pr-6 ${i > 0 ? "sm:border-l sm:pl-6" : ""}`}
               >
-                <span className="text-sm tabular-nums text-accent">{String(i + 1).padStart(2, "0")}</span>
-                <p className={`mt-3 font-display leading-tight text-ink ${i === STORY.stages.length - 1 ? "text-3xl" : "text-2xl"}`}>{s}</p>
+                <span className="font-sans text-[11px] font-semibold tabular-nums tracking-label text-accent">{String(i + 1).padStart(2, "0")}</span>
+                <p className={`mt-4 font-display leading-tight text-ink ${i === STORY.stages.length - 1 ? "text-[1.6rem]" : "text-[1.4rem]"}`}>{s}</p>
                 {i < STORY.stages.length - 1 && (
                   <span aria-hidden="true" className="absolute right-0 top-1/2 hidden translate-x-1/2 bg-paper px-1 text-ink-300 sm:block">
                     &rarr;
@@ -139,10 +140,10 @@ export default async function AboutPage() {
           </div>
           <ol className="border-t border-ink lg:col-span-7 lg:col-start-6">
             {PRINCIPLES.map((p, i) => (
-              <li key={p.title} className="grid grid-cols-1 gap-2 border-b border-rule py-7 sm:grid-cols-[4rem_14rem_1fr] sm:gap-6">
-                <span className="font-display text-2xl font-light tabular-nums text-accent">{String(i + 1).padStart(2, "0")}</span>
-                <h3 className="font-display text-xl leading-snug text-ink">{p.title}</h3>
-                <p className="text-[15px] leading-relaxed text-ink-500">{p.body}</p>
+              <li key={p.title} className="feature-row">
+                <span className="feature-row-num">{String(i + 1).padStart(2, "0")}</span>
+                <h3 className="feature-row-title">{p.title}</h3>
+                <p className="feature-row-body">{p.body}</p>
               </li>
             ))}
           </ol>
@@ -200,7 +201,8 @@ export default async function AboutPage() {
           <div className="mt-14 grid grid-cols-1 gap-x-10 border-t border-ink sm:grid-cols-2 lg:grid-cols-4">
             {WHY_GMAC.map((w) => (
               <div key={w.title} className="border-b border-rule py-8">
-                <h3 className="font-display text-xl leading-snug text-ink">{w.title}</h3>
+                <span className="accent-line" aria-hidden="true" />
+                <h3 className="font-display text-[1.35rem] leading-snug text-ink">{w.title}</h3>
                 <p className="mt-3 text-[15px] leading-relaxed text-ink-500">{w.body}</p>
               </div>
             ))}
