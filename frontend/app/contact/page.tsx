@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { Suspense } from "react";
+import { Arrow } from "@/components/ui/Arrow";
 import { ContactForm } from "@/components/forms/ContactForm";
 import { ENGAGEMENT_MODELS, SITE } from "@/lib/content/site";
 
