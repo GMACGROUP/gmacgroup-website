@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { Arrow } from "@/components/ui/Arrow";
 import { AfricaMap } from "@/components/editorial/AfricaMap";
-import { PhotoSlot } from "@/components/editorial/PhotoSlot";
+import { Portrait } from "@/components/editorial/Portrait";
 import { TeamDirectory } from "@/components/team/TeamDirectory";
 import { FOUNDER, TEAMS } from "@/lib/content/site";
 import { getTeam } from "@/lib/api/server";
@@ -54,14 +54,16 @@ export default async function TeamPage() {
 
       <section className="border-b border-rule bg-ink text-white">
         <div className="wrap grid grid-cols-1 gap-10 py-16 lg:grid-cols-12 lg:py-20">
-          <PhotoSlot
-            src={FOUNDER.photo}
-            alt={`Portrait of ${FOUNDER.name}`}
-            awaiting="founder portrait"
-            tone="dark"
-            sizes="(max-width: 1024px) 60vw, 25vw"
-            className="aspect-[4/5] w-full max-w-xs lg:col-span-3"
-          />
+          <div className="w-full max-w-[220px] sm:max-w-[240px] overflow-hidden bg-ink-900 border border-white/15 shadow-xl lg:col-span-3">
+            <Portrait
+              name={FOUNDER.name}
+              src={FOUNDER.photo}
+              className="aspect-[3/4] w-full object-cover transition-transform duration-300 group-hover:scale-105"
+              sizes="(max-width: 1024px) 240px, 280px"
+              interactive={true}
+              showBadge={false}
+            />
+          </div>
           <div className="flex flex-col justify-end lg:col-span-8 lg:col-start-5">
             <p className="text-[12px] font-medium uppercase tracking-label text-accent-soft">{FOUNDER.role}</p>
             <h2 className="mt-3 font-display text-4xl text-white sm:text-5xl">{FOUNDER.name}</h2>

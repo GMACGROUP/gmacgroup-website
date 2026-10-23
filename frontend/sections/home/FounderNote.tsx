@@ -1,24 +1,26 @@
 import Link from "next/link";
 import { Arrow } from "@/components/ui/Arrow";
-import { PhotoSlot } from "@/components/editorial/PhotoSlot";
+import { Portrait } from "@/components/editorial/Portrait";
 import { FOUNDER } from "@/lib/content/site";
 
 export function FounderNote() {
   return (
-    <section className="site-section bg-navy text-white">
+    <section className="site-section bg-ink text-white">
       <div className="wrap grid grid-cols-1 gap-12 lg:grid-cols-12 lg:gap-16">
         <div className="lg:col-span-4">
           <p className="eyebrow !text-white/60">
             <span className="eyebrow-num !text-accent-soft">03</span> Founding principle
           </p>
-          <PhotoSlot
-            src={FOUNDER.photo}
-            alt={`Portrait of ${FOUNDER.name}`}
-            awaiting="founder portrait"
-            tone="dark"
-            sizes="(max-width: 1024px) 100vw, 30vw"
-            className="mt-10 aspect-[4/5] w-full max-w-[200px] sm:max-w-sm"
-          />
+          <div className="mt-8 w-full max-w-[220px] sm:max-w-[240px] overflow-hidden bg-ink-900 border border-white/15 shadow-xl">
+            <Portrait
+              name={FOUNDER.name}
+              src={FOUNDER.photo}
+              className="aspect-[3/4] w-full object-cover transition-transform duration-300 group-hover:scale-105"
+              sizes="(max-width: 640px) 220px, 240px"
+              interactive={true}
+              showBadge={false}
+            />
+          </div>
         </div>
         <div className="flex flex-col justify-between lg:col-span-8">
           <blockquote className="reveal">
