@@ -37,9 +37,26 @@ export async function generateMetadata({
     return { title: "Team Member Not Found" };
   }
 
+  const description = `${member.name} is ${member.position} based in ${member.country}, working with Gmac Group — a Pan-African research and advisory firm.`;
+
   return {
-    title: `${member.name} | Gmac Group`,
-    description: `${member.name} is ${member.position} (${member.country}) at Gmac Group.`,
+    title: `${member.name}`,
+    description,
+    openGraph: {
+      title: `${member.name} | Gmac Group`,
+      description,
+      url: `/team/${slug}`,
+      type: "profile",
+      images: member.photo_url
+        ? [{ url: member.photo_url, alt: `Portrait of ${member.name}` }]
+        : [{ url: "/og-image.png", width: 1200, height: 630, alt: `${member.name} | Gmac Group` }],
+    },
+    twitter: {
+      card: "summary",
+      title: `${member.name} | Gmac Group`,
+      description,
+      images: member.photo_url ? [member.photo_url] : ["/og-image.png"],
+    },
     alternates: { canonical: `/team/${slug}` },
   };
 }
@@ -61,8 +78,30 @@ export default async function TeamMemberPage({
   const overview = getMemberOverview(member);
   const firstName = member.name.split(" ")[0];
 
+  // Person structured data — helps Google show rich results for name searches
+  const siteBase = process.env.NEXT_PUBLIC_SITE_URL?.replace(/\/$/, "") || "https://gmac-group.com";
+  const personJsonLd = {
+    "@context": "https://schema.org",
+    "@type": "Person",
+    name: member.name,
+    jobTitle: member.position,
+    worksFor: {
+      "@type": "Organization",
+      name: "Gmac Group",
+      url: siteBase,
+    },
+    url: `${siteBase}/team/${slug}`,
+    ...(member.photo_url ? { image: member.photo_url } : {}),
+    ...(member.linkedin_url ? { sameAs: [member.linkedin_url] } : {}),
+    address: {
+      "@type": "PostalAddress",
+      addressCountry: member.country,
+    },
+  };
+
   return (
     <article className="min-h-screen bg-paper">
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(personJsonLd) }} />
       {/* ── Hero Profile Header Band (Gmac Group Core Ink & Accent) ── */}
       <header className="border-b border-rule bg-ink text-white">
         <div className="wrap py-12 sm:py-16 lg:py-20">
@@ -75,23 +114,23 @@ export default async function TeamMemberPage({
               <span>Back to Team</span>
             </Link>
           </div>
-          <div className="grid grid-cols-1 items-center gap-10 lg:grid-cols-12 lg:gap-14">
-            
+          <div className="grid grid-cols-1 items-start gap-8 sm:grid-cols-12 sm:gap-10 lg:gap-14">
+
             {/* Left: Portrait & Contact */}
-            <div className="lg:col-span-4 xl:col-span-3">
-              <div className="overflow-hidden bg-ink-900 shadow-2xl border border-white/15">
+            <div className="flex flex-col items-center sm:items-start sm:col-span-4 lg:col-span-4 xl:col-span-3">
+              <div className="w-full max-w-[200px] sm:max-w-none overflow-hidden bg-ink-900 shadow-2xl border border-white/15">
                 <Portrait
                   name={member.name}
                   src={member.photo_url}
                   className="aspect-[4/5] w-full object-cover"
-                  sizes="(max-width: 640px) 100vw, (max-width: 1024px) 40vw, 300px"
+                  sizes="(max-width: 640px) 200px, (max-width: 1024px) 40vw, 300px"
                   interactive={true}
-                  showBadge={true}
+                  showBadge={false}
                 />
               </div>
 
               {/* Connect with [Name] */}
-              <div className="mt-6 flex items-center justify-between border-t border-white/15 pt-4">
+              <div className="w-full max-w-[200px] sm:max-w-none mt-4 flex items-center justify-between border-t border-white/15 pt-4">
                 <span className="text-sm font-medium text-white/80">
                   Connect with {firstName}
                 </span>
@@ -124,13 +163,13 @@ export default async function TeamMemberPage({
             </div>
 
             {/* Right: Gmac Paper Container with Member Details */}
-            <div className="lg:col-span-8 xl:col-span-9">
-              <div className="border border-rule/90 border-t-4 border-t-accent bg-paper p-8 text-ink sm:p-12 shadow-xl">
+            <div className="sm:col-span-8 xl:col-span-9">
+              <div className="border border-rule/90 border-t-4 border-t-accent bg-paper p-6 text-ink sm:p-10 shadow-xl">
                 <div className="inline-block border-b-2 border-accent pb-1 text-[13px] font-semibold uppercase tracking-label text-accent">
                   {member.is_lead ? "Team Lead" : "Team Member"}
                 </div>
                 
-                <h1 className="mt-5 font-display text-3xl font-bold leading-tight text-ink sm:text-5xl lg:text-[3.5rem]">
+                <h1 className="mt-5 font-display text-2xl font-bold leading-tight text-ink sm:text-4xl lg:text-[3.5rem]">
                   {member.name}
                 </h1>
 

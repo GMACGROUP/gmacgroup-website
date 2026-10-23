@@ -2,13 +2,29 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { Arrow } from "@/components/ui/Arrow";
 import { AfricaMap } from "@/components/editorial/AfricaMap";
-import { PhotoSlot } from "@/components/editorial/PhotoSlot";
+import { Portrait } from "@/components/editorial/Portrait";
 import { getTeam } from "@/lib/api/server";
 import { FIGURES, teamFigures, FOUNDER, PARTNERS, PRINCIPLES, SECTORS, SITE, STORY, TEAMS, WHY_GMAC } from "@/lib/content/site";
 
 export const metadata: Metadata = {
-  title: "About",
-  description: SITE.positioning,
+  title: "About Gmac Group",
+  description:
+    "Founded by Raphael Sochima Ajana, Gmac Group is a Pan-African research and advisory firm specialising in human capital development, labour market research, investment facilitation and capacity building across ten focus markets in Africa.",
+  keywords: [
+    "about Gmac Group",
+    "Raphael Sochima Ajana",
+    "Pan-African advisory firm",
+    "Gmac Advisory and Consulting",
+    "human capital Africa",
+    "Africa investment advisory",
+  ],
+  openGraph: {
+    title: "About Gmac Group",
+    description:
+      "Founded by Raphael Sochima Ajana, Gmac Group is a Pan-African research and advisory firm specialising in human capital development and investment facilitation across Africa.",
+    url: "/about",
+    images: [{ url: "/og-image.png", width: 1200, height: 630, alt: "About Gmac Group" }],
+  },
   alternates: { canonical: "/about" },
 };
 
@@ -101,18 +117,20 @@ export default async function AboutPage() {
       </section>
 
       {/* ── Founder ─────────────────────────────────────────── */}
-      <section className="bg-navy text-white">
+      <section className="bg-ink text-white">
         <div className="wrap grid grid-cols-1 gap-12 py-20 sm:py-24 lg:grid-cols-12 lg:py-28">
           <div className="lg:col-span-4">
             <Label n="02" dark>A word from the founder</Label>
-            <PhotoSlot
-              src={FOUNDER.photo}
-              alt={`Portrait of ${FOUNDER.name}`}
-              awaiting="founder portrait"
-              tone="dark"
-              sizes="(max-width: 1024px) 80vw, 30vw"
-              className="mt-10 aspect-[4/5] w-full max-w-sm"
-            />
+            <div className="mt-8 w-full max-w-[220px] sm:max-w-[240px] overflow-hidden bg-ink-900 border border-white/15 shadow-xl">
+              <Portrait
+                name={FOUNDER.name}
+                src={FOUNDER.photo}
+                className="aspect-[3/4] w-full object-cover transition-transform duration-300 group-hover:scale-105"
+                sizes="(max-width: 1024px) 240px, 280px"
+                interactive={true}
+                showBadge={false}
+              />
+            </div>
             <p className="mt-5 font-medium text-white">{FOUNDER.name}</p>
             <p className="text-sm text-white/60">{FOUNDER.role}</p>
           </div>
