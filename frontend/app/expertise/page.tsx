@@ -66,7 +66,7 @@ export default function ExpertisePage() {
         </ol>
       </section>
 
-      <section className="site-section border-t border-rule bg-stone">
+      <section className="site-section border-t border-rule bg-sand">
         <div className="wrap">
           <p className="eyebrow">Our philosophy</p>
           <h2 className="display-lg mt-6 max-w-[20ch]">Six commitments that hold across every practice area.</h2>

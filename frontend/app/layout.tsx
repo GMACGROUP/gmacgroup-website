@@ -52,6 +52,33 @@ export const metadata: Metadata = {
   alternates: { canonical: "/" },
 };
 
+const organizationJsonLd = {
+  "@context": "https://schema.org",
+  "@type": "Organization",
+  name: SITE.name,
+  legalName: SITE.legalName,
+  url: SITE.url,
+  logo: `${SITE.url.replace(/\/$/, "")}/logo.svg`,
+  description: SITE.positioning,
+  email: SITE.email,
+  telephone: SITE.phones,
+  areaServed: "Africa",
+  sameAs: Object.values(SITE.social),
+};
+
+const websiteJsonLd = {
+  "@context": "https://schema.org",
+  "@type": "WebSite",
+  name: SITE.name,
+  url: SITE.url,
+  description: SITE.positioning,
+  publisher: {
+    "@type": "Organization",
+    name: SITE.name,
+    url: SITE.url,
+  },
+};
+
 export default function RootLayout({
   children,
 }: {
@@ -60,6 +87,8 @@ export default function RootLayout({
   return (
     <html lang="en-GB" className={`${franklin.variable} ${newsreader.variable} overflow-x-hidden`}>
       <body className="min-h-screen flex flex-col font-sans overflow-x-hidden">
+        <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(organizationJsonLd) }} />
+        <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(websiteJsonLd) }} />
         <AuthProvider>
           <Suspense fallback={null}>
             <NavigationProgressBar />
