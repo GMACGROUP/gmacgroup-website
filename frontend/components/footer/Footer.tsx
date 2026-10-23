@@ -87,8 +87,8 @@ export function Footer() {
 
   return (
     <footer className="bg-ink-900 text-white/70">
-      <div className="wrap grid grid-cols-1 gap-12 py-16 sm:py-20 lg:grid-cols-12">
-        <div className="lg:col-span-4">
+      <div className="wrap grid grid-cols-1 gap-10 py-16 sm:grid-cols-2 sm:py-20 lg:grid-cols-12 lg:gap-8">
+        <div className="sm:col-span-2 lg:col-span-4">
           <div className="inline-block bg-white p-3">
             <Logo size="md" />
           </div>
@@ -127,7 +127,7 @@ export function Footer() {
           </div>
         ))}
 
-        <div className="lg:col-span-3">
+        <div className="sm:col-span-2 lg:col-span-3">
           <h4 className="font-sans text-[12px] font-medium uppercase tracking-label text-white">Gmac Insights</h4>
           <p className="mt-5 text-[15px] leading-relaxed">
             Periodic briefings on workforce trends, research and fellowship cohorts.

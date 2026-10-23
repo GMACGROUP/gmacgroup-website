@@ -1,5 +1,6 @@
 import { HomeHero } from "@/sections/home/HomeHero";
 import { Figures } from "@/sections/home/Figures";
+import { WhereWeWork } from "@/sections/home/WhereWeWork";
 import { TwoDoors } from "@/sections/home/TwoDoors";
 import { ExpertiseIndex } from "@/sections/home/ExpertiseIndex";
 import { FounderNote } from "@/sections/home/FounderNote";
@@ -16,8 +17,9 @@ export default async function HomePage() {
   const next = upcoming.find((e) => e.start_at) ?? upcoming[0] ?? null;
   return (
     <>
-      <HomeHero />
+      <HomeHero team={team} />
       <Figures team={team} />
+      <WhereWeWork />
       <TwoDoors />
       <ExpertiseIndex />
       <FounderNote />

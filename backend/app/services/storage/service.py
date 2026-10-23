@@ -55,6 +55,18 @@ def format_file_size(size_bytes: int) -> str:
         return f"{size_bytes / (1024 * 1024):.1f} MB"
 
 
+def supabase_auth_headers(key: str) -> dict:
+    """Headers for Supabase Storage with either key style.
+
+    Legacy service_role keys are JWTs and go in both headers. Newer secret keys
+    (sb_secret_...) are not JWTs and are sent only as the apikey header.
+    """
+    key = (key or "").strip()
+    if key.startswith("sb_"):
+        return {"apikey": key}
+    return {"apikey": key, "Authorization": f"Bearer {key}"}
+
+
 class StorageService:
     def __init__(self):
         self.settings = get_settings()
@@ -196,7 +208,7 @@ class StorageService:
         supabase_url = self.settings.SUPABASE_URL.rstrip("/")
 
         headers = {
-            "Authorization": f"Bearer {self.settings.SUPABASE_SERVICE_ROLE_KEY}",
+            **supabase_auth_headers(self.settings.SUPABASE_SERVICE_ROLE_KEY),
             "Content-Type": content_type,
         }
 
@@ -271,7 +283,7 @@ class StorageService:
                         f"{supabase_url}/storage/v1/object/{self.settings.MEDIA_BUCKET}/{path}",
                         content=content,
                         headers={
-                            "Authorization": f"Bearer {self.settings.SUPABASE_SERVICE_ROLE_KEY}",
+                            **supabase_auth_headers(self.settings.SUPABASE_SERVICE_ROLE_KEY),
                             "Content-Type": content_type,
                             "Cache-Control": "public, max-age=31536000, immutable",
                         },
@@ -365,7 +377,7 @@ class StorageService:
                 res = await client.post(
                     f"{supabase_url}/storage/v1/object/sign/{self.settings.STORAGE_BUCKET}/{storage_path}",
                     json={"expiresIn": expires_in},
-                    headers={"Authorization": f"Bearer {self.settings.SUPABASE_SERVICE_ROLE_KEY}"},
+                    headers=supabase_auth_headers(self.settings.SUPABASE_SERVICE_ROLE_KEY),
                 )
             if res.status_code >= 400:
                 logger.warning("Could not sign document link: %s", res.text)

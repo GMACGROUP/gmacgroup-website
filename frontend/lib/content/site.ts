@@ -353,6 +353,7 @@ export const EVENTS: EventItem[] = [
 export const PARTNERS = [
   { name: "Tarragon Edge", role: "Partner on the Young Professionals Network mentorship programme." },
   { name: "LevelUp Africa", role: "Partner on professional development and audience programming." },
+  { name: "University of Ghana Economics Students' Society", role: "Student partner for the NIS Webinar Series." },
 ];
 
 export const FOUNDER = {

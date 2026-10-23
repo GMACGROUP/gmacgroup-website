@@ -15,9 +15,10 @@ const FOCUS_ORDER = ["Ghana", "Nigeria", "Côte d’Ivoire", "Togo", "Cameroon",
 
 export function AfricaMap({ className = "", tone = "light", numbered = true, showTeam = true, title }: Props) {
   const dark = tone === "dark";
-  const land = dark ? "#1F2C3E" : "#EDEAE3";
-  const border = dark ? "#33425A" : "#D6D1C6";
-  const focusFill = dark ? "#0B5CAD" : "#D5E3F3";
+  const land = dark ? "#1E2D42" : "#E2DDD3";
+  const border = dark ? "#3D526E" : "#9B9284";
+  const outerOutline = dark ? "#5A7291" : "#5F6C7D";
+  const focusFill = dark ? "#0B5CAD" : "#C8DCF0";
   const focusStroke = dark ? "#9CC0E6" : "#0B5CAD";
   const labelInk = dark ? "#FFFFFF" : "#0E1A2B";
 
@@ -40,11 +41,34 @@ export function AfricaMap({ className = "", tone = "light", numbered = true, sho
         viewBox={`0 0 ${MAP_WIDTH} ${MAP_HEIGHT}`}
         role="img"
         aria-labelledby="africa-map-title"
-        className="h-auto w-full"
+        className="h-auto w-full drop-shadow-sm"
       >
         <title id="africa-map-title">
           {title ?? `Map of Africa marking Gmac Group's ten focus markets: ${FOCUS_ORDER.join(", ")}.`}
         </title>
+
+        <defs>
+          <filter id="africa-map-shadow" x="-5%" y="-5%" width="112%" height="112%">
+            <feDropShadow dx="0" dy="4" stdDeviation="6" floodColor={dark ? "#000000" : "#0E1A2B"} floodOpacity={dark ? "0.45" : "0.1"} />
+          </filter>
+        </defs>
+
+        {/* 1. Outer continent coastline outline layer - creates crisp perimeter definition */}
+        <g aria-hidden="true" filter="url(#africa-map-shadow)">
+          {AFRICA.map((c) => (
+            <path
+              key={`outer-${c.name}`}
+              d={c.d}
+              fill={dark ? "#162233" : "#D4CEC3"}
+              stroke={outerOutline}
+              strokeWidth={2.6}
+              strokeLinejoin="round"
+              strokeLinecap="round"
+            />
+          ))}
+        </g>
+
+        {/* 2. Country polygons & distinct internal borders */}
         <g>
           {AFRICA.map((c) => (
             <path
@@ -52,8 +76,9 @@ export function AfricaMap({ className = "", tone = "light", numbered = true, sho
               d={c.d}
               fill={c.focus ? focusFill : land}
               stroke={c.focus ? focusStroke : border}
-              strokeWidth={c.focus ? 0.9 : 0.6}
+              strokeWidth={c.focus ? 1.6 : 0.85}
               strokeLinejoin="round"
+              className="transition-colors duration-150"
             />
           ))}
         </g>
@@ -67,10 +92,10 @@ export function AfricaMap({ className = "", tone = "light", numbered = true, sho
                   key={c.name}
                   cx={c.cx + dx + 9}
                   cy={c.cy + dy + 9}
-                  r={2.6}
-                  fill="#C8242B"
-                  stroke={dark ? "#0E1A2B" : "#FBFAF7"}
-                  strokeWidth={1.2}
+                  r={3.2}
+                  fill="#B4532A"
+                  stroke={dark ? "#0E1A2B" : "#FFFFFF"}
+                  strokeWidth={1.5}
                 />
               );
             })}
@@ -78,15 +103,15 @@ export function AfricaMap({ className = "", tone = "light", numbered = true, sho
         )}
 
         {numbered && (
-          <g fontFamily="var(--font-plex), 'IBM Plex Sans', sans-serif" fontSize="9" fontWeight={500}>
+          <g fontFamily="var(--font-sans), 'Libre Franklin', sans-serif" fontSize="9.5" fontWeight={700}>
             {focus.map((c, i) => {
               const [dx, dy] = nudge[c.name] ?? [0, 0];
               const x = c.cx + dx;
               const y = c.cy + dy;
               return (
                 <g key={c.name}>
-                  <circle cx={x} cy={y} r={7.5} fill={dark ? "#0E1A2B" : "#FBFAF7"} stroke={focusStroke} strokeWidth={1} />
-                  <text x={x} y={y + 3.1} textAnchor="middle" fill={labelInk}>
+                  <circle cx={x} cy={y} r={8} fill={dark ? "#0E1A2B" : "#FBFAF7"} stroke={focusStroke} strokeWidth={1.4} />
+                  <text x={x} y={y + 3.2} textAnchor="middle" fill={labelInk}>
                     {i + 1}
                   </text>
                 </g>

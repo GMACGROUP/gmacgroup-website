@@ -3,6 +3,8 @@ import Link from "next/link";
 import { Arrow } from "@/components/ui/Arrow";
 import { EventRow } from "@/components/events/EventRow";
 import { PastEvents } from "@/components/events/PastEvents";
+import { PastSpeakers } from "@/components/events/PastSpeakers";
+import { PAST_SPEAKERS } from "@/lib/content/speakers";
 import { EVENTS } from "@/lib/content/site";
 import { getEvents } from "@/lib/api/server";
 import { FORMAT_LABEL, dateBlock, dateLine, timeLine } from "@/lib/events";
@@ -30,15 +32,15 @@ export default async function EventsPage() {
   return (
     <>
       <header className="border-b border-rule">
-        <div className="wrap pb-14 pt-14 sm:pt-20 lg:pb-20 lg:pt-24">
-          <nav aria-label="Breadcrumb" className="text-sm text-ink-400">
-            <Link href="/" className="hover:text-ink">Home</Link>
-            <span className="mx-2" aria-hidden="true">/</span>
-            <span className="text-ink">Events</span>
+        <div className="wrap pb-16 pt-14 sm:pt-20 lg:pb-24 lg:pt-24">
+          <nav aria-label="Breadcrumb" className="breadcrumb">
+            <Link href="/">Home</Link>
+            <span className="breadcrumb-sep" aria-hidden="true">/</span>
+            <span className="breadcrumb-current">Events</span>
           </nav>
           <div className="mt-8 grid grid-cols-1 gap-10 lg:grid-cols-12">
             <h1 className="display-xl lg:col-span-8">
-              Convenings that put the right room together, <em className="font-light italic text-ink-500">then keep it.</em>
+              Convenings that put the right room together, <em className="heading-aside">then keep it.</em>
             </h1>
             <div className="flex flex-col justify-end gap-5 lg:col-span-4">
               <p className="lede">
@@ -55,7 +57,7 @@ export default async function EventsPage() {
 
       {/* Featured upcoming */}
       {featured && (
-        <section aria-labelledby="featured-title" className="bg-navy text-white">
+        <section aria-labelledby="featured-title" className="band-blue text-white">
           <div className="wrap grid grid-cols-1 gap-10 py-16 sm:py-20 lg:grid-cols-12">
             <div className="lg:col-span-3">
               <p className="text-[12px] font-medium uppercase tracking-label text-accent-soft">Next flagship</p>
@@ -134,6 +136,27 @@ export default async function EventsPage() {
             <Count n={past.length} />
           </h2>
           <PastEvents events={past} />
+        </div>
+      </section>
+
+      {/* Past speakers */}
+      <section id="speakers" aria-labelledby="speakers-title" className="site-section border-t border-rule scroll-mt-24">
+        <div className="wrap">
+          <div className="grid grid-cols-1 gap-8 lg:grid-cols-12">
+            <div className="lg:col-span-4">
+              <p className="eyebrow">Who has spoken</p>
+            </div>
+            <div className="lg:col-span-8">
+              <h2 id="speakers-title" className="display-lg max-w-[22ch]">Past speakers.</h2>
+              <p className="lede mt-6 max-w-[60ch]">
+                Ambassadors, chief executives, economists and founders who have spoken across the NIS Webinar Series and the
+                Leadership 2050 Summit since 2021.
+              </p>
+            </div>
+          </div>
+          <div className="mt-14">
+            <PastSpeakers speakers={PAST_SPEAKERS} />
+          </div>
         </div>
       </section>
 

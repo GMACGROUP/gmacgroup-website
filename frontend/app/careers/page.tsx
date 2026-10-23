@@ -20,15 +20,15 @@ export default async function CareersPage() {
   return (
     <>
       <header className="border-b border-rule">
-        <div className="wrap pb-14 pt-14 sm:pt-20 lg:pb-20 lg:pt-24">
-          <nav aria-label="Breadcrumb" className="text-sm text-ink-400">
-            <Link href="/" className="hover:text-ink">Home</Link>
-            <span className="mx-2" aria-hidden="true">/</span>
-            <span className="text-ink">Careers</span>
+        <div className="wrap pb-16 pt-14 sm:pt-20 lg:pb-24 lg:pt-24">
+          <nav aria-label="Breadcrumb" className="breadcrumb">
+            <Link href="/">Home</Link>
+            <span className="breadcrumb-sep" aria-hidden="true">/</span>
+            <span className="breadcrumb-current">Careers</span>
           </nav>
           <div className="mt-8 grid grid-cols-1 gap-10 lg:grid-cols-12">
             <h1 className="display-xl lg:col-span-8">
-              Work on the evidence <em className="font-light italic text-ink-500">and the people, at the same time.</em>
+              Work on the evidence <em className="heading-aside">and the people, at the same time.</em>
             </h1>
             <dl className="grid grid-cols-2 gap-6 self-end lg:col-span-4">
               {[people, countries].map((f) => (
@@ -85,8 +85,7 @@ export default async function CareersPage() {
           </div>
           <ol className="border-t border-ink lg:col-span-7 lg:col-start-6">
             {TEAMS.map((t) => (
-              <li key={t.name} className="grid grid-cols-[3rem_1fr] gap-4 border-b border-ink/15 py-6">
-                <span className="tabular-nums text-accent">{t.number}</span>
+              <li key={t.name} className="border-b border-ink/15 py-6">
                 <div>
                   <h3 className="font-display text-xl">{t.name}</h3>
                   <p className="mt-1.5 text-[15px] leading-relaxed text-ink-600">{t.remit}</p>

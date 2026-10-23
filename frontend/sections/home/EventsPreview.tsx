@@ -34,7 +34,7 @@ export function EventsPreview({ next }: { next?: GmacEvent | null }) {
           </Link>
         )}
 
-        <div className="mt-16 grid gap-px bg-ink/15 md:grid-cols-3">
+        <div className="mt-16 grid gap-px bg-ink/15 sm:grid-cols-2 md:grid-cols-3">
           {flagships.map((e, k) => (
             <article key={e.title} className="reveal flex flex-col bg-paper p-8 sm:p-10" style={{ transitionDelay: `${k * 90}ms` }}>
               <p className="flex items-center justify-between text-[12px] font-medium uppercase tracking-label">
