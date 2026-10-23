@@ -1,10 +1,13 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useEffect, useState } from "react";
+import Link from "next/link";
 import { apiClient } from "@/lib/api/client";
 import { useAuth } from "@/hooks/useAuth";
-import { Opportunity } from "@/types";
-import { BriefcaseIcon, CheckCircleIcon, XMarkIcon } from "@/components/common/Icons";
+import type { OfferType, Opportunity } from "@/types";
+import { Dialog, money } from "@/components/modals/Dialog";
+import { DocumentUploadDropzone } from "@/components/forms/DocumentUploadDropzone";
+import { Arrow } from "@/components/ui/Arrow";
 
 interface ApplicationModalProps {
   opportunity: Opportunity | null;
@@ -13,218 +16,183 @@ interface ApplicationModalProps {
   onSuccess?: () => void;
 }
 
-export function ApplicationModal({
-  opportunity,
-  isOpen,
-  onClose,
-  onSuccess,
-}: ApplicationModalProps) {
+export const ROLE_TYPE: Record<string, string> = {
+  internship: "Internship",
+  employment: "Role",
+  fellowship: "Fellowship",
+  other: "Opportunity",
+};
+
+export function ApplicationModal({ opportunity, isOpen, onClose, onSuccess }: ApplicationModalProps) {
   const { user } = useAuth();
   const [submitting, setSubmitting] = useState(false);
   const [submitted, setSubmitted] = useState(false);
   const [error, setError] = useState<string | null>(null);
-
-  const [formData, setFormData] = useState({
+  const [offerType, setOfferType] = useState<OfferType>("free");
+  const [form, setForm] = useState({
     applicant_name: "",
     applicant_email: "",
     phone: "",
     linkedin_url: "",
+    resume_url: "",
     cover_note: "",
   });
 
   useEffect(() => {
     if (user && typeof user === "object") {
-      setFormData((prev) => ({
-        ...prev,
-        applicant_name: user.full_name || prev.applicant_name,
-        applicant_email: user.email || prev.applicant_email,
-        phone: user.phone || prev.phone,
-        organization: user.organization || "",
+      setForm((f) => ({
+        ...f,
+        applicant_name: user.full_name || f.applicant_name,
+        applicant_email: user.email || f.applicant_email,
+        phone: user.phone || f.phone,
       }));
     }
     setSubmitted(false);
     setError(null);
+    setOfferType(opportunity?.offers?.[0]?.type || "free");
   }, [user, isOpen, opportunity]);
 
   if (!isOpen || !opportunity) return null;
 
-  async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
+  const closed = Boolean(opportunity.deadline && new Date(opportunity.deadline).getTime() < Date.now());
+  const offer = opportunity.offers?.find((o) => o.type === offerType);
+  const paid = Boolean(offer && offer.amount > 0);
+  const meta = [
+    opportunity.location,
+    opportunity.deadline &&
+      `Apply by ${new Date(opportunity.deadline).toLocaleDateString("en-GB", { day: "numeric", month: "long", year: "numeric" })}`,
+  ]
+    .filter(Boolean)
+    .join(" · ");
+
+  async function submit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
     if (!opportunity) return;
+    if (form.linkedin_url && !/^https:\/\//.test(form.linkedin_url)) {
+      setError("Profile links must start with https://");
+      return;
+    }
     setSubmitting(true);
     setError(null);
-
     try {
-      await apiClient.post(`/opportunities/${opportunity.id}/apply`, formData);
+      if (offer && offer.amount > 0) {
+        const payment = await apiClient.post<{ checkout_url?: string }>("/payments/initialize", {
+          target_type: "opportunity",
+          target_id: opportunity.id,
+          offer_type: offer.type,
+          email: form.applicant_email,
+          full_name: form.applicant_name,
+          details: form,
+        });
+        if (payment.checkout_url) window.location.assign(payment.checkout_url);
+        return;
+      }
+      await apiClient.post(`/opportunities/${opportunity.id}/apply`, { ...form, offer_type: offerType });
       setSubmitted(true);
-      if (onSuccess) onSuccess();
+      onSuccess?.();
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Failed to submit application");
+      setError(err instanceof Error ? err.message : "We could not submit your application. Please try again.");
     } finally {
       setSubmitting(false);
     }
   }
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-fadeIn">
-      <div
-        className="relative w-full max-w-lg bg-white rounded-3xl shadow-2xl border border-slate-200 overflow-hidden"
-        role="dialog"
-        aria-modal="true"
-      >
-        {/* Top Gradient Stripe */}
-        <div className="h-2 bg-gradient-to-r from-brand-navy via-brand-cyan to-brand-red" />
-
-        {/* Close Button */}
-        <button
-          onClick={onClose}
-          className="absolute top-5 right-5 p-2 rounded-full text-slate-400 hover:text-slate-700 hover:bg-slate-100 transition-colors"
-          aria-label="Close modal"
-        >
-          <XMarkIcon className="w-5 h-5" />
-        </button>
-
-        <div className="p-6 sm:p-8">
-          {!submitted ? (
-            <>
-              <div className="flex items-center gap-2 mb-2 text-brand-navy text-xs font-bold uppercase tracking-wider">
-                <BriefcaseIcon className="w-4 h-4" />
-                <span>Application Form</span>
-              </div>
-              <h2 className="text-xl sm:text-2xl font-bold text-slate-900 font-serif leading-snug">
-                Apply for {opportunity.title}
-              </h2>
-              <p className="text-xs sm:text-sm text-slate-500 mt-1 mb-6">
-                {opportunity.organization || "GMAC GROUP"} • {opportunity.location || "Hybrid"}
-              </p>
-
-              <form onSubmit={handleSubmit} className="space-y-4">
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                  <div>
-                    <label className="block text-xs font-bold text-slate-800 uppercase tracking-wider mb-1.5">
-                      Full Name <span className="text-brand-red">*</span>
-                    </label>
-                    <input
-                      type="text"
-                      required
-                      value={formData.applicant_name}
-                      onChange={(e) =>
-                        setFormData({ ...formData, applicant_name: e.target.value })
-                      }
-                      placeholder="e.g. Kwame Mensah"
-                      className="w-full px-3.5 py-2.5 text-xs sm:text-sm rounded-xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-brand-navy/30 focus:border-brand-navy bg-slate-50 focus:bg-white transition-all text-slate-900"
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-xs font-bold text-slate-800 uppercase tracking-wider mb-1.5">
-                      Email Address <span className="text-brand-red">*</span>
-                    </label>
-                    <input
-                      type="email"
-                      required
-                      value={formData.applicant_email}
-                      onChange={(e) =>
-                        setFormData({ ...formData, applicant_email: e.target.value })
-                      }
-                      placeholder="kwame@example.com"
-                      className="w-full px-3.5 py-2.5 text-xs sm:text-sm rounded-xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-brand-navy/30 focus:border-brand-navy bg-slate-50 focus:bg-white transition-all text-slate-900"
-                    />
-                  </div>
-                </div>
-
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                  <div>
-                    <label className="block text-xs font-bold text-slate-800 uppercase tracking-wider mb-1.5">
-                      Phone Number
-                    </label>
-                    <input
-                      type="tel"
-                      value={formData.phone}
-                      onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
-                      placeholder="+233 24 123 4567"
-                      className="w-full px-3.5 py-2.5 text-xs sm:text-sm rounded-xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-brand-navy/30 focus:border-brand-navy bg-slate-50 focus:bg-white transition-all text-slate-900"
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-xs font-bold text-slate-800 uppercase tracking-wider mb-1.5">
-                      LinkedIn / Portfolio URL
-                    </label>
-                    <input
-                      type="url"
-                      value={formData.linkedin_url}
-                      onChange={(e) =>
-                        setFormData({ ...formData, linkedin_url: e.target.value })
-                      }
-                      placeholder="https://linkedin.com/in/..."
-                      className="w-full px-3.5 py-2.5 text-xs sm:text-sm rounded-xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-brand-navy/30 focus:border-brand-navy bg-slate-50 focus:bg-white transition-all text-slate-900"
-                    />
-                  </div>
-                </div>
-
-                <div>
-                  <label className="block text-xs font-bold text-slate-800 uppercase tracking-wider mb-1.5">
-                    Statement of Interest / Experience Summary <span className="text-brand-red">*</span>
-                  </label>
-                  <textarea
-                    required
-                    rows={3}
-                    value={formData.cover_note}
-                    onChange={(e) =>
-                      setFormData({ ...formData, cover_note: e.target.value })
-                    }
-                    placeholder="Briefly describe your background, career ambitions, and why you are interested in this position..."
-                    className="w-full px-3.5 py-2.5 text-xs sm:text-sm rounded-xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-brand-navy/30 focus:border-brand-navy bg-slate-50 focus:bg-white transition-all text-slate-900 resize-none"
-                  />
-                </div>
-
-                {error && (
-                  <p className="p-3 rounded-xl bg-red-50 text-xs font-semibold text-brand-red border border-red-200 text-center">
-                    {error}
-                  </p>
-                )}
-
-                <div className="pt-2 flex items-center justify-end gap-3">
-                  <button
-                    type="button"
-                    onClick={onClose}
-                    className="px-4 py-2.5 rounded-xl text-xs font-bold text-slate-600 hover:bg-slate-100 transition-colors"
-                  >
-                    Cancel
-                  </button>
-                  <button
-                    type="submit"
-                    disabled={submitting}
-                    className="px-6 py-2.5 rounded-xl text-xs sm:text-sm font-bold text-white bg-brand-navy hover:bg-brand-navyDark shadow-md hover:shadow-lg transition-all disabled:opacity-50"
-                  >
-                    {submitting ? "Submitting Application..." : "Submit Application →"}
-                  </button>
-                </div>
-              </form>
-            </>
-          ) : (
-            <div className="text-center py-6 space-y-4">
-              <div className="w-14 h-14 mx-auto rounded-full bg-emerald-100 text-emerald-600 flex items-center justify-center">
-                <CheckCircleIcon className="w-8 h-8" />
-              </div>
-              <h3 className="text-xl sm:text-2xl font-bold text-slate-900 font-serif">
-                Application Received!
-              </h3>
-              <p className="text-xs sm:text-sm text-slate-600 max-w-sm mx-auto leading-relaxed">
-                Thank you for applying to <strong>{opportunity.title}</strong>. Our human capital selection committee will review your profile and contact you via{" "}
-                <strong>{formData.applicant_email}</strong>.
-              </p>
-              <div className="pt-4 flex items-center justify-center gap-3">
-                <button
-                  onClick={onClose}
-                  className="px-6 py-2.5 rounded-xl text-xs sm:text-sm font-bold text-white bg-brand-navy hover:bg-brand-navyDark shadow-sm transition-all"
-                >
-                  Done
-                </button>
-              </div>
-            </div>
-          )}
+    <Dialog
+      open={isOpen}
+      onClose={onClose}
+      eyebrow={submitted ? "Application received" : ROLE_TYPE[opportunity.type] || "Opportunity"}
+      title={submitted ? `Thank you, ${form.applicant_name.split(" ")[0] || "for applying"}.` : opportunity.title}
+      meta={!submitted && meta ? meta : undefined}
+    >
+      {closed ? (
+        <div>
+          <p className="text-[15px] leading-relaxed text-ink-600">
+            Applications for this opportunity have closed. You are welcome to send a speculative note for future roles.
+          </p>
+          <Link href="/contact?topic=careers" className="btn-primary mt-6">
+            Write to us
+            <Arrow />
+          </Link>
         </div>
-      </div>
-    </div>
+      ) : submitted ? (
+        <div role="status">
+          <p className="text-[15px] leading-relaxed text-ink-600">
+            Your application for <strong className="font-medium text-ink">{opportunity.title}</strong> has reached our team. A
+            confirmation is on its way to {form.applicant_email}. We reply to every applicant once the shortlist is decided.
+          </p>
+          <button type="button" onClick={onClose} className="btn-primary mt-6">
+            Done
+          </button>
+        </div>
+      ) : (
+        <form onSubmit={submit} className="space-y-5">
+          {opportunity.offers && opportunity.offers.length > 1 && (
+            <fieldset>
+              <legend className="field-label">Choose an option</legend>
+              <div className="mt-1 divide-y divide-rule border border-ink/20 bg-white">
+                {opportunity.offers.map((o) => (
+                  <label key={o.type} className="flex cursor-pointer items-center justify-between gap-4 px-4 py-3 text-sm">
+                    <span className="flex items-center gap-3">
+                      <input type="radio" name="offer" value={o.type} checked={offerType === o.type} onChange={() => setOfferType(o.type)} className="accent-[#0B5CAD]" />
+                      <span className="text-ink">{o.label}</span>
+                    </span>
+                    <span className="tabular-nums text-ink-500">{o.amount > 0 ? money(o.amount, o.currency) : "No fee"}</span>
+                  </label>
+                ))}
+              </div>
+            </fieldset>
+          )}
+
+          <div className="grid grid-cols-1 gap-5 sm:grid-cols-2">
+            <div>
+              <label htmlFor="ap-name" className="field-label">Full name *</label>
+              <input id="ap-name" required autoComplete="name" className="field" value={form.applicant_name} onChange={(e) => setForm({ ...form, applicant_name: e.target.value })} />
+            </div>
+            <div>
+              <label htmlFor="ap-email" className="field-label">Email *</label>
+              <input id="ap-email" type="email" required autoComplete="email" className="field" value={form.applicant_email} onChange={(e) => setForm({ ...form, applicant_email: e.target.value })} />
+            </div>
+            <div>
+              <label htmlFor="ap-phone" className="field-label">Phone <span className="font-normal text-ink-400">(optional)</span></label>
+              <input id="ap-phone" type="tel" autoComplete="tel" className="field" value={form.phone} onChange={(e) => setForm({ ...form, phone: e.target.value })} />
+            </div>
+            <div>
+              <label htmlFor="ap-link" className="field-label">LinkedIn <span className="font-normal text-ink-400">(optional)</span></label>
+              <input id="ap-link" type="url" placeholder="https://" className="field" value={form.linkedin_url} onChange={(e) => setForm({ ...form, linkedin_url: e.target.value })} />
+            </div>
+          </div>
+
+          <div>
+            <label htmlFor="ap-note" className="field-label">Why this, and why now? *</label>
+            <textarea id="ap-note" required rows={5} maxLength={4000} className="field" value={form.cover_note} onChange={(e) => setForm({ ...form, cover_note: e.target.value })} />
+            <p className="mt-1.5 text-[13px] text-ink-400">A short note is enough: what you have done that is relevant, and what you want to learn.</p>
+          </div>
+
+          <DocumentUploadDropzone value={form.resume_url} onChange={(url) => setForm((f) => ({ ...f, resume_url: url }))} />
+
+          <p className="text-[13px] leading-relaxed text-ink-400">
+            We use your application only to assess it and keep it for up to twelve months, as described in our{" "}
+            <Link href="/privacy" className="text-accent underline underline-offset-4">privacy notice</Link>.
+          </p>
+
+          {error && (
+            <p role="alert" className="border border-red-200 bg-red-50 px-4 py-3 text-sm text-danger">
+              {error}
+            </p>
+          )}
+
+          <div className="flex flex-col-reverse gap-3 pt-1 sm:flex-row sm:items-center sm:justify-end">
+            <button type="button" onClick={onClose} className="btn-secondary">
+              Cancel
+            </button>
+            <button type="submit" disabled={submitting} className="btn-primary disabled:opacity-60">
+              {submitting ? "Sending..." : paid && offer ? `Continue to payment, ${money(offer.amount, offer.currency)}` : "Submit application"}
+              <Arrow />
+            </button>
+          </div>
+        </form>
+      )}
+    </Dialog>
   );
 }

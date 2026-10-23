@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 700" role="img" aria-labelledby="title desc">
+  <title id="title">Connected workforce network</title>
+  <desc id="desc">Abstract people and pathways representing talent, training, and workforce connections.</desc>
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#063f4a"/><stop offset="1" stop-color="#0a6e72"/></linearGradient>
+  </defs>
+  <rect width="1200" height="700" fill="url(#bg)"/>
+  <circle cx="970" cy="120" r="190" fill="#b4e2d8" opacity=".1"/><circle cx="180" cy="580" r="260" fill="#f4c95d" opacity=".08"/>
+  <g stroke="#b4e2d8" stroke-width="4" opacity=".5" fill="none"><path d="M165 465 L390 260 L610 405 L850 190 L1040 355"/><path d="M390 260 L850 190"/><path d="M610 405 L1040 355"/></g>
+  <g fill="#f7faf9" stroke="#063f4a" stroke-width="10">
+    <circle cx="165" cy="465" r="35"/><circle cx="390" cy="260" r="35"/><circle cx="610" cy="405" r="35"/><circle cx="850" cy="190" r="35"/><circle cx="1040" cy="355" r="35"/>
+  </g>
+  <g fill="#f4c95d"><circle cx="165" cy="465" r="13"/><circle cx="390" cy="260" r="13"/><circle cx="610" cy="405" r="13"/><circle cx="850" cy="190" r="13"/><circle cx="1040" cy="355" r="13"/></g>
+  <g fill="#f7faf9" opacity=".9"><rect x="72" y="104" width="270" height="110" rx="10"/><rect x="830" y="490" width="280" height="105" rx="10"/></g>
+  <g fill="#0a6e72" opacity=".65"><rect x="105" y="140" width="105" height="9" rx="4"/><rect x="105" y="169" width="190" height="9" rx="4"/><rect x="865" y="528" width="125" height="9" rx="4"/><rect x="865" y="557" width="205" height="9" rx="4"/></g>
+  <path d="M70 620 H1130" stroke="#f4c95d" stroke-width="8" opacity=".75"/><path d="M120 620 V585 M210 620 V565 M300 620 V600 M390 620 V540 M480 620 V580 M570 620 V550 M660 620 V595 M750 620 V560 M840 620 V575 M930 620 V530 M1020 620 V590" stroke="#b4e2d8" stroke-width="12" opacity=".8"/>
+</svg>
