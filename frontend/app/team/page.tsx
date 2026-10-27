@@ -69,12 +69,7 @@ export default async function TeamPage() {
             <h2 className="mt-3 font-display text-4xl text-white sm:text-5xl">{FOUNDER.name}</h2>
             <p className="mt-6 max-w-[62ch] text-[15px] leading-relaxed text-white/70">{FOUNDER.bio[0]}</p>
             <p className="mt-4 max-w-[62ch] text-[15px] leading-relaxed text-white/70">{FOUNDER.bio[1]}</p>
-            <div className="mt-6">
-              <Link href="/team/raphael-sochima-ajana" className="link-arrow !text-white hover:!text-accent-soft text-[15px] font-medium">
-                Learn More
-                <Arrow />
-              </Link>
-            </div>
+            <div className="mt-6" aria-hidden="true" />
           </div>
         </div>
       </section>
