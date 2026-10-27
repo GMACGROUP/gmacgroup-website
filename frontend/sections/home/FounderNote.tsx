@@ -1,0 +1,60 @@
+import Link from "next/link";
+import { Arrow } from "@/components/ui/Arrow";
+import { Portrait } from "@/components/editorial/Portrait";
+import { FOUNDER } from "@/lib/content/site";
+
+export function FounderNote() {
+  return (
+    <section className="site-section bg-ink text-white">
+      <div className="wrap grid grid-cols-1 gap-12 lg:grid-cols-12 lg:gap-16">
+        <div className="lg:col-span-4">
+          <p className="eyebrow !text-white/60">
+            <span className="eyebrow-num !text-accent-soft">03</span> Founding principle
+          </p>
+          <div className="mt-8 w-full max-w-[220px] sm:max-w-[240px] overflow-hidden bg-ink-900 border border-white/15 shadow-xl">
+            <Portrait
+              name={FOUNDER.name}
+              src={FOUNDER.photo}
+              className="aspect-[3/4] w-full object-cover transition-transform duration-300 group-hover:scale-105"
+              sizes="(max-width: 640px) 220px, 240px"
+              interactive={true}
+              showBadge={false}
+            />
+          </div>
+        </div>
+        <div className="flex flex-col justify-between lg:col-span-8">
+          <blockquote className="reveal">
+            <p className="pull-quote !border-l-0 !pl-0 !text-white sm:!text-[2.75rem] lg:!text-[3.25rem] !leading-[1.18]">
+              <span className="text-accent-soft">&ldquo;</span>
+              {FOUNDER.quote}
+              <span className="text-accent-soft">&rdquo;</span>
+            </p>
+            <footer className="mt-10 flex items-center gap-4 text-[15px]">
+              <span className="h-px w-12 bg-accent-soft" aria-hidden="true" />
+              <span>
+                <span className="font-medium text-white tracking-wide">{FOUNDER.name}</span>
+                <span className="text-white/60">, {FOUNDER.role}</span>
+              </span>
+            </footer>
+          </blockquote>
+          <div className="mt-14 grid grid-cols-1 gap-8 border-t border-white/15 pt-8 sm:grid-cols-2">
+            <p className="text-[16px] leading-relaxed text-white/80">
+              Gmac Group began with a gap visible from both sides of the same room. Graduates were leaving university with
+              credentials but without a route into work. Institutions were making decisions about those same graduates on
+              evidence that was thin, imported or out of date.
+            </p>
+            <div className="flex flex-col justify-between gap-6">
+              <p className="text-[16px] leading-relaxed text-white/80">
+                The firm works remotely by design. The team assembles around a brief rather than a building.
+              </p>
+              <Link href="/about" className="link-arrow !text-white hover:!text-accent-soft">
+                Read our story
+                <Arrow />
+              </Link>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  );
+}

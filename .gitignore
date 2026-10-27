@@ -14,6 +14,7 @@ npm-debug.log*
 backend/__pycache__/
 backend/**/__pycache__/
 backend/.venv/
+/.venv311/
 backend/*.egg-info/
 backend/.pytest_cache/
 
@@ -24,3 +25,10 @@ Thumbs.db
 # IDE
 .vscode/
 .idea/
+
+# Local uploads (development only)
+uploads/*
+!uploads/.gitkeep
+# Uploaded files must never be committed (they contain personal data)
+uploads/
+backend/uploads/

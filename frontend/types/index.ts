@@ -44,6 +44,15 @@ export type ProgrammeCategory =
   | "training"
   | "institutional";
 
+export type OfferType = "free" | "vip" | "premium";
+
+export interface Offer {
+  type: OfferType;
+  label: string;
+  amount: number;
+  currency: string;
+}
+
 export interface Programme {
   id: string;
   title: string;
@@ -51,6 +60,7 @@ export interface Programme {
   description?: string;
   start_date?: string | null; // ISO 8601 datetime string or null
   end_date?: string | null;   // ISO 8601 datetime string or null
+  offers?: Offer[];
 }
 
 export interface EnrolmentCreate {
@@ -89,6 +99,7 @@ export interface Opportunity {
   location?: string;
   description?: string;
   deadline?: string | null; // ISO 8601 datetime string or null
+  offers?: Offer[];
 }
 
 export interface ApplicationCreate {

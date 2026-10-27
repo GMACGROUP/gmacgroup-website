@@ -3,7 +3,8 @@
 from datetime import datetime
 from enum import Enum
 from typing import Optional
-from pydantic import BaseModel, ConfigDict, EmailStr
+from uuid import UUID
+from pydantic import BaseModel, ConfigDict, EmailStr, Field
 
 
 class ProgrammeCategory(str, Enum):
@@ -13,6 +14,19 @@ class ProgrammeCategory(str, Enum):
     INSTITUTIONAL = "institutional"
 
 
+class OfferType(str, Enum):
+    FREE = "free"
+    VIP = "vip"
+    PREMIUM = "premium"
+
+
+class OfferOut(BaseModel):
+    type: OfferType
+    label: str
+    amount: float
+    currency: str = "GHS"
+
+
 class ProgrammeOut(BaseModel):
     id: str
     title: str
@@ -20,23 +34,43 @@ class ProgrammeOut(BaseModel):
     description: Optional[str] = None
     start_date: Optional[datetime] = None
     end_date: Optional[datetime] = None
+    offers: list[OfferOut] = []
 
     model_config = ConfigDict(from_attributes=True)
 
 
+class ProgrammeCreate(BaseModel):
+    title: str
+    category: ProgrammeCategory = ProgrammeCategory.STUDENT
+    description: Optional[str] = None
+    start_date: Optional[datetime] = None
+    end_date: Optional[datetime] = None
+    offers: list[OfferOut] = []
+
+
+class ProgrammeUpdate(BaseModel):
+    title: Optional[str] = None
+    category: Optional[ProgrammeCategory] = None
+    description: Optional[str] = None
+    start_date: Optional[datetime] = None
+    end_date: Optional[datetime] = None
+    offers: Optional[list[OfferOut]] = None
+
+
 class EnrolmentCreate(BaseModel):
-    full_name: Optional[str] = None
+    full_name: Optional[str] = Field(default=None, max_length=120)
     email: Optional[EmailStr] = None
-    phone: Optional[str] = None
-    organization: Optional[str] = None
-    notes: Optional[str] = None
+    phone: Optional[str] = Field(default=None, max_length=40)
+    organization: Optional[str] = Field(default=None, max_length=160)
+    notes: Optional[str] = Field(default=None, max_length=2000)
+    offer_type: OfferType = OfferType.FREE
 
 
 class EnrolmentOut(BaseModel):
-    id: str
+    id: UUID
     programme_id: str
     programme_title: Optional[str] = None
-    user_id: Optional[str] = None
+    user_id: Optional[UUID] = None
     full_name: Optional[str] = None
     email: Optional[str] = None
     status: str

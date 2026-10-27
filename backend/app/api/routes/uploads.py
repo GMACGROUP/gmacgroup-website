@@ -1,0 +1,124 @@
+"""Document upload and retrieval routes."""
+
+import mimetypes
+import os
+from uuid import UUID
+
+from fastapi import APIRouter, Depends, File, Form, HTTPException, UploadFile, status
+from fastapi.responses import FileResponse, RedirectResponse
+from sqlalchemy.orm import Session
+
+from app.api.dependencies import require_role
+from app.core.database import get_db
+from app.core.ratelimit import rate_limit
+from app.models.opportunity import Application
+from app.services.storage.service import storage_service
+
+router = APIRouter()
+admin_only = require_role("admin")
+
+
+@router.post("/document", status_code=status.HTTP_201_CREATED)
+async def upload_document(
+    file: UploadFile = File(...),
+    folder: str = Form("resumes"),
+    _: None = Depends(rate_limit("upload", limit=10, window_seconds=600)),
+):
+    """Upload a candidate resume, CV, or proposal document (PDF/DOCX, max 10MB)."""
+    return await storage_service.save_document(file, folder=folder)
+
+
+@router.get("/files/{file_id}/{filename}")
+async def get_uploaded_file(
+    file_id: str,
+    filename: str,
+    folder: str = "resumes",
+    _: dict = Depends(admin_only),
+):
+    """Retrieve and stream an uploaded file for browser inline viewing or download."""
+    path = storage_service.get_local_file_path(file_id, filename, folder=folder)
+    if not path:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Requested document was not found or has been removed.",
+        )
+
+    mime_type, _ = mimetypes.guess_type(str(path))
+    if not mime_type:
+        mime_type = "application/pdf" if path.suffix.lower() == ".pdf" else "application/octet-stream"
+
+    # Inline disposition allows PDFs to open directly in the browser's PDF viewer / iframe
+    headers = {
+        "Content-Disposition": f'attachment; filename="{path.name}"',
+        "Cache-Control": "private, no-store",
+        "X-Content-Type-Options": "nosniff",
+    }
+
+    return FileResponse(
+        path=str(path),
+        media_type=mime_type,
+        headers=headers,
+    )
+
+
+@router.get("/signed/{token}")
+async def get_signed_file(token: str):
+    """Serve a locally stored document through a short-lived signed link (admin viewing)."""
+    path = storage_service.read_signed_token(token)
+    if not path:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="This link has expired. Open the document again from the admin console.")
+    mime_type, _ = mimetypes.guess_type(str(path))
+    return FileResponse(
+        path=str(path),
+        media_type=mime_type or "application/octet-stream",
+        headers={
+            "Content-Disposition": f'inline; filename="{path.name}"',
+            "Cache-Control": "private, no-store",
+            "X-Content-Type-Options": "nosniff",
+        },
+    )
+
+
+@router.get("/admin/applications/{application_id}/document")
+async def view_application_document(
+    application_id: UUID,
+    _: dict = Depends(admin_only),
+    db: Session = Depends(get_db),
+):
+    """Admin-secured endpoint to retrieve application document link or stream."""
+    application = db.get(Application, application_id)
+    if not application:
+        raise HTTPException(status_code=404, detail="Application not found")
+
+    if not application.resume_url:
+        raise HTTPException(status_code=404, detail="No document was attached to this application")
+
+    signed = await storage_service.signed_document_url(application.resume_url)
+    is_internal = signed is not None
+    document_url = signed or application.resume_url
+    if not is_internal and not document_url.startswith("https://"):
+        raise HTTPException(status_code=404, detail="The attached document link is not valid")
+    return {
+        "application_id": str(application.id),
+        "applicant_name": application.applicant_name,
+        "opportunity_title": application.opportunity_title,
+        "document_url": document_url,
+        "is_internal": is_internal,
+        "expires_in": 300 if is_internal else None,
+    }
+
+
+MEDIA_TYPES = {".jpg": "image/jpeg", ".png": "image/png", ".webp": "image/webp"}
+
+
+@router.get("/media/{folder}/{filename}")
+async def get_media(folder: str, filename: str):
+    """Serve a locally stored public image (development only; production uses Supabase)."""
+    path = storage_service.get_local_media_path(folder, filename)
+    if path is None:
+        raise HTTPException(status_code=404, detail="Image not found")
+    return FileResponse(
+        path,
+        media_type=MEDIA_TYPES[path.suffix],
+        headers={"Cache-Control": "public, max-age=31536000, immutable", "X-Content-Type-Options": "nosniff"},
+    )
