@@ -2,7 +2,6 @@ import Link from "next/link";
 import { Arrow } from "@/components/ui/Arrow";
 import { Portrait } from "@/components/editorial/Portrait";
 import { TEAMS } from "@/lib/content/site";
-import { getTeamMemberSlug } from "@/lib/content/team-bios";
 import type { TeamMember } from "@/lib/content/team-seed";
 
 export function TeamPreview({ team }: { team: TeamMember[] }) {
@@ -42,20 +41,17 @@ export function TeamPreview({ team }: { team: TeamMember[] }) {
         </div>
 
         <div className="grid grid-cols-2 gap-3 self-end sm:grid-cols-3 sm:gap-4 lg:col-span-7 lg:col-start-6">
-          {featured.map((m, k) => {
-            const memberSlug = getTeamMemberSlug(m.name);
-            return (
-              <Link key={m.id} href={`/team/${memberSlug}`} className={`group reveal block ${k % 3 === 1 ? "sm:translate-y-10" : ""}`}>
-                <div className="overflow-hidden bg-stone/40">
-                  <Portrait name={m.name} src={m.photo_url} className="aspect-[3/4] w-full object-cover transition-transform duration-300 group-hover:scale-105" sizes="(max-width: 640px) 50vw, 18vw" />
-                </div>
-                <p className="mt-3 text-[15px] font-bold text-accent transition-colors group-hover:text-accent-dark">{m.name}</p>
-                <p className="text-sm text-ink-500">
-                  {m.position}, {m.country}
-                </p>
-              </Link>
-            );
-          })}
+          {featured.map((m, k) => (
+            <div key={m.id} className={`group reveal ${k % 3 === 1 ? "sm:translate-y-10" : ""}`}>
+              <div className="overflow-hidden bg-stone/40">
+                <Portrait name={m.name} src={m.photo_url} className="aspect-[3/4] w-full object-cover transition-transform duration-300 group-hover:scale-105" sizes="(max-width: 640px) 50vw, 18vw" />
+              </div>
+              <p className="mt-3 text-[15px] font-bold text-accent">{m.name}</p>
+              <p className="text-sm text-ink-500">
+                {m.position}, {m.country}
+              </p>
+            </div>
+          ))}
         </div>
       </div>
     </section>
