@@ -20,41 +20,49 @@ export function TwoDoors() {
           </div>
         </div>
 
-        <div className="mt-16 grid lg:grid-cols-12">
+        <div className="mt-12 grid grid-cols-1 gap-6 lg:grid-cols-12 lg:gap-8">
           {/* Institutions */}
-          <div className="reveal relative bg-ink p-8 text-white sm:p-12 lg:col-span-7 border-t-2 border-accent-soft">
-            <p className="text-[12px] font-medium uppercase tracking-label text-accent-soft">Institutions</p>
-            <h3 className="mt-4 font-display text-3xl text-white sm:text-4xl leading-tight">Organisations making decisions that have to hold.</h3>
-            <ul className="mt-10 grid grid-cols-1 gap-x-10 sm:grid-cols-2">
-              {AUDIENCES.institutions.map((a) => (
-                <li key={a.who} className="border-t border-white/15 py-5 transition-colors">
-                  <p className="font-medium text-white">{a.who}</p>
-                  <p className="mt-1.5 text-[15px] leading-relaxed text-white/70">{a.need}</p>
-                </li>
-              ))}
-            </ul>
-            <Link href="/contact?topic=institution" className="btn-primary mt-8">
-              Discuss a brief
-              <Arrow />
-            </Link>
+          <div className="reveal relative flex flex-col justify-between rounded-2xl bg-ink p-8 text-white sm:p-10 lg:col-span-7 border border-white/10 shadow-elevate border-t-4 border-t-accent-soft">
+            <div>
+              <p className="text-[12px] font-semibold uppercase tracking-label text-accent-soft">Institutions</p>
+              <h3 className="mt-4 font-display text-3xl text-white sm:text-4xl leading-tight">Organisations making decisions that have to hold.</h3>
+              <ul className="mt-8 grid grid-cols-1 gap-x-8 sm:grid-cols-2">
+                {AUDIENCES.institutions.map((a) => (
+                  <li key={a.who} className="border-t border-white/15 py-4 transition-colors">
+                    <p className="font-medium text-white">{a.who}</p>
+                    <p className="mt-1 text-[14.5px] leading-relaxed text-white/70">{a.need}</p>
+                  </li>
+                ))}
+              </ul>
+            </div>
+            <div className="pt-8">
+              <Link href="/contact?topic=institution" className="btn-primary">
+                Discuss a brief
+                <Arrow />
+              </Link>
+            </div>
           </div>
 
           {/* Individuals */}
-          <div className="reveal relative border border-rule bg-white p-8 sm:p-12 lg:col-span-5 lg:border-l-0 border-t-2 sm:border-t-2 border-t-accent">
-            <p className="text-[12px] font-medium uppercase tracking-label text-accent">Individuals</p>
-            <h3 className="mt-4 font-display text-3xl sm:text-4xl leading-tight text-ink">People investing in their own next step.</h3>
-            <ul className="mt-10">
-              {AUDIENCES.individuals.map((a) => (
-                <li key={a.who} className="border-t border-rule py-5">
-                  <p className="font-medium text-ink">{a.who}</p>
-                  <p className="mt-1.5 text-[15px] leading-relaxed text-ink-600">{a.need}</p>
-                </li>
-              ))}
-            </ul>
-            <Link href="/programmes" className="btn-secondary mt-8">
-              Find a programme
-              <Arrow />
-            </Link>
+          <div className="reveal relative flex flex-col justify-between rounded-2xl border border-rule/90 bg-white p-8 sm:p-10 lg:col-span-5 shadow-card hover:shadow-card-hover border-t-4 border-t-accent transition-all duration-300">
+            <div>
+              <p className="text-[12px] font-semibold uppercase tracking-label text-accent">Individuals</p>
+              <h3 className="mt-4 font-display text-3xl sm:text-4xl leading-tight text-ink">People investing in their own next step.</h3>
+              <ul className="mt-8 space-y-1">
+                {AUDIENCES.individuals.map((a) => (
+                  <li key={a.who} className="border-t border-rule py-4">
+                    <p className="font-medium text-ink">{a.who}</p>
+                    <p className="mt-1 text-[14.5px] leading-relaxed text-ink-600">{a.need}</p>
+                  </li>
+                ))}
+              </ul>
+            </div>
+            <div className="pt-8">
+              <Link href="/programmes" className="btn-secondary">
+                Find a programme
+                <Arrow />
+              </Link>
+            </div>
           </div>
         </div>
       </div>

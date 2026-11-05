@@ -52,26 +52,26 @@ export function ExpertiseIndex() {
 
           <aside className="hidden lg:col-span-5 lg:block" aria-live="polite">
             <div className="sticky top-28">
-              <div className="border border-ink/15 bg-paper p-8">
-                <p className="font-display text-[5.5rem] leading-none text-accent/25" aria-hidden="true">{area.number}</p>
-                <p className="mt-5 font-display text-[1.5rem] italic leading-snug text-ink">{area.promise}</p>
-                <ul className="mt-6 space-y-2.5 text-[15.5px] text-ink-600">
+              <div className="rounded-2xl border border-rule/90 bg-white p-8 shadow-card">
+                <p className="font-display text-[5rem] leading-none text-accent/25" aria-hidden="true">{area.number}</p>
+                <p className="mt-4 font-display text-[1.45rem] italic leading-snug text-ink">{area.promise}</p>
+                <ul className="mt-6 space-y-2.5 text-[15px] text-ink-600">
                   {area.deliverables.slice(0, 4).map((d) => (
                     <li key={d} className="flex gap-3">
-                      <span className="mt-[0.6em] h-px w-3 shrink-0 bg-ink-400" aria-hidden="true" />
+                      <span className="mt-[0.6em] h-px w-3 shrink-0 bg-accent" aria-hidden="true" />
                       {d}
                     </li>
                   ))}
                 </ul>
               </div>
-              <dl className="mt-6 grid grid-cols-2 gap-6 border-t border-ink/15 pt-5 text-sm">
+              <dl className="mt-5 grid grid-cols-2 gap-4 rounded-xl border border-rule/80 bg-white/70 p-5 text-sm shadow-xs">
                 <div>
-                  <dt className="text-[11px] font-medium uppercase tracking-label text-ink-400">Engagement band</dt>
-                  <dd className="mt-1 text-ink">{area.band}</dd>
+                  <dt className="text-[11px] font-semibold uppercase tracking-label text-ink-400">Engagement band</dt>
+                  <dd className="mt-1 font-medium text-ink">{area.band}</dd>
                 </div>
                 <div>
-                  <dt className="text-[11px] font-medium uppercase tracking-label text-ink-400">Delivered by</dt>
-                  <dd className="mt-1 text-ink">{area.deliveredBy}</dd>
+                  <dt className="text-[11px] font-semibold uppercase tracking-label text-ink-400">Delivered by</dt>
+                  <dd className="mt-1 font-medium text-ink">{area.deliveredBy}</dd>
                 </div>
               </dl>
             </div>

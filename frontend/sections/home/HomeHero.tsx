@@ -25,7 +25,7 @@ export function HomeHero({ team }: { team: TeamMember[] }) {
 
   return (
     <section className="band-blue relative overflow-hidden text-white">
-      <div className="wrap grid grid-cols-1 items-center gap-12 pb-20 pt-14 sm:pt-20 lg:grid-cols-12 lg:gap-10 lg:pb-28 lg:pt-24">
+      <div className="wrap grid grid-cols-1 items-center gap-10 pb-16 pt-12 sm:pt-16 lg:grid-cols-12 lg:gap-12 lg:pb-20 lg:pt-16">
         <div className="lg:col-span-6 lg:pr-6">
           <p className="eyebrow !text-white/70">
             <span className="whitespace-nowrap font-semibold text-accent-soft">Gmac Group</span>

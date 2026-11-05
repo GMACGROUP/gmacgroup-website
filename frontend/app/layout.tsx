@@ -99,6 +99,11 @@ export const metadata: Metadata = {
   verification: {
     google: "VW4QlFjNydIW8WGazckKsseIg4k5_Dz2qaldEqktaTg",
   },
+  icons: {
+    icon: "/icon.png",
+    shortcut: "/favicon.ico",
+    apple: "/apple-icon.png",
+  },
   other: {
     "theme-color": "#0E1A2B",
   },

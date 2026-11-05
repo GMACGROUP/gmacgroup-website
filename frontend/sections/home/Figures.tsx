@@ -4,27 +4,25 @@ import type { TeamMember } from "@/lib/content/team-seed";
 export function Figures({ team }: { team: TeamMember[] }) {
   const figures = [...FIGURES, ...teamFigures(team)];
   return (
-    <section aria-label="Gmac Group in figures" className="bg-teal text-white">
-      <dl className="wrap grid grid-cols-1 divide-y divide-white/20 sm:grid-cols-2 sm:divide-y-0 lg:grid-cols-4">
-        {figures.map((f, i) => (
-          <div
-            key={f.label}
-            className={`reveal py-10 sm:py-12 ${
-              i % 2 === 1 ? "sm:border-l sm:border-white/25 sm:pl-8" : ""
-            } ${
-              i >= 2 ? "sm:border-t sm:border-white/25" : ""
-            } ${
-              i > 0 ? "lg:border-l lg:border-white/25 lg:border-t-0 lg:pl-8" : ""
-            } ${
-              i === 0 ? "lg:pl-0" : ""
-            }`}
-            style={{ transitionDelay: `${i * 80}ms` }}
-          >
-            <dd className="stat-number text-white">{f.display}</dd>
-            <dt className="mt-3 max-w-[26ch] text-[15px] leading-snug text-white/90">{f.label}</dt>
-          </div>
-        ))}
-      </dl>
+    <section aria-label="Gmac Group in figures" className="bg-teal text-white py-12 sm:py-14">
+      <div className="wrap">
+        <dl className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4 sm:gap-6">
+          {figures.map((f, i) => (
+            <div
+              key={f.label}
+              className="reveal rounded-xl border border-white/20 bg-white/10 p-6 sm:p-7 backdrop-blur-sm transition-all duration-300 hover:bg-white/[0.14] hover:-translate-y-0.5"
+              style={{ transitionDelay: `${i * 80}ms` }}
+            >
+              <dd className="stat-number !text-white text-4xl sm:text-5xl font-display font-medium tracking-tight">
+                {f.display}
+              </dd>
+              <dt className="mt-3 text-[14.5px] leading-relaxed text-white/85">
+                {f.label}
+              </dt>
+            </div>
+          ))}
+        </dl>
+      </div>
     </section>
   );
 }

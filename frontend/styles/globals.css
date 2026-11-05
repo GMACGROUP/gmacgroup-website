@@ -72,10 +72,10 @@
 @layer components {
   /* Layout */
   .wrap {
-    @apply mx-auto w-full max-w-site px-5 sm:px-8 lg:px-12;
+    @apply mx-auto w-full max-w-site px-5 sm:px-8 lg:px-10 xl:px-12;
   }
   .site-section {
-    @apply py-20 sm:py-24 lg:py-32;
+    @apply py-14 sm:py-16 lg:py-20;
   }
 
   /* Type scale */
@@ -113,13 +113,13 @@
 
   /* Cards */
   .card {
-    @apply bg-white border border-rule transition-colors duration-300;
+    @apply bg-white border border-rule/90 rounded-xl shadow-card transition-all duration-300;
   }
   .card-hover {
-    @apply hover:border-ink/40 transition-colors duration-300;
+    @apply hover:border-accent/40 hover:shadow-card-hover hover:-translate-y-1 transition-all duration-300;
   }
   .card-featured {
-    @apply bg-white border border-ink/30;
+    @apply bg-white border border-accent/30 rounded-xl shadow-card-featured;
   }
 
   /* Section backgrounds */

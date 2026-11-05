@@ -31,21 +31,21 @@ function inline(text: string): ReactNode[] {
 function Formatted({ content }: { content: string }) {
   const lines = content.replace(/\s+(#{1,3}\s+)/g, "\n\n$1").split(/\r?\n/);
   return (
-    <div className="space-y-2.5">
+    <div className="space-y-2">
       {lines.map((raw, i) => {
         const line = raw.trim();
         if (!line) return null;
         const heading = line.match(/^#{1,3}\s+(.+)/);
-        if (heading) return <p key={i} className="pt-1 font-display text-[17px] text-ink">{inline(heading[1])}</p>;
+        if (heading) return <p key={i} className="pt-1 font-display text-[16px] font-semibold text-ink">{inline(heading[1])}</p>;
         const bullet = line.match(/^(?:\*|-|•)\s+(.+)/);
         if (bullet)
           return (
-            <p key={i} className="grid grid-cols-[0.9rem_1fr]">
+            <p key={i} className="grid grid-cols-[0.9rem_1fr] text-[14px]">
               <span aria-hidden="true" className="text-accent">·</span>
               <span>{inline(bullet[1])}</span>
             </p>
           );
-        return <p key={i}>{inline(line)}</p>;
+        return <p key={i} className="text-[14px] leading-relaxed">{inline(line)}</p>;
       })}
     </div>
   );
@@ -120,53 +120,99 @@ export function AIChatWidget() {
           role="dialog"
           aria-modal="false"
           aria-labelledby="ask-title"
-          className="fixed inset-x-3 bottom-20 z-50 flex max-h-[78dvh] flex-col rounded-t-2xl border-t-4 border-ink bg-paper shadow-[0_-12px_40px_-12px_rgba(14,26,43,0.35)] sm:inset-x-auto sm:bottom-[5.5rem] sm:right-8 sm:h-[min(600px,calc(100dvh-6rem))] sm:max-h-none sm:w-[420px] sm:rounded-2xl sm:border sm:border-t-4 sm:border-ink/15 sm:border-t-ink sm:shadow-[0_20px_50px_-15px_rgba(14,26,43,0.4)] modal-panel-in"
+          className="fixed inset-x-3 bottom-3 z-50 flex max-h-[86dvh] flex-col overflow-hidden rounded-2xl border border-rule/90 bg-paper shadow-2xl transition-all sm:inset-x-auto sm:bottom-24 sm:right-6 sm:h-[min(620px,calc(100dvh-7rem))] sm:w-[410px] modal-panel-in"
         >
-          <header className="flex items-start justify-between gap-4 border-b border-rule px-5 pb-4 pt-5">
-            <div>
-              <h2 id="ask-title" className="font-display text-2xl leading-tight">Ask Gmac Group</h2>
-              <p className="mt-1 text-[13px] leading-snug text-ink-500">
-                Quick answers about our work. For a proposal, <Link href="/contact" onClick={() => setOpen(false)} className="text-accent underline underline-offset-2">write to the team</Link>.
-              </p>
+          {/* Header */}
+          <header className="flex items-center justify-between border-b border-rule/80 bg-white px-4 py-3.5">
+            <div className="flex items-center gap-3">
+              <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-accent text-xs font-bold text-white shadow-xs">
+                G
+              </span>
+              <div>
+                <h2 id="ask-title" className="font-display text-[17px] font-semibold text-ink leading-tight">
+                  Ask Gmac Group
+                </h2>
+                <div className="flex items-center gap-1.5 mt-0.5">
+                  <span className="h-1.5 w-1.5 rounded-full bg-emerald-500 animate-pulse" aria-hidden="true" />
+                  <p className="text-[11.5px] text-ink-500">Advisory & Programmes AI</p>
+                </div>
+              </div>
             </div>
-            <div className="flex shrink-0 items-center gap-1">
-              <button type="button" onClick={reset} className="px-2 py-1 text-[13px] text-ink-500 hover:text-ink">
+
+            <div className="flex items-center gap-1">
+              <button
+                type="button"
+                onClick={reset}
+                title="Restart chat"
+                className="flex items-center gap-1 rounded-lg px-2.5 py-1.5 text-[12px] font-medium text-ink-500 transition-colors hover:bg-stone hover:text-ink"
+              >
+                <svg className="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                </svg>
                 Restart
               </button>
-              <button type="button" onClick={() => setOpen(false)} aria-label="Close" className="p-1.5 text-ink-400 hover:text-ink">
-                <svg aria-hidden="true" viewBox="0 0 20 20" className="h-5 w-5" fill="none" stroke="currentColor" strokeWidth="1.6">
-                  <path d="M5 5l10 10M15 5L5 15" />
+              <button
+                type="button"
+                onClick={() => setOpen(false)}
+                aria-label="Close"
+                className="rounded-lg p-1.5 text-ink-400 transition-colors hover:bg-stone hover:text-ink"
+              >
+                <svg aria-hidden="true" viewBox="0 0 20 20" className="h-4 w-4" fill="none" stroke="currentColor" strokeWidth={2}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M5 5l10 10M15 5L5 15" />
                 </svg>
               </button>
             </div>
           </header>
 
-          <div className="flex-1 space-y-5 overflow-y-auto px-5 py-5 text-[15px] leading-relaxed text-ink-600" aria-live="polite">
+          {/* Conversation history */}
+          <div className="flex-1 space-y-4 overflow-y-auto p-4 text-[14.5px] leading-relaxed text-ink-700 bg-stone/20" aria-live="polite">
             {messages.map((m, i) =>
               m.role === "assistant" ? (
-                <div key={i} className="border-l-2 border-accent/60 pl-4">
-                  <Formatted content={m.content} />
+                <div key={i} className="flex items-start gap-2.5">
+                  <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-accent/15 text-[11px] font-bold text-accent">
+                    G
+                  </span>
+                  <div className="flex-1 rounded-2xl rounded-tl-xs border border-rule/80 bg-white p-3.5 shadow-card text-ink-700">
+                    <Formatted content={m.content} />
+                  </div>
                 </div>
               ) : (
                 <div key={i} className="flex justify-end">
-                  <p className="max-w-[85%] bg-accent-light px-4 py-2.5 text-ink">{m.content}</p>
+                  <p className="max-w-[85%] rounded-2xl rounded-tr-xs bg-ink px-4 py-2.5 text-[14px] text-white shadow-xs">
+                    {m.content}
+                  </p>
                 </div>
               ),
             )}
+
             {sending && (
-              <p className="border-l-2 border-accent/60 pl-4 text-ink-400">
-                <span className="inline-flex gap-1" aria-label="Writing a reply">
-                  <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-ink-400" />
-                  <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-ink-400 [animation-delay:150ms]" />
-                  <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-ink-400 [animation-delay:300ms]" />
+              <div className="flex items-start gap-2.5">
+                <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-accent/15 text-[11px] font-bold text-accent">
+                  G
                 </span>
-              </p>
+                <div className="flex items-center gap-1.5 rounded-2xl rounded-tl-xs border border-rule/80 bg-white px-4 py-3 shadow-xs">
+                  <span className="h-1.5 w-1.5 animate-bounce rounded-full bg-accent" />
+                  <span className="h-1.5 w-1.5 animate-bounce rounded-full bg-accent [animation-delay:150ms]" />
+                  <span className="h-1.5 w-1.5 animate-bounce rounded-full bg-accent [animation-delay:300ms]" />
+                </div>
+              </div>
             )}
-            {error && <p role="alert" className="border-l-2 border-danger pl-4 text-[14px] text-danger">{error}</p>}
+
+            {error && (
+              <div role="alert" className="rounded-xl border border-red-200 bg-red-50 p-3 text-[13px] text-red-700">
+                {error}
+              </div>
+            )}
+
             {suggestions.length > 0 && !sending && (
-              <div className="flex flex-col items-start gap-2 pt-1">
+              <div className="flex flex-wrap gap-2 pt-2 pl-8">
                 {suggestions.map((s) => (
-                  <button key={s} type="button" onClick={() => send(null, s)} className="border border-ink/20 bg-white px-3 py-1.5 text-left text-[14px] text-ink hover:border-accent hover:text-accent">
+                  <button
+                    key={s}
+                    type="button"
+                    onClick={() => send(null, s)}
+                    className="rounded-full border border-rule/90 bg-white px-3.5 py-1.5 text-left text-[12.5px] font-medium text-ink-700 shadow-xs transition-all hover:border-accent hover:bg-accent-light/40 hover:text-accent active:scale-95"
+                  >
                     {s}
                   </button>
                 ))}
@@ -175,22 +221,40 @@ export function AIChatWidget() {
             <div ref={endRef} />
           </div>
 
-          <form onSubmit={send} className="flex items-center gap-2 border-t border-rule px-4 py-3">
-            <label htmlFor="ask-input" className="sr-only">Your question</label>
-            <input
-              id="ask-input"
-              ref={inputRef}
-              value={prompt}
-              onChange={(e) => setPrompt(e.target.value)}
-              maxLength={1000}
-              placeholder="Type a question"
-              className="min-w-0 flex-1 border-0 bg-transparent py-2 text-[15px] text-ink placeholder:text-ink-400 focus:outline-none"
-            />
-            <button type="submit" disabled={!prompt.trim() || sending} className="btn-primary !px-4 !py-2 !text-sm disabled:opacity-40">
-              Send
-            </button>
-          </form>
-          <p className="px-5 pb-3 text-[11.5px] text-ink-400">Automated answers can be wrong. Please confirm important details with our team.</p>
+          {/* Typing bar container */}
+          <div className="border-t border-rule/80 bg-white p-3 sm:p-3.5">
+            <form
+              onSubmit={send}
+              className="flex items-center gap-2 rounded-xl border border-rule bg-stone/40 px-3 py-1.5 transition-all focus-within:border-accent focus-within:bg-white focus-within:ring-2 focus-within:ring-accent/20"
+            >
+              <label htmlFor="ask-input" className="sr-only">Type a question</label>
+              <input
+                id="ask-input"
+                ref={inputRef}
+                value={prompt}
+                onChange={(e) => setPrompt(e.target.value)}
+                maxLength={1000}
+                placeholder="Ask about our research, programmes..."
+                className="min-w-0 flex-1 border-0 bg-transparent py-2 text-[14px] text-ink placeholder:text-ink-400 focus:outline-none"
+              />
+              <button
+                type="submit"
+                disabled={!prompt.trim() || sending}
+                aria-label="Send message"
+                className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-accent text-white shadow-xs transition-all hover:bg-accent-dark disabled:opacity-30 disabled:pointer-events-none active:scale-95"
+              >
+                <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.2}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M5 12h14M12 5l7 7-7 7" />
+                </svg>
+              </button>
+            </form>
+            <p className="mt-2 text-center text-[11px] text-ink-400">
+              Automated answers. For bespoke proposals,{" "}
+              <Link href="/contact" onClick={() => setOpen(false)} className="underline hover:text-accent">
+                write to the team
+              </Link>.
+            </p>
+          </div>
         </div>
       )}
 
@@ -198,10 +262,12 @@ export function AIChatWidget() {
         <button
           type="button"
           onClick={() => setOpen(true)}
-          className="fixed bottom-5 right-5 z-40 flex items-center gap-2.5 border border-ink/15 bg-paper py-2.5 pl-3 pr-4 text-[14px] font-medium text-ink shadow-[0_10px_30px_-12px_rgba(14,26,43,0.45)] transition-all duration-150 hover:border-ink active:scale-[0.98] sm:bottom-8 sm:right-8"
+          className="fixed bottom-5 right-5 z-40 flex items-center gap-2.5 rounded-full border border-rule/90 bg-ink px-4 py-2.5 text-[14px] font-medium text-white shadow-elevate transition-all duration-200 hover:bg-accent hover:shadow-xl hover:scale-105 active:scale-95 sm:bottom-7 sm:right-7"
         >
-          <span aria-hidden="true" className="flex h-7 w-7 items-center justify-center bg-ink font-display text-[15px] text-white">G</span>
-          Ask Gmac
+          <span aria-hidden="true" className="flex h-6 w-6 items-center justify-center rounded-full bg-accent-soft text-ink font-bold text-xs">
+            G
+          </span>
+          <span>Ask Gmac</span>
         </button>
       )}
     </>

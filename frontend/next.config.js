@@ -1,4 +1,5 @@
 /** @type {import('next').NextConfig} */
+const path = require("path");
 
 // Hosts allowed to serve optimised images (team portraits etc.)
 const remotePatterns = [
@@ -23,6 +24,7 @@ const securityHeaders = [
 const nextConfig = {
   reactStrictMode: true,
   output: "standalone",
+  outputFileTracingRoot: path.join(__dirname, "../"),
   poweredByHeader: false,
   images: {
     remotePatterns,

@@ -27,16 +27,21 @@ export function PortraitMosaic({ people }: { people: Person[] }) {
   }, [people.length]);
 
   return (
-    <ul className="grid grid-cols-4 gap-1.5 sm:gap-2" aria-label="Some of the Gmac Group team">
+    <ul className="grid grid-cols-4 gap-2 sm:gap-3" aria-label="Some of the Gmac Group team">
       {people.map((p, i) => (
-        <li key={p.photo} className={`group relative aspect-[4/5] overflow-hidden bg-white/10 ${i % 4 === 1 || i % 4 === 3 ? "translate-y-4 sm:translate-y-6" : ""}`}>
+        <li
+          key={p.photo}
+          className={`group relative aspect-[4/5] overflow-hidden rounded-lg border border-white/20 bg-white/10 shadow-md backdrop-blur-xs ${
+            i % 4 === 1 || i % 4 === 3 ? "translate-y-3 sm:translate-y-5" : ""
+          }`}
+        >
           <Image
             src={p.photo}
             alt={`${p.name}, ${p.country}`}
             fill
             sizes="(max-width: 1024px) 25vw, 12vw"
             priority={i < 4}
-            className={`object-cover transition-[filter] duration-[1200ms] ease-out group-hover:grayscale-0 ${active === i ? "grayscale-0" : "grayscale"}`}
+            className={`object-cover transition-[filter,transform] duration-500 ease-out group-hover:scale-105 group-hover:grayscale-0 ${active === i ? "grayscale-0" : "grayscale"}`}
           />
         </li>
       ))}

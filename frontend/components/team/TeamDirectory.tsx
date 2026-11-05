@@ -54,10 +54,10 @@ export function TeamDirectory({ members }: { members: TeamMember[] }) {
             {g.members.map((m) => (
               <li
                 key={m.id}
-                className="group flex flex-col justify-between border border-rule/80 bg-white p-3 sm:p-5 shadow-[0_2px_12px_-4px_rgba(14,26,43,0.06)] transition-all duration-200 hover:-translate-y-1 hover:border-accent hover:shadow-lg"
+                className="group flex flex-col justify-between rounded-xl border border-rule/90 bg-white p-3.5 sm:p-5 shadow-card transition-all duration-300 hover:-translate-y-1 hover:border-accent/50 hover:shadow-card-hover"
               >
                 <div>
-                  <div className="block overflow-hidden bg-stone/40">
+                  <div className="block overflow-hidden rounded-lg bg-stone/40">
                     <Portrait
                       name={m.name}
                       src={m.photo_url}
