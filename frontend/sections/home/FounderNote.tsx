@@ -11,7 +11,7 @@ export function FounderNote() {
           <p className="eyebrow !text-white/60">
             <span className="eyebrow-num !text-accent-soft">03</span> Founding principle
           </p>
-          <div className="mt-8 w-full max-w-[220px] sm:max-w-[240px] overflow-hidden bg-ink-900 border border-white/15 shadow-xl">
+          <div className="mt-8 w-full max-w-[220px] sm:max-w-[240px] overflow-hidden rounded-2xl bg-ink-900 border border-white/20 shadow-2xl">
             <Portrait
               name={FOUNDER.name}
               src={FOUNDER.photo}

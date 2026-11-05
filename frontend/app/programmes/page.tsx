@@ -100,13 +100,19 @@ export default async function ProgrammesPage() {
         <div className="wrap">
           <p className="eyebrow"><span className="eyebrow-num">03</span> For institutions</p>
           <h2 id="inst-title" className="display-lg mt-6 max-w-[22ch]">Buy a cohort, or build the capability in house.</h2>
-          <div className="mt-12 grid grid-cols-1 gap-px bg-rule sm:grid-cols-2">
+          <div className="mt-12 grid grid-cols-1 gap-6 sm:grid-cols-2">
             {[employability, capacity].map((p) => (
-              <Link key={p.slug} href={`/expertise/${p.slug}`} className="group bg-paper py-8 sm:pr-10 [&:nth-child(2)]:sm:pl-10">
-                <p className="text-sm tabular-nums text-accent">{p.number}</p>
-                <h3 className="mt-3 font-display text-2xl group-hover:text-accent">{p.title}</h3>
-                <p className="mt-3 max-w-[48ch] text-[15px] leading-relaxed text-ink-500">{p.short}</p>
-                <span className="link-arrow mt-5">
+              <Link
+                key={p.slug}
+                href={`/expertise/${p.slug}`}
+                className="group flex flex-col justify-between rounded-xl border border-rule/90 bg-white p-7 sm:p-8 shadow-card hover:shadow-card-hover hover:border-accent/40 transition-all duration-300"
+              >
+                <div>
+                  <p className="text-sm font-semibold tabular-nums text-accent">{p.number}</p>
+                  <h3 className="mt-3 font-display text-2xl text-ink group-hover:text-accent transition-colors">{p.title}</h3>
+                  <p className="mt-3 text-[15px] leading-relaxed text-ink-500">{p.short}</p>
+                </div>
+                <span className="link-arrow mt-6 inline-flex">
                   Read more
                   <Arrow />
                 </span>

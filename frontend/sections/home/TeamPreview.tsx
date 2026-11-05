@@ -40,16 +40,28 @@ export function TeamPreview({ team }: { team: TeamMember[] }) {
           </Link>
         </div>
 
-        <div className="grid grid-cols-2 gap-3 self-end sm:grid-cols-3 sm:gap-4 lg:col-span-7 lg:col-start-6">
+        <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 sm:gap-5 self-center lg:col-span-7 lg:col-start-6">
           {featured.map((m, k) => (
-            <div key={m.id} className={`group reveal ${k % 3 === 1 ? "sm:translate-y-10" : ""}`}>
-              <div className="overflow-hidden bg-stone/40">
-                <Portrait name={m.name} src={m.photo_url} className="aspect-[3/4] w-full object-cover transition-transform duration-300 group-hover:scale-105" sizes="(max-width: 640px) 50vw, 18vw" />
+            <div
+              key={m.id}
+              className={`group reveal rounded-xl border border-rule/80 bg-white p-2.5 sm:p-3 shadow-card hover:shadow-card-hover hover:border-accent/40 transition-all duration-300 ${
+                k % 3 === 1 ? "sm:translate-y-6" : ""
+              }`}
+            >
+              <div className="overflow-hidden rounded-lg bg-stone/40">
+                <Portrait
+                  name={m.name}
+                  src={m.photo_url}
+                  className="aspect-[3/4] w-full object-cover transition-transform duration-300 group-hover:scale-105"
+                  sizes="(max-width: 640px) 50vw, 18vw"
+                />
               </div>
-              <p className="mt-3 text-[15px] font-bold text-accent">{m.name}</p>
-              <p className="text-sm text-ink-500">
-                {m.position}, {m.country}
-              </p>
+              <div className="px-1 pt-3 pb-1">
+                <p className="text-[14.5px] font-bold text-ink group-hover:text-accent transition-colors leading-snug">{m.name}</p>
+                <p className="mt-0.5 text-xs text-ink-500 leading-snug">
+                  {m.position}, {m.country}
+                </p>
+              </div>
             </div>
           ))}
         </div>

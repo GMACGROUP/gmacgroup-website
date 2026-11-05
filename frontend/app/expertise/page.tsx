@@ -70,9 +70,9 @@ export default function ExpertisePage() {
         <div className="wrap">
           <p className="eyebrow">Our philosophy</p>
           <h2 className="display-lg mt-6 max-w-[20ch]">Six commitments that hold across every practice area.</h2>
-          <div className="mt-14 grid grid-cols-1 gap-px bg-ink/15 sm:grid-cols-2 lg:grid-cols-3">
+          <div className="mt-12 grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
             {PRINCIPLES.map((p, i) => (
-              <div key={p.title} className="bg-stone p-8">
+              <div key={p.title} className="rounded-xl border border-rule/90 bg-white p-7 sm:p-8 shadow-card hover:shadow-card-hover hover:border-accent/40 transition-all duration-300">
                 <span className="font-sans text-[11px] font-semibold tabular-nums tracking-label text-accent">{String(i + 1).padStart(2, "0")}</span>
                 <span className="accent-line mt-4" aria-hidden="true" />
                 <h3 className="font-display text-[1.4rem] leading-snug">{p.title}</h3>

@@ -221,7 +221,7 @@ The backend interactive API documentation will be available at:
 - **Swagger UI**: [http://127.0.0.1:8000/docs](http://127.0.0.1:8000/docs)
 - **ReDoc**: [http://127.0.0.1:8000/redoc](http://127.0.0.1:8000/redoc)
 - **Health Probe**: [http://127.0.0.1:8000/health](http://127.0.0.1:8000/health)
-
+And the interface of the AI widget is not clear and proper especially the typing bar both on phone and windows thencd frontn
 ---
 
 ### 4. Frontend Setup
