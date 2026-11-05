@@ -1,17 +1,13 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { Suspense, useEffect, useState } from "react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { useAuth } from "@/hooks/useAuth";
 import { apiClient } from "@/lib/api/client";
-import {
-  AcademicCapIcon,
-  BriefcaseIcon,
-  CheckCircleIcon,
-  ClockIcon,
-  ShieldCheckIcon,
-} from "@/components/common/Icons";
+import type { Opportunity, Programme } from "@/types";
+import { Dialog } from "@/components/modals/Dialog";
+import { Arrow } from "@/components/ui/Arrow";
 
 interface EnrolmentItem {
   id: string;
@@ -29,366 +25,274 @@ interface ApplicationItem {
   created_at: string;
 }
 
-export default function DashboardPage() {
+type Detail = {
+  kind: "programme" | "opportunity";
+  title: string;
+  status: string;
+  createdAt: string;
+  data: Programme | Opportunity | null;
+  error: string | null;
+};
+
+const STATUS: Record<string, { label: string; tone: string }> = {
+  submitted: { label: "Received", tone: "text-ink-600 border-ink/20" },
+  under_review: { label: "Under review", tone: "text-accent border-accent/40" },
+  interview: { label: "Interview", tone: "text-accent border-accent/40" },
+  shortlisted: { label: "Shortlisted", tone: "text-accent border-accent/40" },
+  approved: { label: "Approved", tone: "text-success border-success/40" },
+  accepted: { label: "Accepted", tone: "text-success border-success/40" },
+  confirmed: { label: "Confirmed", tone: "text-success border-success/40" },
+  completed: { label: "Completed", tone: "text-success border-success/40" },
+  pending: { label: "Pending", tone: "text-ink-600 border-ink/20" },
+  rejected: { label: "Not selected", tone: "text-ink-500 border-ink/20" },
+  cancelled: { label: "Cancelled", tone: "text-ink-500 border-ink/20" },
+  withdrawn: { label: "Withdrawn", tone: "text-ink-500 border-ink/20" },
+};
+
+function Status({ value }: { value: string }) {
+  const s = STATUS[value] ?? { label: value.replace(/_/g, " "), tone: "text-ink-600 border-ink/20" };
+  return <span className={`inline-block border px-2 py-0.5 text-[12px] font-medium ${s.tone}`}>{s.label}</span>;
+}
+
+function when(iso: string) {
+  return new Date(iso).toLocaleDateString("en-GB", { day: "numeric", month: "short", year: "numeric" });
+}
+
+function DashboardContent() {
   const router = useRouter();
+  const params = useSearchParams();
+  const welcome = params?.get("welcome") === "1";
   const { user, loading, logout, updateProfile } = useAuth();
 
   const [enrolments, setEnrolments] = useState<EnrolmentItem[]>([]);
   const [applications, setApplications] = useState<ApplicationItem[]>([]);
   const [loadingData, setLoadingData] = useState(true);
-
-  // Profile Edit State
-  const [isEditingProfile, setIsEditingProfile] = useState(false);
-  const [savingProfile, setSavingProfile] = useState(false);
-  const [profileSuccess, setProfileSuccess] = useState(false);
-  const [editForm, setEditForm] = useState({
-    full_name: "",
-    organization: "",
-    phone: "",
-    bio: "",
-  });
+  const [detail, setDetail] = useState<Detail | null>(null);
+  const [editing, setEditing] = useState(false);
+  const [saving, setSaving] = useState(false);
+  const [saveError, setSaveError] = useState<string | null>(null);
+  const [form, setForm] = useState({ full_name: "", organization: "", phone: "", bio: "" });
 
   useEffect(() => {
     if (!loading && !user) {
-      router.replace("/login");
-    } else if (user) {
-      setEditForm({
-        full_name: user.full_name || "",
-        organization: user.organization || "",
-        phone: user.phone || "",
-        bio: user.bio || "",
-      });
-
-      // Fetch user's live enrolments & applications
-      setLoadingData(true);
-      Promise.all([
-        apiClient.get<EnrolmentItem[]>("/programmes/my-enrolments").catch(() => []),
-        apiClient.get<ApplicationItem[]>("/opportunities/my-applications").catch(() => []),
-      ])
-        .then(([enrols, apps]) => {
-          setEnrolments(enrols);
-          setApplications(apps);
-        })
-        .finally(() => setLoadingData(false));
+      router.replace("/login?next=/dashboard");
+      return;
     }
+    if (!user) return;
+    setForm({ full_name: user.full_name || "", organization: user.organization || "", phone: user.phone || "", bio: user.bio || "" });
+    setLoadingData(true);
+    Promise.all([
+      apiClient.get<EnrolmentItem[]>("/programmes/my-enrolments").catch(() => []),
+      apiClient.get<ApplicationItem[]>("/opportunities/my-applications").catch(() => []),
+    ])
+      .then(([e, a]) => {
+        setEnrolments(e);
+        setApplications(a);
+      })
+      .finally(() => setLoadingData(false));
   }, [loading, router, user]);
 
   if (loading || !user) {
-    return (
-      <div className="min-h-[70vh] flex items-center justify-center">
-        <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-brand-navy" />
-      </div>
-    );
+    return <div className="wrap min-h-[60vh] py-24 text-sm text-ink-400">Loading your account...</div>;
   }
 
-  const handleProfileSave = async (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    setSavingProfile(true);
+  const name = user.full_name || user.email.split("@")[0];
+
+  async function open(kind: "programme" | "opportunity", id: string, title: string, status: string, createdAt: string) {
+    setDetail({ kind, title, status, createdAt, data: null, error: null });
     try {
-      await updateProfile(editForm);
-      setProfileSuccess(true);
-      setTimeout(() => {
-        setProfileSuccess(false);
-        setIsEditingProfile(false);
-      }, 1500);
+      const data = await apiClient.get<Programme | Opportunity>(`/${kind === "programme" ? "programmes" : "opportunities"}/${id}`);
+      setDetail((d) => (d ? { ...d, data } : d));
     } catch {
-      // handle error
-    } finally {
-      setSavingProfile(false);
+      setDetail((d) => (d ? { ...d, error: "Full details are no longer listed on the site. Your record is still kept." } : d));
     }
-  };
+  }
 
-  const handleLogout = () => {
-    logout();
-    router.push("/login");
-  };
+  async function save(e: React.FormEvent<HTMLFormElement>) {
+    e.preventDefault();
+    setSaving(true);
+    setSaveError(null);
+    try {
+      await updateProfile(form);
+      setEditing(false);
+    } catch (err) {
+      setSaveError(err instanceof Error ? err.message : "Could not save your details.");
+    } finally {
+      setSaving(false);
+    }
+  }
 
-  const userDisplayName = user.full_name || user.email.split("@")[0];
+  async function signOut() {
+    await logout();
+    router.push("/");
+  }
+
+  const rows = (
+    items: { id: string; ref: string; title?: string; status: string; created_at: string }[],
+    kind: "programme" | "opportunity",
+  ) => (
+    <ul className="border-t border-ink">
+      {items.map((it) => (
+        <li key={it.id} className="border-b border-rule">
+          <button
+            type="button"
+            onClick={() => open(kind, it.ref, it.title || it.ref, it.status, it.created_at)}
+            className="grid w-full grid-cols-1 gap-2 py-5 text-left hover:bg-stone/60 sm:grid-cols-[1fr_auto] sm:items-center sm:gap-6 sm:px-2"
+          >
+            <span>
+              <span className="block font-display text-xl leading-snug">{it.title || it.ref}</span>
+              <span className="mt-1 block text-[13px] text-ink-400">Since {when(it.created_at)}</span>
+            </span>
+            <Status value={it.status} />
+          </button>
+        </li>
+      ))}
+    </ul>
+  );
 
   return (
-    <div className="bg-slate-50 min-h-screen py-10 sm:py-14">
-      <div className="container mx-auto px-4 sm:px-6 max-w-6xl space-y-8">
+    <>
+      <header className="border-b border-rule">
+        <div className="wrap flex flex-col gap-8 pb-12 pt-14 sm:pt-20 lg:flex-row lg:items-end lg:justify-between">
+          <div>
+            <p className="text-[12px] font-medium uppercase tracking-label text-clay">Your account</p>
+            <h1 className="display-lg mt-4">{welcome ? `Welcome, ${name.split(" ")[0]}.` : `Hello, ${name.split(" ")[0]}.`}</h1>
+            <p className="mt-3 text-[15px] text-ink-500">{user.email}</p>
+          </div>
+          <div className="flex flex-wrap gap-3">
+            {user.role === "admin" && (
+              <Link href="/admin" className="btn-dark">
+                Admin console
+                <Arrow />
+              </Link>
+            )}
+            <button type="button" onClick={() => setEditing((v) => !v)} className="btn-secondary">
+              {editing ? "Close details" : "Edit your details"}
+            </button>
+            <button type="button" onClick={signOut} className="btn-secondary">
+              Sign out
+            </button>
+          </div>
+        </div>
+      </header>
 
-        {/* ── Welcome Banner ── */}
-        <div className="relative rounded-3xl bg-brand-navy text-white p-8 sm:p-10 shadow-elevate overflow-hidden border border-brand-navyLight/20">
-          <div className="absolute top-0 right-0 w-96 h-96 bg-brand-cyan/10 rounded-full blur-3xl pointer-events-none" />
-          <div className="absolute bottom-0 right-48 w-80 h-80 bg-brand-red/10 rounded-full blur-3xl pointer-events-none" />
+      {welcome && (
+        <div className="border-b border-rule bg-sand">
+          <p className="wrap py-5 text-[15px] text-ink-600">
+            Your account is ready. Enrol in a programme or apply for a role and it will appear here.
+          </p>
+        </div>
+      )}
 
-          <div className="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-6">
-            <div className="space-y-2">
-              <div className="flex items-center gap-2">
-                <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-white/10 text-brand-cyan text-xs font-bold uppercase tracking-wider border border-white/15">
-                  <ShieldCheckIcon className="w-3.5 h-3.5 text-brand-cyan" />
-                  GMAC Member Portal
-                </span>
-                <span className="capitalize text-xs font-semibold px-2.5 py-0.5 rounded-full bg-brand-red text-white">
-                  {user.role}
-                </span>
-              </div>
-
-              <h1 className="text-2xl sm:text-3xl lg:text-4xl font-extrabold font-serif">
-                Welcome back, {userDisplayName}
-              </h1>
-              <p className="text-xs sm:text-sm text-slate-200 max-w-2xl leading-relaxed">
-                Track your active cohort enrolments, fellowship applications, and collaborate across the GMAC research network.
-              </p>
+      {editing && (
+        <section className="border-b border-rule">
+          <form onSubmit={save} className="wrap grid grid-cols-1 gap-6 py-12 sm:grid-cols-2 lg:max-w-4xl">
+            <div>
+              <label htmlFor="pf-name" className="field-label">Full name</label>
+              <input id="pf-name" className="field" maxLength={120} value={form.full_name} onChange={(e) => setForm({ ...form, full_name: e.target.value })} />
             </div>
+            <div>
+              <label htmlFor="pf-org" className="field-label">University or employer</label>
+              <input id="pf-org" className="field" maxLength={160} value={form.organization} onChange={(e) => setForm({ ...form, organization: e.target.value })} />
+            </div>
+            <div>
+              <label htmlFor="pf-phone" className="field-label">Phone</label>
+              <input id="pf-phone" type="tel" className="field" maxLength={40} value={form.phone} onChange={(e) => setForm({ ...form, phone: e.target.value })} />
+            </div>
+            <div className="sm:col-span-2">
+              <label htmlFor="pf-bio" className="field-label">About you</label>
+              <textarea id="pf-bio" rows={3} className="field" maxLength={2000} value={form.bio} onChange={(e) => setForm({ ...form, bio: e.target.value })} />
+            </div>
+            {saveError && <p role="alert" className="text-sm text-danger sm:col-span-2">{saveError}</p>}
+            <div className="sm:col-span-2">
+              <button type="submit" disabled={saving} className="btn-primary disabled:opacity-60">
+                {saving ? "Saving..." : "Save details"}
+                <Arrow />
+              </button>
+            </div>
+          </form>
+        </section>
+      )}
 
-            <div className="flex flex-wrap items-center gap-3 shrink-0">
-              <button
-                onClick={() => setIsEditingProfile(!isEditingProfile)}
-                className="px-4 py-2.5 rounded-xl font-bold text-xs bg-white/10 hover:bg-white/20 border border-white/20 text-white transition-all"
-              >
-                {isEditingProfile ? "Close Profile" : "Edit Profile"}
-              </button>
-              <button
-                onClick={handleLogout}
-                className="px-4 py-2.5 rounded-xl font-bold text-xs bg-red-500/20 hover:bg-red-500/30 text-red-200 border border-red-400/30 transition-all"
-              >
-                Sign Out
-              </button>
+      <section className="site-section">
+        <div className="wrap grid grid-cols-1 gap-16 lg:grid-cols-2">
+          <div>
+            <div className="flex items-end justify-between gap-6">
+              <h2 className="display-md">Programmes <span className="font-light text-ink-400 tabular-nums">{enrolments.length}</span></h2>
+              <Link href="/programmes" className="link-arrow shrink-0">
+                Browse
+                <Arrow />
+              </Link>
+            </div>
+            <div className="mt-8">
+              {loadingData ? (
+                <p className="border-t border-ink pt-6 text-sm text-ink-400">Loading...</p>
+              ) : enrolments.length ? (
+                rows(enrolments.map((e) => ({ ...e, ref: e.programme_id, title: e.programme_title })), "programme")
+              ) : (
+                <p className="border-t border-ink pt-6 text-[15px] text-ink-500">You are not enrolled in a programme yet.</p>
+              )}
+            </div>
+          </div>
+          <div>
+            <div className="flex items-end justify-between gap-6">
+              <h2 className="display-md">Applications <span className="font-light text-ink-400 tabular-nums">{applications.length}</span></h2>
+              <Link href="/careers" className="link-arrow shrink-0">
+                Open roles
+                <Arrow />
+              </Link>
+            </div>
+            <div className="mt-8">
+              {loadingData ? (
+                <p className="border-t border-ink pt-6 text-sm text-ink-400">Loading...</p>
+              ) : applications.length ? (
+                rows(applications.map((a) => ({ ...a, ref: a.opportunity_id, title: a.opportunity_title })), "opportunity")
+              ) : (
+                <p className="border-t border-ink pt-6 text-[15px] text-ink-500">You have not applied for anything yet.</p>
+              )}
             </div>
           </div>
         </div>
+      </section>
 
-        {/* ── Profile Editing Panel ── */}
-        {isEditingProfile && (
-          <div className="bg-white rounded-3xl p-6 sm:p-8 border border-slate-200 shadow-card animate-fadeIn">
-            <div className="mb-6">
-              <h3 className="text-lg font-bold text-slate-900 font-serif">Update Profile Details</h3>
-              <p className="text-xs text-slate-500 mt-1">Keep your contact and institutional information up to date.</p>
-            </div>
-
-            <form onSubmit={handleProfileSave} className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              <div>
-                <label className="block text-xs font-bold text-slate-800 uppercase tracking-wider mb-1.5">
-                  Full Name
-                </label>
-                <input
-                  type="text"
-                  value={editForm.full_name}
-                  onChange={(e) => setEditForm({ ...editForm, full_name: e.target.value })}
-                  className="w-full px-3.5 py-2.5 text-xs sm:text-sm rounded-xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-brand-navy/30 focus:border-brand-navy bg-slate-50 focus:bg-white text-slate-900"
-                />
-              </div>
-
-              <div>
-                <label className="block text-xs font-bold text-slate-800 uppercase tracking-wider mb-1.5">
-                  Institution / Organization
-                </label>
-                <input
-                  type="text"
-                  value={editForm.organization}
-                  onChange={(e) => setEditForm({ ...editForm, organization: e.target.value })}
-                  placeholder="e.g. University / Enterprise"
-                  className="w-full px-3.5 py-2.5 text-xs sm:text-sm rounded-xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-brand-navy/30 focus:border-brand-navy bg-slate-50 focus:bg-white text-slate-900"
-                />
-              </div>
-
-              <div>
-                <label className="block text-xs font-bold text-slate-800 uppercase tracking-wider mb-1.5">
-                  Phone Number
-                </label>
-                <input
-                  type="tel"
-                  value={editForm.phone}
-                  onChange={(e) => setEditForm({ ...editForm, phone: e.target.value })}
-                  placeholder="+233 24 123 4567"
-                  className="w-full px-3.5 py-2.5 text-xs sm:text-sm rounded-xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-brand-navy/30 focus:border-brand-navy bg-slate-50 focus:bg-white text-slate-900"
-                />
-              </div>
-
-              <div>
-                <label className="block text-xs font-bold text-slate-800 uppercase tracking-wider mb-1.5">
-                  Professional Bio / Research Focus
-                </label>
-                <input
-                  type="text"
-                  value={editForm.bio}
-                  onChange={(e) => setEditForm({ ...editForm, bio: e.target.value })}
-                  placeholder="e.g. Econometrician & Labor Policy Fellow"
-                  className="w-full px-3.5 py-2.5 text-xs sm:text-sm rounded-xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-brand-navy/30 focus:border-brand-navy bg-slate-50 focus:bg-white text-slate-900"
-                />
-              </div>
-
-              <div className="sm:col-span-2 pt-2 flex items-center justify-between">
-                {profileSuccess ? (
-                  <span className="text-xs font-bold text-emerald-700 bg-emerald-50 px-3 py-1.5 rounded-lg border border-emerald-200 flex items-center gap-1.5">
-                    <CheckCircleIcon className="w-4 h-4" /> Profile updated successfully!
-                  </span>
-                ) : (
-                  <span />
-                )}
-
-                <div className="flex gap-2">
-                  <button
-                    type="button"
-                    onClick={() => setIsEditingProfile(false)}
-                    className="px-4 py-2 rounded-xl text-xs font-bold text-slate-600 hover:bg-slate-100"
-                  >
-                    Cancel
-                  </button>
-                  <button
-                    type="submit"
-                    disabled={savingProfile}
-                    className="px-5 py-2 rounded-xl text-xs font-bold text-white bg-brand-navy hover:bg-brand-navyDark shadow-sm disabled:opacity-50"
-                  >
-                    {savingProfile ? "Saving..." : "Save Changes"}
-                  </button>
-                </div>
-              </div>
-            </form>
+      <Dialog
+        open={Boolean(detail)}
+        onClose={() => setDetail(null)}
+        eyebrow={detail?.kind === "programme" ? "Programme" : "Application"}
+        title={detail?.title || ""}
+        meta={detail ? <span className="flex flex-wrap items-center gap-3"><Status value={detail.status} /> Since {when(detail.createdAt)}</span> : undefined}
+      >
+        {detail?.error ? (
+          <p className="text-[15px] text-ink-500">{detail.error}</p>
+        ) : !detail?.data ? (
+          <p className="text-sm text-ink-400">Loading...</p>
+        ) : (
+          <div className="space-y-4 text-[15px] leading-relaxed text-ink-600">
+            {detail.data.description && <p>{detail.data.description}</p>}
+            {"start_date" in detail.data && detail.data.start_date && (
+              <p className="text-sm text-ink-500">
+                Runs {when(detail.data.start_date)}
+                {detail.data.end_date ? ` to ${when(detail.data.end_date)}` : ""}
+              </p>
+            )}
+            {"deadline" in detail.data && detail.data.deadline && (
+              <p className="text-sm text-ink-500">Application deadline: {when(detail.data.deadline)}</p>
+            )}
           </div>
         )}
+        <p className="mt-6 border-t border-rule pt-4 text-sm text-ink-500">
+          Questions? Write to us through the{" "}
+          <Link href="/contact" className="text-accent underline underline-offset-4">contact page</Link>.
+        </p>
+      </Dialog>
+    </>
+  );
+}
 
-        {/* ── Key Stats ── */}
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
-          <div className="p-6 rounded-2xl bg-white border border-slate-200 shadow-card flex items-center justify-between">
-            <div>
-              <div className="text-xs font-bold text-slate-400 uppercase tracking-wider">Active Cohorts</div>
-              <div className="text-3xl font-extrabold text-brand-navy mt-1">
-                {loadingData ? "…" : enrolments.length}
-              </div>
-              <Link href="/programmes" className="text-xs text-brand-red font-semibold hover:underline mt-2 inline-block">
-                Browse cohorts →
-              </Link>
-            </div>
-            <div className="w-12 h-12 rounded-xl bg-blue-50 text-brand-navy flex items-center justify-center border border-blue-100">
-              <AcademicCapIcon className="w-6 h-6 text-brand-navy" />
-            </div>
-          </div>
-
-          <div className="p-6 rounded-2xl bg-white border border-slate-200 shadow-card flex items-center justify-between">
-            <div>
-              <div className="text-xs font-bold text-slate-400 uppercase tracking-wider">Applications</div>
-              <div className="text-3xl font-extrabold text-slate-900 mt-1">
-                {loadingData ? "…" : applications.length}
-              </div>
-              <Link href="/opportunities" className="text-xs text-brand-navy font-semibold hover:underline mt-2 inline-block">
-                View openings →
-              </Link>
-            </div>
-            <div className="w-12 h-12 rounded-xl bg-purple-50 text-purple-700 flex items-center justify-center border border-purple-100">
-              <BriefcaseIcon className="w-6 h-6 text-purple-700" />
-            </div>
-          </div>
-
-          <div className="p-6 rounded-2xl bg-white border border-slate-200 shadow-card flex items-center justify-between">
-            <div>
-              <div className="text-xs font-bold text-slate-400 uppercase tracking-wider">Membership</div>
-              <div className="text-sm font-bold text-emerald-700 bg-emerald-50 border border-emerald-200 px-2.5 py-1 rounded-full w-fit mt-2">
-                ● Verified Member
-              </div>
-              <p className="text-[11px] text-slate-400 mt-1.5">{user.email}</p>
-            </div>
-            <div className="w-12 h-12 rounded-xl bg-emerald-50 text-emerald-700 flex items-center justify-center border border-emerald-100">
-              <ShieldCheckIcon className="w-6 h-6 text-emerald-700" />
-            </div>
-          </div>
-        </div>
-
-        {/* ── Main Dashboard Content Grid ── */}
-        <div className="grid md:grid-cols-2 gap-8">
-
-          {/* Section 1: Enrolled Programmes */}
-          <div className="p-7 sm:p-8 rounded-3xl bg-white border border-slate-200 shadow-card space-y-5 flex flex-col">
-            <div className="flex items-center justify-between">
-              <div>
-                <h2 className="text-xl font-bold text-slate-900 font-serif">My Cohorts & Enrolments</h2>
-                <p className="text-xs text-slate-500 mt-0.5">Development pathways and workshops registered to your profile</p>
-              </div>
-              <Link href="/programmes" className="text-xs font-bold text-brand-navy hover:text-brand-red">
-                + Enrol
-              </Link>
-            </div>
-
-            <div className="flex-1 space-y-3">
-              {enrolments.length > 0 ? (
-                enrolments.map((enrol) => (
-                  <div
-                    key={enrol.id}
-                    className="p-4 rounded-2xl bg-slate-50 border border-slate-200 flex items-start justify-between gap-3 hover:bg-slate-100/80 transition-colors"
-                  >
-                    <div className="space-y-1">
-                      <h4 className="text-sm font-bold text-slate-900">
-                        {enrol.programme_title || enrol.programme_id}
-                      </h4>
-                      <p className="text-[11px] text-slate-500 flex items-center gap-1">
-                        <ClockIcon className="w-3.5 h-3.5 text-slate-400" />
-                        Enrolled {new Date(enrol.created_at).toLocaleDateString()}
-                      </p>
-                    </div>
-                    <span className="text-[10px] font-bold uppercase tracking-wider bg-emerald-50 text-emerald-700 border border-emerald-200 px-2.5 py-1 rounded-full whitespace-nowrap">
-                      {enrol.status || "Confirmed"}
-                    </span>
-                  </div>
-                ))
-              ) : (
-                <div className="p-8 rounded-2xl bg-slate-50 border border-dashed border-slate-200 text-center space-y-2">
-                  <AcademicCapIcon className="w-8 h-8 text-slate-300 mx-auto" />
-                  <p className="text-xs text-slate-500">You have not enrolled in any cohorts yet.</p>
-                  <Link
-                    href="/programmes"
-                    className="inline-block text-xs font-bold text-brand-red hover:underline pt-1"
-                  >
-                    Explore upcoming cohorts →
-                  </Link>
-                </div>
-              )}
-            </div>
-          </div>
-
-          {/* Section 2: Opportunity Applications */}
-          <div className="p-7 sm:p-8 rounded-3xl bg-white border border-slate-200 shadow-card space-y-5 flex flex-col">
-            <div className="flex items-center justify-between">
-              <div>
-                <h2 className="text-xl font-bold text-slate-900 font-serif">Application History</h2>
-                <p className="text-xs text-slate-500 mt-0.5">Internship and fellowship submissions</p>
-              </div>
-              <Link href="/opportunities" className="text-xs font-bold text-brand-navy hover:text-brand-red">
-                + Apply
-              </Link>
-            </div>
-
-            <div className="flex-1 space-y-3">
-              {applications.length > 0 ? (
-                applications.map((app) => (
-                  <div
-                    key={app.id}
-                    className="p-4 rounded-2xl bg-slate-50 border border-slate-200 flex items-start justify-between gap-3 hover:bg-slate-100/80 transition-colors"
-                  >
-                    <div className="space-y-1">
-                      <h4 className="text-sm font-bold text-slate-900">
-                        {app.opportunity_title || app.opportunity_id}
-                      </h4>
-                      <p className="text-[11px] text-slate-500 flex items-center gap-1">
-                        <ClockIcon className="w-3.5 h-3.5 text-slate-400" />
-                        Submitted {new Date(app.created_at).toLocaleDateString()}
-                      </p>
-                    </div>
-                    <span className="text-[10px] font-bold uppercase tracking-wider bg-blue-50 text-brand-navy border border-blue-200 px-2.5 py-1 rounded-full whitespace-nowrap">
-                      {app.status || "Submitted"}
-                    </span>
-                  </div>
-                ))
-              ) : (
-                <div className="p-8 rounded-2xl bg-slate-50 border border-dashed border-slate-200 text-center space-y-2">
-                  <BriefcaseIcon className="w-8 h-8 text-slate-300 mx-auto" />
-                  <p className="text-xs text-slate-500">No active applications submitted yet.</p>
-                  <Link
-                    href="/opportunities"
-                    className="inline-block text-xs font-bold text-brand-navy hover:underline pt-1"
-                  >
-                    Browse open fellowships & roles →
-                  </Link>
-                </div>
-              )}
-            </div>
-          </div>
-
-        </div>
-
-      </div>
-    </div>
+export default function DashboardPage() {
+  return (
+    <Suspense fallback={<div className="wrap min-h-[60vh] py-24 text-sm text-ink-400">Loading your account...</div>}>
+      <DashboardContent />
+    </Suspense>
   );
 }
