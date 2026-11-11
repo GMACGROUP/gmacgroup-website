@@ -16,6 +16,20 @@ export const EVENTS_SEED: GmacEvent[] = [
     is_featured: true,
   },
   {
+    id: "seed-linkedin-masterclass",
+    slug: "professional-linkedin-masterclass",
+    title: "Professional LinkedIn Masterclass",
+    summary:
+      "A focused workshop on building and optimising your LinkedIn presence: profile strategy, content positioning, outreach and visibility for professionals.",
+    series: "Employability Series",
+    format: "online",
+    location: "Online (Zoom)",
+    timezone: "Africa/Accra",
+    all_day: false,
+    date_label: "Date to be announced",
+    is_featured: false,
+  },
+  {
     id: "seed-rm-2025",
     slug: "research-methods-training-and-certification-workshop-2025",
     title: "Research Methods Training and Certification Workshop",
