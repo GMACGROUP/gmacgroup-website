@@ -4,7 +4,16 @@ import { FormEvent, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/hooks/useAuth";
-import { Logo } from "@/components/common/Logo";
+import { AuthShell, FormError } from "@/components/account/AuthShell";
+import { Arrow } from "@/components/ui/Arrow";
+
+const ROLES = [
+  { value: "student", label: "Student or recent graduate" },
+  { value: "professional", label: "Working professional" },
+  { value: "researcher", label: "Academic or researcher" },
+  { value: "employer", label: "Employer or talent partner" },
+  { value: "institution", label: "Institution" },
+];
 
 export default function RegisterPage() {
   const router = useRouter();
@@ -14,120 +23,67 @@ export default function RegisterPage() {
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
-    setSubmitting(true);
-    setError(null);
-
     const form = new FormData(event.currentTarget);
-    const full_name = String(form.get("full_name") || "");
+    const full_name = String(form.get("full_name") || "").trim();
     const email = String(form.get("email") || "");
     const password = String(form.get("password") || "");
     const role = String(form.get("role") || "student");
-
+    if (password.length < 8) {
+      setError("Please choose a password of at least 8 characters.");
+      return;
+    }
+    setSubmitting(true);
+    setError(null);
     try {
       await register({ full_name, email, password, role });
-      router.push("/dashboard");
+      router.push("/dashboard?welcome=1");
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Registration failed");
-    } finally {
+      setError(err instanceof Error ? err.message : "We could not create your account. Please try again.");
       setSubmitting(false);
     }
   }
 
   return (
-    <div className="min-h-[85vh] flex items-center justify-center bg-slate-50 py-16 px-4">
-      <div className="relative w-full max-w-md bg-white p-8 sm:p-10 rounded-3xl border border-slate-200 shadow-elevate overflow-hidden">
-        {/* Top Accent Strip */}
-        <div className="absolute top-0 left-0 right-0 h-1.5 bg-gradient-to-r from-brand-red via-brand-cyan to-brand-navy" />
-
-        {/* Logo Header */}
-        <div className="text-center mb-8 pt-2">
-          <Logo size="md" showTagline={true} />
-          <h1 className="text-2xl sm:text-3xl font-bold text-slate-900 mt-6 font-serif">Join GMAC Network</h1>
-          <p className="text-xs sm:text-sm text-slate-600 mt-1 font-medium">
-            Create an account to enrol in cohorts and apply to fellowships
-          </p>
+    <AuthShell
+      eyebrow="Create an account"
+      title="Join Gmac Group."
+      intro="An account lets you enrol in programmes, register for events and follow your applications in one place."
+    >
+      <form onSubmit={handleSubmit} className="max-w-md space-y-6">
+        <div>
+          <label htmlFor="rg-name" className="field-label">Full name</label>
+          <input id="rg-name" name="full_name" required autoComplete="name" maxLength={120} className="field" />
         </div>
-
-        {/* Form */}
-        <form onSubmit={handleSubmit} className="flex flex-col gap-4">
-          <div>
-            <label className="block text-xs font-bold text-slate-800 uppercase tracking-wider mb-1.5">
-              Full Name <span className="text-brand-red">*</span>
-            </label>
-            <input
-              name="full_name"
-              placeholder="e.g. Kwabena Mensah"
-              required
-              className="w-full px-4 py-3 rounded-xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-brand-navy/30 focus:border-brand-navy text-sm font-medium text-slate-900 transition-all placeholder:text-slate-400 bg-slate-50/50 focus:bg-white"
-            />
-          </div>
-
-          <div>
-            <label className="block text-xs font-bold text-slate-800 uppercase tracking-wider mb-1.5">
-              Email Address <span className="text-brand-red">*</span>
-            </label>
-            <input
-              name="email"
-              type="email"
-              placeholder="you@example.com"
-              required
-              className="w-full px-4 py-3 rounded-xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-brand-navy/30 focus:border-brand-navy text-sm font-medium text-slate-900 transition-all placeholder:text-slate-400 bg-slate-50/50 focus:bg-white"
-            />
-          </div>
-
-          <div>
-            <label className="block text-xs font-bold text-slate-800 uppercase tracking-wider mb-1.5">
-              Password <span className="text-brand-red">*</span>
-            </label>
-            <input
-              name="password"
-              type="password"
-              placeholder="Min. 6 characters"
-              minLength={6}
-              required
-              className="w-full px-4 py-3 rounded-xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-brand-navy/30 focus:border-brand-navy text-sm font-medium text-slate-900 transition-all placeholder:text-slate-400 bg-slate-50/50 focus:bg-white"
-            />
-          </div>
-
-          <div>
-            <label className="block text-xs font-bold text-slate-800 uppercase tracking-wider mb-1.5">
-              Your Primary Role
-            </label>
-            <select
-              name="role"
-              defaultValue="student"
-              className="w-full px-4 py-3 rounded-xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-brand-navy/30 focus:border-brand-navy text-sm font-medium text-slate-900 bg-slate-50/50 focus:bg-white transition-all"
-            >
-              <option value="student">Student / Recent Graduate</option>
-              <option value="professional">Working Professional</option>
-              <option value="researcher">Academic / Researcher</option>
-              <option value="employer">Employer / Recruiter</option>
-              <option value="institution">University / Institutional Partner</option>
-            </select>
-          </div>
-
-          <button
-            type="submit"
-            disabled={submitting}
-            className="mt-2 w-full py-3.5 rounded-xl font-bold text-sm text-white bg-brand-red hover:bg-brand-redDark shadow-card hover:shadow-elevate-red active:scale-98 transition-all disabled:opacity-50"
-          >
-            {submitting ? "Creating Account..." : "Create Account →"}
-          </button>
-
-          {error && (
-            <p role="alert" className="p-3.5 rounded-xl bg-red-50 text-xs font-semibold text-brand-red border border-red-200 text-center animate-shake">
-              {error}
-            </p>
-          )}
-        </form>
-
-        <div className="mt-6 pt-6 border-t border-slate-200 text-center text-xs text-slate-600 font-medium">
-          Already have an account?{" "}
-          <Link href="/login" className="font-bold text-brand-navy hover:underline ml-1">
-            Sign in here →
-          </Link>
+        <div>
+          <label htmlFor="rg-email" className="field-label">Email</label>
+          <input id="rg-email" name="email" type="email" required autoComplete="email" className="field" />
         </div>
-      </div>
-    </div>
+        <div>
+          <label htmlFor="rg-password" className="field-label">Password</label>
+          <input id="rg-password" name="password" type="password" required minLength={8} autoComplete="new-password" className="field" aria-describedby="rg-password-help" />
+          <p id="rg-password-help" className="mt-1.5 text-[13px] text-ink-400">At least 8 characters.</p>
+        </div>
+        <div>
+          <label htmlFor="rg-role" className="field-label">Which best describes you?</label>
+          <select id="rg-role" name="role" defaultValue="student" className="field">
+            {ROLES.map((r) => (
+              <option key={r.value} value={r.value}>{r.label}</option>
+            ))}
+          </select>
+        </div>
+        <p className="text-[13px] leading-relaxed text-ink-400">
+          By creating an account you agree to our <Link href="/terms" className="text-accent underline underline-offset-4">terms</Link> and
+          confirm you have read the <Link href="/privacy" className="text-accent underline underline-offset-4">privacy notice</Link>.
+        </p>
+        {error && <FormError>{error}</FormError>}
+        <button type="submit" disabled={submitting} className="btn-primary w-full justify-center disabled:opacity-60 sm:w-auto">
+          {submitting ? "Creating your account..." : "Create account"}
+          <Arrow />
+        </button>
+        <p className="border-t border-rule pt-6 text-sm text-ink-500">
+          Already have an account? <Link href="/login" className="text-accent underline underline-offset-4">Sign in</Link>
+        </p>
+      </form>
+    </AuthShell>
   );
 }

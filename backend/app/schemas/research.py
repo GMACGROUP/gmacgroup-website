@@ -1,74 +1,58 @@
-"""Pydantic schemas for research projects, publications, and experts."""
+"""Pydantic schemas for research publications."""
 
-from datetime import datetime
-from typing import Optional, List
-from pydantic import BaseModel, ConfigDict, EmailStr
+from datetime import date
+from enum import Enum
+from typing import List, Optional
+
+from pydantic import BaseModel, ConfigDict, Field, field_validator
 
 
-class ResearchProjectOut(BaseModel):
-    id: str
-    title: str
-    summary: Optional[str] = None
-    status: Optional[str] = None
-    lead_researcher: Optional[str] = None
+class PublicationType(str, Enum):
+    REPORT = "report"
+    POLICY_BRIEF = "policy_brief"
+    WORKING_PAPER = "working_paper"
+    ARTICLE = "article"
+    DATASET = "dataset"
 
-    model_config = ConfigDict(from_attributes=True)
+
+def _https_only(value: Optional[str]) -> Optional[str]:
+    if value and not value.startswith("https://"):
+        raise ValueError("Links must start with https://")
+    return value
 
 
 class PublicationOut(BaseModel):
     id: str
     title: str
+    type: PublicationType = PublicationType.REPORT
+    summary: Optional[str] = None
     authors: List[str] = []
-    published_at: Optional[datetime] = None
+    published_at: Optional[date] = None
     url: Optional[str] = None
+    practice: Optional[str] = None
 
     model_config = ConfigDict(from_attributes=True)
 
 
-class ExpertOut(BaseModel):
-    id: str
-    full_name: str
-    expertise_areas: List[str] = []
-    bio: Optional[str] = None
+class PublicationCreate(BaseModel):
+    title: str = Field(min_length=3, max_length=240)
+    type: PublicationType = PublicationType.REPORT
+    summary: Optional[str] = Field(default=None, max_length=1200)
+    authors: List[str] = []
+    published_at: Optional[date] = None
+    url: Optional[str] = Field(default=None, max_length=500)
+    practice: Optional[str] = Field(default=None, max_length=80)
 
-    model_config = ConfigDict(from_attributes=True)
-
-
-class PublicationRequestCreate(BaseModel):
-    publication_id: Optional[str] = None
-    publication_title: str
-    full_name: str
-    email: EmailStr
-    organization: Optional[str] = None
-    purpose: Optional[str] = None
+    _check_url = field_validator("url")(_https_only)
 
 
-class PublicationRequestOut(BaseModel):
-    id: str
-    publication_title: str
-    full_name: str
-    email: EmailStr
-    status: str
-    created_at: datetime
+class PublicationUpdate(BaseModel):
+    title: Optional[str] = Field(default=None, min_length=3, max_length=240)
+    type: Optional[PublicationType] = None
+    summary: Optional[str] = Field(default=None, max_length=1200)
+    authors: Optional[List[str]] = None
+    published_at: Optional[date] = None
+    url: Optional[str] = Field(default=None, max_length=500)
+    practice: Optional[str] = Field(default=None, max_length=80)
 
-    model_config = ConfigDict(from_attributes=True)
-
-
-class ExpertApplicationCreate(BaseModel):
-    full_name: str
-    email: EmailStr
-    highest_degree: Optional[str] = None
-    institution: Optional[str] = None
-    expertise_areas: List[str] = []
-    orcid_or_link: Optional[str] = None
-    statement: Optional[str] = None
-
-
-class ExpertApplicationOut(BaseModel):
-    id: str
-    full_name: str
-    email: EmailStr
-    status: str
-    created_at: datetime
-
-    model_config = ConfigDict(from_attributes=True)
+    _check_url = field_validator("url")(_https_only)
